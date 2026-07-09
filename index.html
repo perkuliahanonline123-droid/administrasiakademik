@@ -3,29 +3,288 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Sistem Kampus</title>
+    <title>Sistem Kampus | Layanan Administrasi</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600;700&family=Outfit:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: { sans: ['Outfit', 'sans-serif'], serif: ['Playfair Display', 'serif'] },
+                    colors: { 
+                        brand: { 950: '#022c22', 900: '#064e3b', 800: '#065f46', 700: '#047857', 600: '#059669', 500: '#10b981', 100: '#d1fae5', 50: '#f0fdf4' } 
+                    },
+                    boxShadow: {
+                        'timbul': '0 20px 40px -15px rgba(2, 44, 34, 0.12), 0 15px 30px -20px rgba(5, 150, 105, 0.15), inset 0 1px 0 rgba(255,255,255,0.6)',
+                        'timbul-lg': '0 30px 60px -15px rgba(2, 44, 34, 0.2), 0 25px 45px -20px rgba(5, 150, 105, 0.25)',
+                    }
+                }
+            }
+        }
+    </script>
     <style>
-        /* Menghilangkan margin dan padding bawaan browser agar iframe bisa memenuhi layar */
-        html, body {
-            margin: 0;
-            padding: 0;
-            width: 100%;
-            height: 100%;
-            overflow: hidden; /* Mencegah scroll ganda dari body */
-            background-color: #ffffff;
-        }
-
-        /* Mengatur iframe agar berukuran penuh tanpa batas (border) */
-        iframe {
-            border: none;
-            width: 100%;
-            height: 100%;
-            display: block;
-        }
+        body { background-color: #F8FAFC; }
+        .bg-mesh { background-color: #064e3b; background-image: radial-gradient(at 0% 0%, #065f46 0px, transparent 50%), radial-gradient(at 100% 100%, #047857 0px, transparent 50%); }
+        .animate-slide-up { animation: slideUp 0.6s cubic-bezier(0.16, 1, 0.3, 1) forwards; }
+        @keyframes slideUp { from { opacity: 0; transform: translateY(24px); } to { opacity: 1; transform: translateY(0); } }
+        @keyframes shimmer { 100% { transform: translateX(100%); } }
+        html { scroll-behavior: smooth; }
+        a { -webkit-tap-highlight-color: transparent; }
     </style>
 </head>
-<body>
-    <!-- Memuat link Google Apps Script -->
-    <iframe src="https://script.google.com/macros/s/AKfycbyxHkTkVUmc0abF2SllCisDkSuTNDj691YTxi2E7427ooASQd8IESztTwspR_VuH9_blg/exec" allowfullscreen></iframe>
+<body class="flex flex-col min-h-screen text-slate-800 font-sans antialiased">
+
+    <main class="flex-1 w-full max-w-5xl mx-auto px-4 md:px-6 py-8 md:pb-12">
+        <div class="space-y-8">
+            
+            <div class="bg-mesh rounded-[2.5rem] p-8 md:p-14 text-white shadow-timbul-lg text-center relative overflow-hidden border border-white/10 animate-slide-up">
+                <div class="absolute top-0 right-0 w-64 h-64 bg-white/5 rounded-full blur-3xl -mr-20 -mt-20"></div>
+                <span class="text-xs font-bold tracking-widest text-brand-100 uppercase mb-4 inline-block px-4 py-1.5 bg-white/10 backdrop-blur-md rounded-full border border-white/10">Portal Terpadu</span>
+                <h1 class="font-serif text-4xl md:text-5xl leading-tight mb-5 font-bold tracking-tight">Layanan Administrasi</h1>
+                <p class="text-brand-100/90 text-sm md:text-base max-w-xl mx-auto leading-relaxed font-normal">Akses cepat formulir permohonan layanan akademik Anda secara online.</p>
+            </div>
+
+            <div class="bg-white rounded-[2.5rem] shadow-timbul border border-slate-200/60 p-6 md:p-10 animate-slide-up" style="animation-delay: 0.1s;">
+                <div class="flex items-center gap-4 mb-6 pb-4 border-b border-slate-100">
+                    <div class="w-12 h-12 bg-brand-50 text-brand-600 rounded-2xl flex items-center justify-center shadow-inner">
+                        <i class="fas fa-concierge-bell text-xl"></i>
+                    </div>
+                    <div>
+                        <h2 class="font-extrabold text-2xl text-slate-800 tracking-tight">Daftar Layanan</h2>
+                        <p class="text-sm font-medium text-slate-500">Pilih layanan di bawah ini untuk mengisi form permohonan</p>
+                    </div>
+                </div>
+
+                <div id="loadingLayanan" class="text-center py-8">
+                    <div class="inline-block relative w-8 h-8 mb-3">
+                        <div class="absolute inset-0 border-4 border-brand-100 rounded-full"></div>
+                        <div class="absolute inset-0 border-4 border-brand-600 rounded-full border-t-transparent animate-spin"></div>
+                    </div>
+                    <p class="text-slate-500 text-sm font-semibold">Memuat daftar layanan...</p>
+                </div>
+
+                <div id="gridLayanan" class="hidden grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4"></div>
+
+                <div class="mt-10 pt-8 border-t border-slate-100 flex justify-center hidden" id="wadahTombolStatus">
+                    <button onclick="bukaAreaPencarian()" class="group relative inline-flex items-center gap-5 px-8 py-4 bg-gradient-to-b from-brand-600 to-brand-800 text-white rounded-[1.25rem] shadow-[0_12px_30px_-10px_rgba(4,120,87,0.7),inset_0_1px_0_rgba(255,255,255,0.3)] hover:shadow-[0_20px_40px_-10px_rgba(4,120,87,0.9),inset_0_1px_0_rgba(255,255,255,0.5)] hover:-translate-y-1.5 active:translate-y-0 active:shadow-[0_5px_15px_-5px_rgba(4,120,87,0.7)] transition-all duration-300 border border-brand-900/50 overflow-hidden cursor-pointer">
+                        <div class="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent -translate-x-full group-hover:animate-[shimmer_1.5s_infinite]"></div>
+                        <div class="relative w-12 h-12 bg-white/10 rounded-xl flex items-center justify-center backdrop-blur-sm border border-white/20 group-hover:scale-110 group-hover:-rotate-3 transition-transform duration-300 z-10 shadow-inner">
+                            <i class="fas fa-clipboard-check text-xl"></i>
+                        </div>
+                        <div class="relative flex flex-col text-left z-10">
+                            <span class="text-[10px] uppercase tracking-widest text-brand-100/80 font-bold mb-0.5">Sudah Mengajukan?</span>
+                            <span class="font-extrabold text-lg leading-none tracking-wide">Cek Status Pengajuan</span>
+                        </div>
+                    </button>
+                </div>
+
+                <div id="areaPencarian" class="hidden mt-8 p-6 md:p-8 bg-slate-50 border border-slate-200 rounded-[2rem] shadow-inner transition-all duration-500">
+                    <h3 class="font-bold text-xl text-slate-800 mb-5 flex items-center"><i class="fas fa-search mr-3 text-brand-600"></i>Cari Berkas Layanan Anda</h3>
+                    
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-5 mb-6">
+                        <div class="flex flex-col">
+                            <label class="text-[11px] font-black text-slate-400 uppercase tracking-wider mb-2 pl-1">Pilih Jenis Layanan</label>
+                            <div class="relative">
+                                <select id="inputJenisLayanan" class="w-full appearance-none bg-white border-2 border-slate-200 text-slate-700 py-3.5 px-4 pr-10 rounded-xl focus:outline-none focus:border-brand-500 focus:ring-4 focus:ring-brand-500/10 font-bold cursor-pointer transition-all shadow-sm" onchange="prosesPencarian()">
+                                    <option value="">-- Pilih Layanan --</option>
+                                    <option value="Keterangan Aktif">Keterangan Aktif</option>
+                                    <option value="KHS">Kartu Hasil Studi (KHS)</option>
+                                    <option value="SKL">Surat Keterangan Lulus (SKL)</option>
+                                    <option value="Bebas Tanggungan">Surat Bebas Tanggungan</option>
+                                    <option value="Mutasi">Mutasi (Pindah Kampus)</option>
+                                </select>
+                                <div class="pointer-events-none absolute inset-y-0 right-0 flex items-center px-4 text-slate-400"><i class="fas fa-chevron-down"></i></div>
+                            </div>
+                        </div>
+
+                        <div class="flex flex-col">
+                            <label class="text-[11px] font-black text-slate-400 uppercase tracking-wider mb-2 pl-1">Nama Mahasiswa</label>
+                            <div class="relative">
+                                <input type="text" id="inputNamaMahasiswa" placeholder="Ketik minimal 3 huruf..." class="w-full bg-white border-2 border-slate-200 text-slate-700 py-3.5 px-4 pl-11 rounded-xl focus:outline-none focus:border-brand-500 focus:ring-4 focus:ring-brand-500/10 font-bold transition-all shadow-sm" oninput="prosesPencarian()">
+                                <div class="absolute inset-y-0 left-0 flex items-center pl-4 text-slate-400"><i class="fas fa-user"></i></div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div id="loadingPencarian" class="hidden text-center py-8">
+                        <i class="fas fa-circle-notch fa-spin text-3xl text-brand-500 mb-3"></i>
+                        <p class="text-slate-500 text-sm font-semibold">Mencari data...</p>
+                    </div>
+
+                    <div id="wadahHasil" class="hidden bg-white border border-slate-200 rounded-xl overflow-hidden shadow-sm mt-4">
+                        <div id="isiHasil" class="divide-y divide-slate-100"></div>
+                        <div id="pesanKosong" class="hidden p-8 text-center text-slate-400 font-medium">
+                            <i class="fas fa-search-minus text-3xl mb-3 block text-slate-300"></i>
+                            Tidak ditemukan data yang cocok.
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </main>
+
+    <script>
+        // Link Google Apps Script Anda (Menggunakan Fetch API)
+        const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbyxHkTkVUmc0abF2SllCisDkSuTNDj691YTxi2E7427ooASQd8IESztTwspR_VuH9_blg/exec';
+
+        window.onload = async function() {
+            try {
+                const response = await fetch(`${SCRIPT_URL}?action=getLayanan`);
+                const data = await response.json();
+                tampilkanDaftarLayanan(data);
+            } catch (error) {
+                console.error("Gagal memuat layanan:", error);
+                document.getElementById("gridLayanan").innerHTML = `<div class="col-span-full p-8 text-center text-rose-500 bg-rose-50 rounded-3xl border border-rose-200 text-sm shadow-sm">Koneksi ke server gagal. Muat ulang halaman.</div>`;
+                document.getElementById("loadingLayanan").classList.add("hidden");
+                document.getElementById("gridLayanan").classList.remove("hidden");
+            }
+        };
+
+        function tampilkanDaftarLayanan(data) {
+            document.getElementById("loadingLayanan").classList.add("hidden");
+            document.getElementById("gridLayanan").classList.remove("hidden");
+            document.getElementById("wadahTombolStatus").classList.remove("hidden");
+
+            if (!data || data.length === 0 || data.error) {
+                document.getElementById("gridLayanan").innerHTML = `<div class="col-span-full p-8 text-center text-slate-500 bg-slate-50 rounded-3xl border border-slate-200 text-sm shadow-sm">Belum ada layanan yang tersedia.</div>`;
+                return;
+            }
+
+            data.forEach(function(item) {
+                const a = document.createElement("a");
+                a.href = item.link;
+                a.target = "_blank";
+                a.className = "group relative flex items-center gap-5 p-5 bg-white border border-slate-200/50 rounded-[1.25rem] shadow-sm hover:shadow-[0_8px_30px_rgb(0,0,0,0.06)] hover:border-brand-200/80 hover:-translate-y-1 transition-all duration-500 no-underline overflow-hidden";
+                
+                a.innerHTML = `
+                    <div class="absolute inset-0 bg-gradient-to-br from-brand-50/50 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
+                    <div class="absolute left-0 top-0 bottom-0 w-1 bg-brand-500 transform scale-y-0 group-hover:scale-y-100 transition-transform duration-500 ease-in-out origin-center"></div>
+                    <div class="relative w-14 h-14 bg-slate-50 text-slate-400 group-hover:bg-brand-600 group-hover:text-white rounded-[1rem] flex items-center justify-center transition-all duration-500 flex-shrink-0 border border-slate-100 group-hover:border-transparent group-hover:shadow-lg group-hover:shadow-brand-600/30 z-10">
+                        <i class="fas fa-arrow-right -rotate-45 group-hover:rotate-0 transition-all duration-500 text-lg"></i>
+                    </div>
+                    <div class="flex flex-col justify-center z-10 pr-2">
+                        <span class="font-bold text-[15px] text-slate-700 group-hover:text-brand-900 transition-colors leading-tight">${item.nama}</span>
+                        <span class="text-[11px] text-brand-600/80 font-bold mt-1 absolute opacity-0 group-hover:opacity-100 group-hover:relative transform translate-y-2 group-hover:translate-y-0 transition-all duration-500">Buka Formulir &rarr;</span>
+                    </div>
+                `;
+                document.getElementById("gridLayanan").appendChild(a);
+            });
+        }
+
+        function bukaAreaPencarian() {
+            const area = document.getElementById("areaPencarian");
+            area.classList.remove("hidden");
+            area.classList.add("animate-slide-up");
+            
+            setTimeout(() => {
+                area.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                document.getElementById("inputJenisLayanan").focus();
+            }, 100);
+        }
+
+        let timerKetik;
+        function prosesPencarian() {
+            clearTimeout(timerKetik);
+            
+            let jenis = document.getElementById("inputJenisLayanan").value;
+            let nama = document.getElementById("inputNamaMahasiswa").value.trim();
+            
+            if (jenis !== "" && nama.length >= 3) {
+                document.getElementById("loadingPencarian").classList.remove("hidden");
+                document.getElementById("wadahHasil").classList.add("hidden");
+                
+                timerKetik = setTimeout(async () => {
+                    try {
+                        const response = await fetch(`${SCRIPT_URL}?action=cariStatus&jenis=${encodeURIComponent(jenis)}&nama=${encodeURIComponent(nama)}`);
+                        const data = await response.json();
+                        tampilkanHasilPencarian(data);
+                    } catch (error) {
+                        console.error("Gagal mencari data:", error);
+                        document.getElementById("loadingPencarian").classList.add("hidden");
+                    }
+                }, 600);
+            } else {
+                document.getElementById("loadingPencarian").classList.add("hidden");
+                document.getElementById("wadahHasil").classList.add("hidden");
+            }
+        }
+
+        function tampilkanHasilPencarian(data) {
+            document.getElementById("loadingPencarian").classList.add("hidden");
+            let wadahHasil = document.getElementById("wadahHasil");
+            let isiHasil = document.getElementById("isiHasil");
+            let pesanKosong = document.getElementById("pesanKosong");
+            
+            wadahHasil.classList.remove("hidden");
+            isiHasil.innerHTML = "";
+
+            if (data && !data.error && data.length > 0) {
+                pesanKosong.classList.add("hidden");
+                
+                data.forEach(item => {
+                    let div = document.createElement("div");
+                    div.className = "p-5 flex flex-col md:flex-row md:items-center justify-between gap-4 hover:bg-slate-50 transition-colors";
+                    
+                    let r1 = item.rincian1 || "";
+                    let r2 = item.rincian2 || "";
+                    let r3 = item.rincian3 || "";
+                    let cekWarna = (r1 + " " + r2 + " " + r3).toLowerCase();
+                    
+                    let warnaBadge = '';
+                    let iconBadge = '';
+                    let teksBadge = '';
+                    
+                    if (cekWarna.includes('ditolak')) {
+                        warnaBadge = 'bg-rose-100 text-rose-700 border-rose-200';
+                        iconBadge = 'fas fa-times-circle';
+                        teksBadge = 'Ditolak';
+                    } else if (cekWarna.includes('proses') || cekWarna.includes('belum')) {
+                        warnaBadge = 'bg-amber-100 text-amber-700 border-amber-200';
+                        iconBadge = 'fas fa-spinner fa-spin';
+                        teksBadge = 'Diproses';
+                    } else {
+                        warnaBadge = 'bg-emerald-100 text-emerald-700 border-emerald-200';
+                        iconBadge = 'fas fa-check-circle';
+                        teksBadge = 'Selesai';
+                    }
+
+                    let badgeUsiaHtml = "";
+                    if (item.usia && item.usia !== "-") {
+                        badgeUsiaHtml = `<span class="bg-indigo-50 text-indigo-600 text-[10px] font-bold px-2 py-0.5 rounded uppercase tracking-wider border border-indigo-100"><i class="fas fa-clock mr-1"></i>Usia: ${item.usia}</span>`;
+                    }
+
+                    let rincianHtml = "";
+                    if (item.rincian1) rincianHtml += `<div><i class="fas fa-caret-right text-slate-400 mr-2"></i>${item.rincian1}</div>`;
+                    if (item.rincian2) rincianHtml += `<div><i class="fas fa-caret-right text-slate-400 mr-2"></i>${item.rincian2}</div>`;
+                    if (item.rincian3) rincianHtml += `<div><i class="fas fa-caret-right text-slate-400 mr-2"></i>${item.rincian3}</div>`;
+
+                    div.innerHTML = `
+                        <div class="flex-1">
+                            <div class="flex flex-wrap items-center gap-2 mb-1">
+                                <span class="bg-slate-100 text-slate-500 text-[10px] font-bold px-2 py-0.5 rounded uppercase tracking-wider">${item.tgl}</span>
+                                <span class="bg-slate-100 text-slate-500 text-[10px] font-bold px-2 py-0.5 rounded uppercase tracking-wider">NIM: ${item.nim}</span>
+                                ${badgeUsiaHtml}
+                            </div>
+                            <h4 class="font-extrabold text-slate-800 text-lg mt-1">${item.nama}</h4>
+                            <div class="mt-2 text-sm text-slate-600 font-medium flex flex-col gap-1">
+                                ${rincianHtml}
+                            </div>
+                        </div>
+                        <div class="md:w-1/4 flex justify-start md:justify-end mt-3 md:mt-0">
+                            <span class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-bold border shadow-sm ${warnaBadge}">
+                                <i class="${iconBadge}"></i> ${teksBadge}
+                            </span>
+                        </div>
+                    `;
+                    isiHasil.appendChild(div);
+                });
+            } else {
+                pesanKosong.classList.remove("hidden");
+            }
+        }
+    </script>
 </body>
 </html>
