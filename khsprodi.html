@@ -12,14 +12,14 @@
         select { padding: 10px; border: 1px solid #ccc; border-radius: 4px; font-size: 16px; background-color: white; cursor: pointer; }
         button { padding: 10px 20px; background: #2980b9; color: white; border: none; border-radius: 4px; cursor: pointer; font-size: 16px; font-weight: bold;}
         button:hover { background: #3498db; }
-        #status-msg { text-align: center; margin-bottom: 20px; font-weight: bold; color: #e67e22; padding: 15px; border-radius: 5px; line-height: 1.5; }
+        #status-msg { text-align: center; margin-bottom: 20px; font-weight: bold; color: #e67e22; padding: 15px; border-radius: 5px; line-height: 1.5; display: none; }
         
         /* DESAIN CETAKAN KHS & TRANSKRIP */
         #cetakArea { display: none; margin-top: 30px; }
         .judul-dokumen { text-align: center; font-size: 18px; font-weight: bold; margin-bottom: 20px; color: #000; }
         
-        /* Tabel Informasi Mahasiswa (Tanpa Garis Atas) */
-        .info-table-container { border-bottom: 3px solid #000; padding-bottom: 10px; margin-bottom: 20px; }
+        /* Tabel Informasi Mahasiswa (Garis bawah dihilangkan) */
+        .info-table-container { padding-bottom: 10px; margin-bottom: 15px; }
         .info-table { width: 100%; border-collapse: collapse; font-size: 14px; font-weight: bold; }
         .info-table td { padding: 4px 8px; vertical-align: top; border: none; }
         .info-table td:nth-child(2), .info-table td:nth-child(5) { width: 10px; }
@@ -49,7 +49,10 @@
     <h1 style="text-align: center; color: #2c3e50; margin-bottom: 20px;">Sistem Cetak KHS & Transkrip Prodi</h1>
     
     <div class="search-box">
-        <input type="text" id="searchInput" placeholder="Ketik Nama Mahasiswa (contoh: Moh Asror)" onkeypress="handleEnter(event)">
+        <!-- Input dengan fitur auto-suggest dari datalist -->
+        <input type="text" id="searchInput" list="namaMahasiswaList" placeholder="Ketik Nama Mahasiswa (contoh: Moh Asror)" autocomplete="off" onkeypress="handleEnter(event)">
+        <datalist id="namaMahasiswaList"></datalist>
+
         <select id="jenisCetak">
             <option value="all">Transkrip Nilai (Semua Semester)</option>
             <option value="1">KHS Semester 1</option>
@@ -64,7 +67,7 @@
         <button onclick="cariKHS()">Cari Data</button>
     </div>
     
-    <div id="status-msg">Memeriksa koneksi database...</div>
+    <div id="status-msg"></div>
 
     <!-- AREA YANG AKAN DICETAK -->
     <div id="cetakArea">
@@ -153,7 +156,7 @@
         return excludeList.includes(norm);
     }
 
-    // UPDATE: Skala Penilaian Baru
+    // UPDATE: Skala Penilaian Sesuai Permintaan
     function konversiNilai(nilai) {
         let huruf = 'E', bobot = 0.00;
         
@@ -192,13 +195,39 @@
 
     function setStatus(msg, type = 'normal') {
         const statusEl = document.getElementById('status-msg');
-        statusEl.innerText = msg;
-        statusEl.className = type;
         if(msg === "") {
             statusEl.style.display = "none";
+            statusEl.innerText = "";
         } else {
+            statusEl.innerText = msg;
+            statusEl.className = type;
             statusEl.style.display = "block";
         }
+    }
+
+    // Fungsi untuk memunculkan nama otomatis di dropdown input
+    function populateDatalist() {
+        if (!globalData) return;
+        const datalist = document.getElementById('namaMahasiswaList');
+        datalist.innerHTML = '';
+        const names = new Set();
+        
+        for (const sheetName in globalData) {
+            const nameUpper = sheetName.toUpperCase();
+            if (nameUpper.includes('ASH') || nameUpper.includes('PBA') || nameUpper.includes('NIM') || nameUpper.includes('MAHASISWA')) {
+                globalData[sheetName].forEach(row => {
+                    if (row['Nama Mahasiswa'] && row['Nama Mahasiswa'].toString().trim() !== '') {
+                        names.add(row['Nama Mahasiswa'].toString().trim());
+                    }
+                });
+            }
+        }
+        
+        names.forEach(name => {
+            const option = document.createElement('option');
+            option.value = name;
+            datalist.appendChild(option);
+        });
     }
 
     async function initData() {
@@ -209,13 +238,13 @@
             const parsedCache = JSON.parse(cachedItem);
             if (Date.now() - parsedCache.timestamp < CACHE_EXPIRY) {
                 globalData = parsedCache.data;
-                setStatus("✅ Data siap (Menggunakan Cache Lokal)", "success");
-                setTimeout(() => setStatus(""), 3000);
+                populateDatalist();
+                setStatus(""); // Langsung hilangkan, tidak perlu tampil Data Siap
                 return true;
             }
         }
 
-        setStatus("⏳ Sedang mengunduh database dari Spreadsheet... Mohon tunggu.");
+        setStatus("Mohon tunggu sebentar...");
         
         try {
             const response = await fetch(SCRIPT_URL);
@@ -227,8 +256,8 @@
             globalData = json.data;
             localStorage.setItem(CACHE_KEY, JSON.stringify({ timestamp: Date.now(), data: globalData }));
             
-            setStatus("✅ Database berhasil dimuat!", "success");
-            setTimeout(() => setStatus(""), 3000);
+            populateDatalist();
+            setStatus(""); // Langsung hilangkan setelah selesai memuat
             return true;
         } catch (error) {
             setStatus("❌ Error: " + error.message, "error");
@@ -260,7 +289,7 @@
 
         const mhsGagal = dataGagal.find(row => 
             row['Mahasiswa yang GAGAL'] && 
-            row['Mahasiswa yang GAGAL'].toString().toLowerCase().includes(namaInput)
+            row['Mahasiswa yang GAGAL'].toString().toLowerCase() === namaInput
         );
 
         if (mhsGagal) {
@@ -299,19 +328,17 @@
             }
         });
 
+        // PEMBARUAN PENCARIAN NIM: Langsung cek ke kolom NIM
         let nimMhs = "-";
         if (dataNIM.length > 0) {
-            for (let i = 0; i < dataNIM.length; i++) {
-                let row = dataNIM[i];
-                let rowStr = JSON.stringify(row).toLowerCase(); 
+            const matchedRow = dataNIM.find(row => 
+                row['Nama Mahasiswa'] && row['Nama Mahasiswa'].toString().toLowerCase() === namaInput
+            ) || dataNIM.find(row => 
+                row['Nama Mahasiswa'] && row['Nama Mahasiswa'].toString().toLowerCase().includes(namaInput)
+            );
 
-                if (rowStr.includes(namaInput)) {
-                    let match = rowStr.match(/\b\d{8}\b/);
-                    if (match) {
-                        nimMhs = match[0];
-                        break;
-                    }
-                }
+            if (matchedRow && matchedRow['NIM']) {
+                nimMhs = matchedRow['NIM'].toString();
             }
         }
 
