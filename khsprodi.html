@@ -39,7 +39,7 @@
     <h1>Sistem Cetak KHS & Transkrip Prodi</h1>
     
     <div class="search-box">
-        <input type="text" id="searchInput" placeholder="Ketik Nama Mahasiswa (contoh: Mustafa Arbash)" onkeypress="handleEnter(event)">
+        <input type="text" id="searchInput" placeholder="Ketik Nama Mahasiswa (contoh: Moh Asror)" onkeypress="handleEnter(event)">
         
         <select id="jenisCetak">
             <option value="all">Transkrip Nilai (Semua Semester)</option>
@@ -113,26 +113,20 @@
 </div>
 
 <script>
-    // --- PASTIKAN URL GOOGLE APPS SCRIPT ANDA BENAR ---
     const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbxlS2O6Z0hEzUCYVnIyuZHg-v_bV12pRKF2mG-ujQE1TDEJeSmph5mnCqIX6bAS7rls0Q/exec'; 
-    // -----------------------------------------------------------------------
 
     const CACHE_KEY = 'KHS_PRODI_CACHE';
-    const CACHE_EXPIRY = 60 * 60 * 1000; // 1 Jam cache
+    const CACHE_EXPIRY = 60 * 60 * 1000; 
     let globalData = null;
 
-    // FUNGSI BARU: Membersihkan spasi, simbol, dan case untuk pencocokan Mata Kuliah yang sangat akurat
     function normalizeMK(text) {
         if (!text) return "";
         return text.toString().toLowerCase().replace(/[^a-z0-9]/g, '');
     }
 
-    // FUNGSI BARU: Mendeteksi apakah kolom bukan merupakan Mata Kuliah
     function isColumnExcluded(colName) {
         const norm = colName.toString().toLowerCase().replace(/\s+/g, '');
-        // Abaikan kolom yang namanya mengandung kata 'semester' (ini kolom pembatas, bukan nilai)
         if (norm.includes('semester')) return true; 
-        
         const excludeList = ['ta', 'namamahasiswa', 'ppl', 'kkn', 'skripsi'];
         return excludeList.includes(norm);
     }
@@ -239,17 +233,29 @@
         }
 
         const semuaNilai = [...dataASH, ...dataPBA];
-        const mhsData = semuaNilai.find(row => 
+        
+        // PERBAIKAN UTAMA: Filter semua baris (row) milik mahasiswa ini, bukan cuma baris pertama
+        const mhsRows = semuaNilai.filter(row => 
             row['Nama Mahasiswa'] && row['Nama Mahasiswa'].toString().toLowerCase().includes(namaInput)
         );
 
-        if (!mhsData) {
+        if (mhsRows.length === 0) {
             setStatus(`❌ Mahasiswa bernama '${document.getElementById('searchInput').value}' tidak ditemukan.`, "error");
             document.getElementById('khsHeader').style.display = 'none';
             document.getElementById('khsTable').style.display = 'none';
             document.getElementById('printBtn').style.display = 'none';
             return;
         }
+
+        // GABUNGKAN SEMUA BARIS: Satukan nilai dari Semester 1, 2, 3, dst ke dalam satu data utuh
+        let mhsData = {};
+        mhsRows.forEach(row => {
+            for (const [key, value] of Object.entries(row)) {
+                if (value !== null && value !== undefined && value !== '') {
+                    mhsData[key] = value;
+                }
+            }
+        });
 
         setStatus(""); 
 
@@ -268,7 +274,8 @@
         document.getElementById('lblNama').innerText = mhsData['Nama Mahasiswa'];
         document.getElementById('lblTA').innerText = mhsData['TA'] || '2023/2024';
         
-        const isASH = dataASH.find(r => r['Nama Mahasiswa'] === mhsData['Nama Mahasiswa']);
+        // Penentuan Prodi berdasarkan dari mana data tersebut berasal
+        const isASH = dataASH.find(r => r['Nama Mahasiswa'] && r['Nama Mahasiswa'].toString().toLowerCase().includes(namaInput));
         document.getElementById('lblProdi').innerText = isASH ? 'Ahwal Al-Syakhshiyyah (ASH)' : 'Pendidikan Bahasa Arab (PBA)';
 
         const tbody = document.getElementById('khsBody');
@@ -281,17 +288,15 @@
         let totalMutu = 0;
 
         for (const [mkName, mkValue] of Object.entries(mhsData)) {
-            // Lakukan pengecekan ketat menggunakan filter isColumnExcluded yang baru
             if (!isColumnExcluded(mkName) && mkValue !== null && mkValue !== '' && !isNaN(parseFloat(mkValue))) {
                 
                 const nilaiValid = parseFloat(mkValue);
-                const normKey = normalizeMK(mkName); // Bersihkan nama MK (contoh: "ulumulhaditsi")
+                const normKey = normalizeMK(mkName); 
                 
                 let sks = 2; 
-                let semesterMK = "0"; // Default semester
+                let semesterMK = "0"; 
                 
                 if (dataKurikulum.length > 0) {
-                    // Cari di Kurikulum dengan pencocokan string yang sudah dibersihkan
                     const matchMK = dataKurikulum.find(k => k['Mata Kuliah'] && normalizeMK(k['Mata Kuliah']) === normKey);
                     
                     if (matchMK) {
