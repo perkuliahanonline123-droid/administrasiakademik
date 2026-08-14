@@ -16,7 +16,7 @@
         #cetakArea { display: none; margin-top: 30px; }
         .judul-dokumen { text-align: center; font-size: 18px; font-weight: bold; margin-bottom: 20px; color: #000; }
         
-        /* Tabel Informasi Mahasiswa (Tanpa Garis Atas) */
+        /* Tabel Informasi Mahasiswa */
         .info-table-container { border-bottom: 3px solid #000; padding-bottom: 10px; margin-bottom: 20px; }
         .info-table { width: 100%; border-collapse: collapse; font-size: 14px; font-weight: bold; }
         .info-table td { padding: 4px 8px; vertical-align: top; border: none; }
@@ -32,7 +32,6 @@
         .print-btn { display: none; margin-top: 30px; width: 100%; background-color: #27ae60; color: white; padding: 10px 20px; border: none; border-radius: 4px; cursor: pointer; font-size: 16px; font-weight: bold; }
         .print-btn:hover { background-color: #2ecc71; }
         .error { background-color: #fdeaea; color: #e74c3c !important; border: 1px solid #e74c3c; text-align: justify; }
-        .success { color: #27ae60 !important; }
         
         @media print {
             body { background: #fff; padding: 0; margin: 0; }
@@ -47,7 +46,6 @@
     <h1 style="text-align: center; color: #2c3e50; margin-bottom: 20px;">Sistem Cetak KHS & Transkrip Prodi</h1>
     
     <div class="search-box">
-        <!-- Input dengan event oninput untuk mengatur 3 huruf dan auto-fetch -->
         <input type="text" id="searchInput" placeholder="Ketik Nama Mahasiswa (contoh: Moh Asror)" autocomplete="off" oninput="handleInput(event)" onkeypress="handleEnter(event)">
         <datalist id="namaMahasiswaList"></datalist>
 
@@ -66,10 +64,7 @@
     
     <div id="status-msg"></div>
 
-    <!-- AREA YANG AKAN DICETAK -->
     <div id="cetakArea">
-        
-        <!-- KOP SURAT -->
         <div id="kopSurat">
             <div style="text-align: center; line-height: 1.15;">
                 <div style="font-size: 14px; font-weight: bold; letter-spacing: 1px;">PUSAT ILMU KEISLAMAN INTERNASIONAL</div>
@@ -78,8 +73,6 @@
                 <div style="font-size: 12px; margin-top: 4px;">Jl. Sarongge No. 16, RT 01/RW 04, Desa Ciputri, Kec. Pacet, Cianjur, Jawa Barat</div>
                 <div style="font-size: 12px;">Telp.: +62 851-1145-0055 | Email: staiis_cianjur@yahoo.com</div>
             </div>
-
-            <!-- GARIS PEMBATAS KOP -->
             <div style="margin-top: 10px; margin-bottom: 2px; border-bottom: 3px solid black;"></div>
             <div style="margin-bottom: 15px; border-bottom: 1px solid black;"></div>
         </div>
@@ -125,7 +118,6 @@
                     <th style="width: 8%;">Indeks</th>
                 </tr>
             </thead>
-            
             <tbody id="khsBody"></tbody>
         </table>
     </div>
@@ -134,13 +126,14 @@
 </div>
 
 <script>
-    // --- PASTIKAN URL GOOGLE APPS SCRIPT ANDA BENAR ---
+    // --- PASTIKAN URL GOOGLE APPS SCRIPT ANDA BENAR (GANTI JIKA PERLU) ---
     const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbxlS2O6Z0hEzUCYVnIyuZHg-v_bV12pRKF2mG-ujQE1TDEJeSmph5mnCqIX6bAS7rls0Q/exec'; 
 
-    const CACHE_KEY = 'KHS_PRODI_CACHE';
+    // MENGGANTI KUNCI CACHE AGAR BROWSER MENGAMBIL DATA BARU
+    const CACHE_KEY = 'KHS_PRODI_CACHE_V2';
     const CACHE_EXPIRY = 60 * 60 * 1000; 
     let globalData = null;
-    let allNames = []; // Menyimpan semua daftar nama untuk auto-fetch
+    let allNames = []; 
 
     function normalizeMK(text) {
         if (!text) return "";
@@ -156,29 +149,16 @@
 
     function konversiNilai(nilai) {
         let huruf = 'E', bobot = 0.00;
-        
-        if (nilai >= 85.00) {
-            huruf = 'A'; bobot = 4.00;
-        } else if (nilai >= 80.00) {
-            huruf = 'A-'; bobot = 3.75;
-        } else if (nilai >= 70.00) {
-            huruf = 'B+'; bobot = 3.50;
-        } else if (nilai >= 65.00) {
-            huruf = 'B'; bobot = 3.25;
-        } else if (nilai >= 60.00) {
-            huruf = 'B-'; bobot = 3.00;
-        } else if (nilai >= 55.00) {
-            huruf = 'C+'; bobot = 2.75;
-        } else if (nilai >= 50.00) {
-            huruf = 'C'; bobot = 2.50;
-        } else if (nilai >= 45.00) {
-            huruf = 'C-'; bobot = 2.25;
-        } else if (nilai >= 40.00) {
-            huruf = 'D'; bobot = 2.00;
-        } else {
-            huruf = 'E'; bobot = 0.00;
-        }
-        
+        if (nilai >= 85.00) { huruf = 'A'; bobot = 4.00; } 
+        else if (nilai >= 80.00) { huruf = 'A-'; bobot = 3.75; } 
+        else if (nilai >= 70.00) { huruf = 'B+'; bobot = 3.50; } 
+        else if (nilai >= 65.00) { huruf = 'B'; bobot = 3.25; } 
+        else if (nilai >= 60.00) { huruf = 'B-'; bobot = 3.00; } 
+        else if (nilai >= 55.00) { huruf = 'C+'; bobot = 2.75; } 
+        else if (nilai >= 50.00) { huruf = 'C'; bobot = 2.50; } 
+        else if (nilai >= 45.00) { huruf = 'C-'; bobot = 2.25; } 
+        else if (nilai >= 40.00) { huruf = 'D'; bobot = 2.00; } 
+        else { huruf = 'E'; bobot = 0.00; }
         return { huruf, bobot };
     }
 
@@ -190,23 +170,17 @@
         if (e.key === 'Enter') cariKHS();
     }
 
-    // Fungsi membaca ketikan di form
     function handleInput(e) {
         const val = e.target.value.trim();
-        
-        // Aturan 3 Huruf: Hanya munculkan rekomendasi datalist bila karakter >= 3
         if (val.length >= 3) {
             e.target.setAttribute('list', 'namaMahasiswaList');
         } else {
             e.target.removeAttribute('list');
         }
 
-        // Auto-fetch: Jika nama persis sama dengan yang ada di database, langsung cetak
         if (val.length > 0) {
             const exactMatch = allNames.find(n => n.toLowerCase() === val.toLowerCase());
-            if (exactMatch) {
-                cariKHS();
-            }
+            if (exactMatch) cariKHS();
         }
     }
 
@@ -232,8 +206,10 @@
             const nameUpper = sheetName.toUpperCase();
             if (nameUpper.includes('ASH') || nameUpper.includes('PBA') || nameUpper.includes('NIM') || nameUpper.includes('MAHASISWA')) {
                 globalData[sheetName].forEach(row => {
-                    if (row['Nama Mahasiswa'] && row['Nama Mahasiswa'].toString().trim() !== '') {
-                        names.add(row['Nama Mahasiswa'].toString().trim());
+                    // Cari semua keys yang mengandung unsur kata 'nama'
+                    const namaKey = Object.keys(row).find(k => k.toLowerCase().includes('nama mahasiswa'));
+                    if (namaKey && row[namaKey] && row[namaKey].toString().trim() !== '') {
+                        names.add(row[namaKey].toString().trim());
                     }
                 });
             }
@@ -306,7 +282,7 @@
 
         const mhsGagal = dataGagal.find(row => 
             row['Mahasiswa yang GAGAL'] && 
-            row['Mahasiswa yang GAGAL'].toString().toLowerCase() === namaInput
+            row['Mahasiswa yang GAGAL'].toString().trim().toLowerCase() === namaInput
         );
 
         if (mhsGagal) {
@@ -325,9 +301,10 @@
 
         const semuaNilai = [...dataASH, ...dataPBA];
         
-        const mhsRows = semuaNilai.filter(row => 
-            row['Nama Mahasiswa'] && row['Nama Mahasiswa'].toString().toLowerCase().includes(namaInput)
-        );
+        const mhsRows = semuaNilai.filter(row => {
+            const nmKey = Object.keys(row).find(k => k.toLowerCase().includes('nama mahasiswa'));
+            return nmKey && row[nmKey] && row[nmKey].toString().trim().toLowerCase() === namaInput;
+        });
 
         if (mhsRows.length === 0) {
             setStatus(`❌ Mahasiswa bernama '${document.getElementById('searchInput').value}' tidak ditemukan.`, "error");
@@ -345,24 +322,34 @@
             }
         });
 
+        // PENCARIAN NIM YANG LEBIH CERDAS
         let nimMhs = "-";
         if (dataNIM.length > 0) {
-            for (let i = 0; i < dataNIM.length; i++) {
-                let row = dataNIM[i];
-                let rowStr = JSON.stringify(row).toLowerCase(); 
+            const matchedRow = dataNIM.find(row => {
+                const nmKey = Object.keys(row).find(k => k.toLowerCase().includes('nama mahasiswa'));
+                return nmKey && row[nmKey] && row[nmKey].toString().trim().toLowerCase() === namaInput;
+            });
 
-                if (rowStr.includes(namaInput)) {
-                    let match = rowStr.match(/\b\d{8}\b/);
-                    if (match) {
-                        nimMhs = match[0];
-                        break;
+            if (matchedRow) {
+                // 1. Coba cari di kolom yang persis bernama "NIM"
+                const nimKey = Object.keys(matchedRow).find(key => key.trim().toUpperCase() === 'NIM');
+                if (nimKey && matchedRow[nimKey]) {
+                    nimMhs = matchedRow[nimKey].toString().trim();
+                } else {
+                    // 2. Jika tidak ada kolom NIM, cari angka 8 digit (Backup regex)
+                    let vals = Object.values(matchedRow);
+                    for (let v of vals) {
+                        let str = v ? v.toString().trim() : '';
+                        if (/^\d{8}$/.test(str)) {
+                            nimMhs = str;
+                            break;
+                        }
                     }
                 }
             }
         }
 
         setStatus(""); 
-
         document.getElementById('kopSurat').style.display = 'block';
 
         let labelIndeksText = '';
@@ -384,9 +371,15 @@
         }
 
         document.getElementById('cetakArea').style.display = 'block';
-        document.getElementById('lblNama').innerText = mhsData['Nama Mahasiswa'];
         
-        const isASH = dataASH.find(r => r['Nama Mahasiswa'] && r['Nama Mahasiswa'].toString().toLowerCase().includes(namaInput));
+        // Menampilkan Nama yang benar dari data
+        const theNameKey = Object.keys(mhsData).find(k => k.toLowerCase().includes('nama mahasiswa'));
+        document.getElementById('lblNama').innerText = mhsData[theNameKey] || document.getElementById('searchInput').value;
+        
+        const isASH = dataASH.find(row => {
+            const nKey = Object.keys(row).find(k => k.toLowerCase().includes('nama mahasiswa'));
+            return nKey && row[nKey] && row[nKey].toString().trim().toLowerCase() === namaInput;
+        });
         document.getElementById('lblProdi').innerText = isASH ? 'Ahwal Al-Syakhshiyyah (ASH)' : 'Pendidikan Bahasa Arab (PBA)';
 
         const tbody = document.getElementById('khsBody');
@@ -409,7 +402,6 @@
                 
                 if (dataKurikulum.length > 0) {
                     const matchMK = dataKurikulum.find(k => k['Mata Kuliah'] && normalizeMK(k['Mata Kuliah']) === normKey);
-                    
                     if (matchMK) {
                         if (matchMK['SKS']) sks = parseInt(matchMK['SKS']);
                         if (matchMK['Semester']) semesterMK = matchMK['Semester'].toString();
@@ -417,9 +409,7 @@
                     }
                 }
 
-                if (jenisCetak !== 'all' && semesterMK !== jenisCetak) {
-                    continue; 
-                }
+                if (jenisCetak !== 'all' && semesterMK !== jenisCetak) continue; 
 
                 const { huruf, bobot } = konversiNilai(nilaiValid);
                 const mutu = sks * bobot;
