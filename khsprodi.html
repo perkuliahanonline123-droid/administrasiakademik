@@ -16,13 +16,14 @@
         
         /* DESAIN CETAKAN KHS & TRANSKRIP */
         #cetakArea { display: none; margin-top: 30px; }
-        .judul-dokumen { text-align: center; font-size: 18px; font-weight: bold; text-decoration: underline; margin-bottom: 20px; color: #000; }
+        .judul-dokumen { text-align: center; font-size: 18px; font-weight: bold; margin-bottom: 20px; color: #000; }
         
         /* Tabel Informasi Mahasiswa (Garis Tebal) */
         .info-table-container { border-top: 3px solid #000; border-bottom: 3px solid #000; padding: 10px 0; margin-bottom: 20px; }
         .info-table { width: 100%; border-collapse: collapse; font-size: 14px; font-weight: bold; }
         .info-table td { padding: 4px 8px; vertical-align: top; border: none; }
         .info-table td:nth-child(2), .info-table td:nth-child(5) { width: 10px; }
+        .label-nowrap { white-space: nowrap; }
 
         /* Tabel Nilai Utama */
         .data-table { width: 100%; border-collapse: collapse; font-size: 13px; }
@@ -50,7 +51,7 @@
     <div class="search-box">
         <input type="text" id="searchInput" placeholder="Ketik Nama Mahasiswa (contoh: Moh Asror)" onkeypress="handleEnter(event)">
         <select id="jenisCetak">
-            <option value="all">Transkrip Nilai</option>
+            <option value="all">Transkrip Nilai (Semua Semester)</option>
             <option value="1">KHS Semester 1</option>
             <option value="2">KHS Semester 2</option>
             <option value="3">KHS Semester 3</option>
@@ -63,12 +64,12 @@
         <button onclick="cariKHS()">Cari Data</button>
     </div>
     
-    <div id="status-msg">Mohon tunggu sebentar...</div>
+    <div id="status-msg">Memeriksa koneksi database...</div>
 
     <!-- AREA YANG AKAN DICETAK -->
     <div id="cetakArea">
         
-        <!-- KOP SURAT (DIBUNGKUS DALAM DIV ID KOP SURAT AGAR BISA DISEMBUNYIKAN SAAT TRANSKRIP) -->
+        <!-- KOP SURAT (Dibuat lebih rapat spasi antar barisnya) -->
         <div id="kopSurat">
             <div style="text-align: center; line-height: 1.15;">
                 <div style="font-size: 14px; font-weight: bold; letter-spacing: 1px;">PUSAT ILMU KEISLAMAN INTERNASIONAL</div>
@@ -89,20 +90,20 @@
         <div class="info-table-container">
             <table class="info-table">
                 <tr>
-                    <td style="width: 15%;">Nama Mahasiswa</td>
+                    <td class="label-nowrap" style="width: 15%;">Nama Mahasiswa</td>
                     <td>:</td>
                     <td id="lblNama" style="width: 40%;"></td>
                     
-                    <td style="width: 15%;" id="lblNIMLabel">NIM</td>
+                    <td class="label-nowrap" style="width: 15%;" id="lblNIMLabel">NIM</td>
                     <td>:</td>
                     <td id="lblNIM">-</td>
                 </tr>
                 <tr>
-                    <td>Program Studi</td>
+                    <td class="label-nowrap">Program Studi</td>
                     <td>:</td>
                     <td id="lblProdi"></td>
                     
-                    <td id="lblSemesterLabel">Semester</td>
+                    <td class="label-nowrap" id="lblSemesterLabel">Semester</td>
                     <td>:</td>
                     <td id="lblSemester"></td>
                 </tr>
@@ -201,6 +202,8 @@
             const parsedCache = JSON.parse(cachedItem);
             if (Date.now() - parsedCache.timestamp < CACHE_EXPIRY) {
                 globalData = parsedCache.data;
+                setStatus("✅ Data siap (Menggunakan Cache Lokal)", "success");
+                setTimeout(() => setStatus(""), 3000);
                 return true;
             }
         }
@@ -290,42 +293,61 @@
             }
         });
 
-        // Cari NIM (Jika ada di sheet NIM / Data Mahasiswa)
+        // Cari NIM yang 8 Digit di Sheet NIM
         let nimMhs = "-";
         if (dataNIM.length > 0) {
-            // Kita asumsikan kolom pertama adalah NIM, atau mencari di kolom apapun yang cocok namanya
-            const matchNIM = dataNIM.find(row => {
+            for (let i = 0; i < dataNIM.length; i++) {
+                let row = dataNIM[i];
                 let isMatch = false;
-                for (const key in row) {
-                    if (row[key] && row[key].toString().toLowerCase().includes(namaInput)) isMatch = true;
-                }
-                return isMatch;
-            });
 
-            if (matchNIM) {
-                // Ambil value pertama yang berbentuk angka (asumsi NIM)
-                nimMhs = Object.values(matchNIM)[0] || "-";
+                // Cek isi values
+                let vals = Object.values(row);
+                for (let v of vals) {
+                    if (v && v.toString().toLowerCase().includes(namaInput)) isMatch = true;
+                }
+                
+                // Cek di keys (karena terkadang sheet tanpa header terbaca keys nya sebagai data)
+                let keys = Object.keys(row);
+                if (!isMatch) {
+                    for (let k of keys) {
+                        if (k.toLowerCase().includes(namaInput)) isMatch = true;
+                    }
+                }
+
+                if (isMatch) {
+                    // Cari data yang murni berisi 8 digit angka untuk format NIM
+                    let allData = [...keys, ...vals];
+                    for (let d of allData) {
+                        let strD = d ? d.toString().trim() : '';
+                        if (/^\d{8}$/.test(strD)) {
+                            nimMhs = strD;
+                            break;
+                        }
+                    }
+                    if (nimMhs !== "-") break;
+                }
             }
         }
 
         setStatus(""); 
 
+        // Tampilkan Selalu KOP SURAT
+        document.getElementById('kopSurat').style.display = 'block';
+
         // Update UI Text sesuai mode
         if (jenisCetak === 'all') {
-            document.getElementById('kopSurat').style.display = 'none'; // Transkrip biasanya tanpa Kop
             document.getElementById('judulDokumen').innerText = 'TRANSKRIP NILAI AKADEMIK';
-            document.getElementById('lblSemesterLabel').innerText = 'Tahun Akademik';
-            document.getElementById('lblSemester').innerText = mhsData['TA'] || '2025/2026';
-            document.getElementById('lblNIMLabel').innerText = 'Semester Dicetak';
-            document.getElementById('lblNIM').innerHTML = 'Keseluruhan<br>(Transkrip)';
-            document.getElementById('lblIndeks').innerText = 'IPK ( Indeks Prestasi Kumulatif )';
-        } else {
-            document.getElementById('kopSurat').style.display = 'block'; // KHS pakai Kop
-            document.getElementById('judulDokumen').innerText = 'KARTU HASIL STUDI (KHS)';
-            document.getElementById('lblSemesterLabel').innerText = 'Semester';
-            document.getElementById('lblSemester').innerText = jenisCetak;
             document.getElementById('lblNIMLabel').innerText = 'NIM';
             document.getElementById('lblNIM').innerText = nimMhs;
+            document.getElementById('lblSemesterLabel').innerText = 'Program Pendidikan';
+            document.getElementById('lblSemester').innerText = 'Strata - 1 (S1)';
+            document.getElementById('lblIndeks').innerText = 'IPK ( Indeks Prestasi Kumulatif )';
+        } else {
+            document.getElementById('judulDokumen').innerText = 'KARTU HASIL STUDI (KHS)';
+            document.getElementById('lblNIMLabel').innerText = 'NIM';
+            document.getElementById('lblNIM').innerText = nimMhs;
+            document.getElementById('lblSemesterLabel').innerText = 'Semester';
+            document.getElementById('lblSemester').innerText = jenisCetak;
             document.getElementById('lblIndeks').innerText = 'IPS ( Indeks Prestasi Semester )';
         }
 
