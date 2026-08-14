@@ -163,7 +163,6 @@
             const parsedCache = JSON.parse(cachedItem);
             if (Date.now() - parsedCache.timestamp < CACHE_EXPIRY) {
                 globalData = parsedCache.data;
-                setStatus("✅ Data siap (Menggunakan Cache Lokal)", "success");
                 setTimeout(() => setStatus(""), 3000);
                 return true;
             }
