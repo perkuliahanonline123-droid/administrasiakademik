@@ -39,7 +39,7 @@
     <h1>Sistem Cetak KHS & Transkrip Prodi</h1>
     
     <div class="search-box">
-        <input type="text" id="searchInput" placeholder="Ketik Nama Mahasiswa (contoh: Muhammad Izzul Wafi)" onkeypress="handleEnter(event)">
+        <input type="text" id="searchInput" placeholder="Ketik Nama Mahasiswa (contoh: Mustafa Arbash)" onkeypress="handleEnter(event)">
         
         <select id="jenisCetak">
             <option value="all">Transkrip Nilai (Semua Semester)</option>
@@ -121,6 +121,22 @@
     const CACHE_EXPIRY = 60 * 60 * 1000; // 1 Jam cache
     let globalData = null;
 
+    // FUNGSI BARU: Membersihkan spasi, simbol, dan case untuk pencocokan Mata Kuliah yang sangat akurat
+    function normalizeMK(text) {
+        if (!text) return "";
+        return text.toString().toLowerCase().replace(/[^a-z0-9]/g, '');
+    }
+
+    // FUNGSI BARU: Mendeteksi apakah kolom bukan merupakan Mata Kuliah
+    function isColumnExcluded(colName) {
+        const norm = colName.toString().toLowerCase().replace(/\s+/g, '');
+        // Abaikan kolom yang namanya mengandung kata 'semester' (ini kolom pembatas, bukan nilai)
+        if (norm.includes('semester')) return true; 
+        
+        const excludeList = ['ta', 'namamahasiswa', 'ppl', 'kkn', 'skripsi'];
+        return excludeList.includes(norm);
+    }
+
     function konversiNilai(nilai) {
         let huruf = 'E', bobot = 0;
         if (nilai >= 85) { huruf = 'A'; bobot = 4.0; }
@@ -131,9 +147,7 @@
     }
 
     function handleEnter(e) {
-        if (e.key === 'Enter') {
-            cariKHS();
-        }
+        if (e.key === 'Enter') cariKHS();
     }
 
     function setStatus(msg, type = 'normal') {
@@ -148,10 +162,7 @@
     }
 
     async function initData() {
-        if (!SCRIPT_URL || SCRIPT_URL === 'URL_WEB_APP_GOOGLE_SCRIPT_ANDA') {
-            setStatus("⚠️ URL Google Apps Script belum dimasukkan di kode HTML!", "error");
-            return false;
-        }
+        if (!SCRIPT_URL) return false;
 
         const cachedItem = localStorage.getItem(CACHE_KEY);
         if (cachedItem) {
@@ -171,25 +182,16 @@
             if (!response.ok) throw new Error("Gagal terhubung ke server");
             
             const json = await response.json();
-            
-            if (json.status !== "success" || !json.data) {
-                throw new Error("Format data dari Google Apps Script tidak valid.");
-            }
+            if (json.status !== "success" || !json.data) throw new Error("Format data tidak valid.");
 
             globalData = json.data;
-            
-            localStorage.setItem(CACHE_KEY, JSON.stringify({
-                timestamp: Date.now(),
-                data: globalData
-            }));
+            localStorage.setItem(CACHE_KEY, JSON.stringify({ timestamp: Date.now(), data: globalData }));
             
             setStatus("✅ Database berhasil dimuat!", "success");
             setTimeout(() => setStatus(""), 3000);
             return true;
-
         } catch (error) {
             setStatus("❌ Error: " + error.message, "error");
-            console.error("Fetch Error:", error);
             return false;
         }
     }
@@ -198,20 +200,14 @@
         const namaInput = document.getElementById('searchInput').value.trim().toLowerCase();
         const jenisCetak = document.getElementById('jenisCetak').value;
 
-        if (!namaInput) {
-            alert('Silakan masukkan nama mahasiswa terlebih dahulu!');
-            return;
-        }
+        if (!namaInput) return alert('Silakan masukkan nama mahasiswa terlebih dahulu!');
 
         if (!globalData) {
             const isReady = await initData();
             if (!isReady) return;
         }
         
-        let dataASH = [];
-        let dataPBA = [];
-        let dataKurikulum = [];
-        let dataGagal = []; 
+        let dataASH = [], dataPBA = [], dataKurikulum = [], dataGagal = []; 
         
         for (const sheetName in globalData) {
             const nameUpper = sheetName.toUpperCase();
@@ -221,9 +217,7 @@
             if (nameUpper.includes('GAGAL')) dataGagal = globalData[sheetName]; 
         }
 
-        // ==========================================
-        // 1. CEK STATUS MAHASISWA GAGAL
-        // ==========================================
+        // Cek Status Gagal
         const mhsGagal = dataGagal.find(row => 
             row['Mahasiswa yang GAGAL'] && 
             row['Mahasiswa yang GAGAL'].toString().toLowerCase().includes(namaInput)
@@ -237,16 +231,12 @@
                 }
             }
             let teksMkGagal = mkYangGagal.length > 0 ? mkYangGagal.join(', ') : 'beberapa mata kuliah';
-            let namaAsli = mhsGagal['Mahasiswa yang GAGAL'];
-            let pesanPeringatan = `❌ AKSES DITOLAK: Mahasiswa atas nama '${namaAsli}' belum dapat mencetak dokumen karena terdapat mata kuliah yang belum lulus, yaitu: ${teksMkGagal}. Dokumen dapat dicetak setelah seluruh mata kuliah dinyatakan lulus.`;
-            
-            setStatus(pesanPeringatan, "error");
+            setStatus(`❌ AKSES DITOLAK: Mahasiswa atas nama '${mhsGagal['Mahasiswa yang GAGAL']}' belum dapat mencetak dokumen karena terdapat mata kuliah yang belum lulus, yaitu: ${teksMkGagal}. Dokumen dapat dicetak setelah seluruh mata kuliah dinyatakan lulus.`, "error");
             document.getElementById('khsHeader').style.display = 'none';
             document.getElementById('khsTable').style.display = 'none';
             document.getElementById('printBtn').style.display = 'none';
             return; 
         }
-        // ==========================================
 
         const semuaNilai = [...dataASH, ...dataPBA];
         const mhsData = semuaNilai.find(row => 
@@ -254,7 +244,7 @@
         );
 
         if (!mhsData) {
-            setStatus("❌ Mahasiswa bernama '" + document.getElementById('searchInput').value + "' tidak ditemukan.", "error");
+            setStatus(`❌ Mahasiswa bernama '${document.getElementById('searchInput').value}' tidak ditemukan.`, "error");
             document.getElementById('khsHeader').style.display = 'none';
             document.getElementById('khsTable').style.display = 'none';
             document.getElementById('printBtn').style.display = 'none';
@@ -263,7 +253,7 @@
 
         setStatus(""); 
 
-        // Update Judul & Label berdasarkan jenis cetak
+        // Update Judul UI
         if (jenisCetak === 'all') {
             document.getElementById('judulDokumen').innerText = 'TRANSKRIP NILAI AKADEMIK';
             document.getElementById('lblSemester').innerText = 'Keseluruhan (Transkrip)';
@@ -290,26 +280,27 @@
         let totalSKS = 0;
         let totalMutu = 0;
 
-        const excludeCols = ['TA', 'Nama Mahasiswa', 'Semester', 'Semester.1', 'Semester.2', 'Semester.3', 'Semester.4', 'Semester.5', 'Semester.6', 'Semester.7', 'PPL', 'KKN', 'Skripsi', 'Pendidikan Pancasila dan Kewarganegaraan'];
-
         for (const [mkName, mkValue] of Object.entries(mhsData)) {
-            if (!excludeCols.includes(mkName) && mkValue !== null && mkValue !== '' && !isNaN(parseFloat(mkValue))) {
+            // Lakukan pengecekan ketat menggunakan filter isColumnExcluded yang baru
+            if (!isColumnExcluded(mkName) && mkValue !== null && mkValue !== '' && !isNaN(parseFloat(mkValue))) {
                 
                 const nilaiValid = parseFloat(mkValue);
+                const normKey = normalizeMK(mkName); // Bersihkan nama MK (contoh: "ulumulhaditsi")
                 
-                // Cari SKS dan Semester Mata Kuliah dari sheet Kurikulum
                 let sks = 2; 
-                let semesterMK = "1"; 
+                let semesterMK = "0"; // Default semester
+                
                 if (dataKurikulum.length > 0) {
-                    const matchMK = dataKurikulum.find(k => k['Mata Kuliah'] && k['Mata Kuliah'].toString().trim().toLowerCase() === mkName.trim().toLowerCase());
+                    // Cari di Kurikulum dengan pencocokan string yang sudah dibersihkan
+                    const matchMK = dataKurikulum.find(k => k['Mata Kuliah'] && normalizeMK(k['Mata Kuliah']) === normKey);
+                    
                     if (matchMK) {
                         if (matchMK['SKS']) sks = parseInt(matchMK['SKS']);
                         if (matchMK['Semester']) semesterMK = matchMK['Semester'].toString();
                     }
                 }
 
-                // LOGIKA FILTER SEMESTER
-                // Jika bukan mode "Transkrip" dan semester mata kuliah ini tidak sama dengan yang dipilih di dropdown, maka SKIP
+                // Logika Filter Semester
                 if (jenisCetak !== 'all' && semesterMK !== jenisCetak) {
                     continue; 
                 }
@@ -333,10 +324,9 @@
             }
         }
 
-        // Jika tidak ada mata kuliah yang cocok dengan semester yang dipilih
         if (no === 1) {
             const tr = document.createElement('tr');
-            tr.innerHTML = `<td colspan="6" style="text-align: center; font-style: italic;">Data nilai untuk semester ini tidak ditemukan.</td>`;
+            tr.innerHTML = `<td colspan="6" style="text-align: center; font-style: italic; color: #7f8c8d;">Data nilai untuk semester ini tidak ditemukan atau belum diinput.</td>`;
             tbody.appendChild(tr);
         }
 
