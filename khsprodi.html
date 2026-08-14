@@ -126,7 +126,6 @@
                 </tr>
             </thead>
             
-            <!-- Perhatikan bahwa bagian tfoot dihapus, dan diganti inject baris langsung ke tbody melalui JS agar tidak berulang -->
             <tbody id="khsBody"></tbody>
         </table>
     </div>
@@ -154,12 +153,32 @@
         return excludeList.includes(norm);
     }
 
+    // UPDATE: Skala Penilaian Baru
     function konversiNilai(nilai) {
-        let huruf = 'E', bobot = 0;
-        if (nilai >= 85) { huruf = 'A'; bobot = 4.0; }
-        else if (nilai >= 75) { huruf = 'B'; bobot = 3.0; }
-        else if (nilai >= 60) { huruf = 'C'; bobot = 2.0; }
-        else if (nilai >= 50) { huruf = 'D'; bobot = 1.0; }
+        let huruf = 'E', bobot = 0.00;
+        
+        if (nilai >= 85.00) {
+            huruf = 'A'; bobot = 4.00;
+        } else if (nilai >= 80.00) {
+            huruf = 'A-'; bobot = 3.75;
+        } else if (nilai >= 70.00) {
+            huruf = 'B+'; bobot = 3.50;
+        } else if (nilai >= 65.00) {
+            huruf = 'B'; bobot = 3.25;
+        } else if (nilai >= 60.00) {
+            huruf = 'B-'; bobot = 3.00;
+        } else if (nilai >= 55.00) {
+            huruf = 'C+'; bobot = 2.75;
+        } else if (nilai >= 50.00) {
+            huruf = 'C'; bobot = 2.50;
+        } else if (nilai >= 45.00) {
+            huruf = 'C-'; bobot = 2.25;
+        } else if (nilai >= 40.00) {
+            huruf = 'D'; bobot = 2.00;
+        } else {
+            huruf = 'E'; bobot = 0.00;
+        }
+        
         return { huruf, bobot };
     }
 
@@ -239,7 +258,6 @@
             if (nameUpper.includes('NIM') || nameUpper.includes('MAHASISWA')) dataNIM = globalData[sheetName]; 
         }
 
-        // Cek Status Gagal
         const mhsGagal = dataGagal.find(row => 
             row['Mahasiswa yang GAGAL'] && 
             row['Mahasiswa yang GAGAL'].toString().toLowerCase().includes(namaInput)
@@ -281,16 +299,13 @@
             }
         });
 
-        // PENCARIAN NIM DIPERKUAT DENGAN REGEX
         let nimMhs = "-";
         if (dataNIM.length > 0) {
             for (let i = 0; i < dataNIM.length; i++) {
                 let row = dataNIM[i];
-                let rowStr = JSON.stringify(row).toLowerCase(); // Ubah 1 baris ke string JSON
+                let rowStr = JSON.stringify(row).toLowerCase(); 
 
-                // Jika nama mahasiswa ada di baris ini
                 if (rowStr.includes(namaInput)) {
-                    // Cari pola angka yang jumlahnya pas 8 digit (misal: 25110455)
                     let match = rowStr.match(/\b\d{8}\b/);
                     if (match) {
                         nimMhs = match[0];
@@ -387,8 +402,6 @@
             tbody.appendChild(tr);
         }
 
-        // --- PENYELESAIAN MASALAH FOOTER BERULANG DI SETIAP HALAMAN ---
-        // Footer ditambahkan langsung ke bagian akhir <tbody> alih-alih menggunakan tag <tfoot>
         const ips = totalSKS > 0 ? (totalMutu / totalSKS).toFixed(2) : '0.00';
         
         tbody.innerHTML += `
