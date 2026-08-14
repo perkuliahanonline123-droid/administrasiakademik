@@ -50,7 +50,7 @@
     <div class="search-box">
         <input type="text" id="searchInput" placeholder="Ketik Nama Mahasiswa (contoh: Moh Asror)" onkeypress="handleEnter(event)">
         <select id="jenisCetak">
-            <option value="all">Transkrip Nilai (Semua Semester)</option>
+            <option value="all">Transkrip Nilai</option>
             <option value="1">KHS Semester 1</option>
             <option value="2">KHS Semester 2</option>
             <option value="3">KHS Semester 3</option>
@@ -63,7 +63,7 @@
         <button onclick="cariKHS()">Cari Data</button>
     </div>
     
-    <div id="status-msg">Memeriksa koneksi database...</div>
+    <div id="status-msg">Mohon tunggu sebentar...</div>
 
     <!-- AREA YANG AKAN DICETAK -->
     <div id="cetakArea">
@@ -201,8 +201,6 @@
             const parsedCache = JSON.parse(cachedItem);
             if (Date.now() - parsedCache.timestamp < CACHE_EXPIRY) {
                 globalData = parsedCache.data;
-                setStatus("✅ Data siap (Menggunakan Cache Lokal)", "success");
-                setTimeout(() => setStatus(""), 3000);
                 return true;
             }
         }
