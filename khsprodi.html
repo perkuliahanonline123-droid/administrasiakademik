@@ -12,7 +12,7 @@
         input[type="text"] { padding: 10px; width: 60%; border: 1px solid #ccc; border-radius: 4px; font-size: 16px; }
         button { padding: 10px 20px; background: #2980b9; color: white; border: none; border-radius: 4px; cursor: pointer; font-size: 16px; font-weight: bold;}
         button:hover { background: #3498db; }
-        #status-msg { text-align: center; margin-bottom: 20px; font-weight: bold; color: #e67e22; }
+        #status-msg { text-align: center; margin-bottom: 20px; font-weight: bold; color: #e67e22; padding: 10px; border-radius: 5px; }
         table { width: 100%; border-collapse: collapse; margin-top: 20px; font-size: 14px; }
         th, td { border: 1px solid #ddd; padding: 8px 12px; text-align: left; }
         th { background-color: #ecf0f1; font-weight: bold; text-align: center; }
@@ -21,7 +21,9 @@
         .khs-header table td { border: none; padding: 4px; }
         .print-btn { display: none; margin-top: 20px; width: 100%; background-color: #27ae60; }
         .print-btn:hover { background-color: #2ecc71; }
-        .error { color: #e74c3c !important; }
+        
+        /* Pewarnaan Status Pesan */
+        .error { background-color: #fdeaea; color: #e74c3c !important; border: 1px solid #e74c3c; }
         .success { color: #27ae60 !important; }
         
         @media print {
@@ -37,7 +39,7 @@
     <h1>Sistem Cetak KHS Prodi</h1>
     
     <div class="search-box">
-        <input type="text" id="searchInput" placeholder="Ketik Nama Mahasiswa (contoh: Ihsan Nasrulloh)" onkeypress="handleEnter(event)">
+        <input type="text" id="searchInput" placeholder="Ketik Nama Mahasiswa (contoh: Muhammad Izzul Wafi)" onkeypress="handleEnter(event)">
         <button onclick="cariKHS()">Cari Data</button>
     </div>
     
@@ -99,14 +101,13 @@
 
 <script>
     // --- GANTI URL DI BAWAH INI DENGAN URL WEB APP GOOGLE APPS SCRIPT ANDA ---
-    const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbxlS2O6Z0hEzUCYVnIyuZHg-v_bV12pRKF2mG-ujQE1TDEJeSmph5mnCqIX6bAS7rls0Q/exec'; 
+    const SCRIPT_URL = 'URL_WEB_APP_GOOGLE_SCRIPT_ANDA'; 
     // -----------------------------------------------------------------------
 
     const CACHE_KEY = 'KHS_PRODI_CACHE';
     const CACHE_EXPIRY = 60 * 60 * 1000; // 1 Jam cache
     let globalData = null;
 
-    // Fungsi konversi Nilai Angka ke Huruf dan Bobot
     function konversiNilai(nilai) {
         let huruf = 'E', bobot = 0;
         if (nilai >= 85) { huruf = 'A'; bobot = 4.0; }
@@ -116,21 +117,23 @@
         return { huruf, bobot };
     }
 
-    // Tangkap tombol Enter pada input pencarian
     function handleEnter(e) {
         if (e.key === 'Enter') {
             cariKHS();
         }
     }
 
-    // Menampilkan pesan status
     function setStatus(msg, type = 'normal') {
         const statusEl = document.getElementById('status-msg');
         statusEl.innerText = msg;
-        statusEl.className = type; // 'error', 'success', atau 'normal'
+        statusEl.className = type;
+        if(msg === "") {
+            statusEl.style.display = "none";
+        } else {
+            statusEl.style.display = "block";
+        }
     }
 
-    // Inisialisasi Data dari Apps Script atau Cache
     async function initData() {
         if (!SCRIPT_URL || SCRIPT_URL === 'URL_WEB_APP_GOOGLE_SCRIPT_ANDA') {
             setStatus("⚠️ URL Google Apps Script belum dimasukkan di kode HTML!", "error");
@@ -178,7 +181,6 @@
         }
     }
 
-    // Fungsi Utama Pencarian Data
     async function cariKHS() {
         const namaInput = document.getElementById('searchInput').value.trim().toLowerCase();
         if (!namaInput) {
@@ -191,52 +193,64 @@
             if (!isReady) return;
         }
         
-        // Deteksi dinamis nama sheet (Mencegah error jika nama sheet tidak persis sama)
         let dataASH = [];
         let dataPBA = [];
         let dataKurikulum = [];
+        let dataGagal = []; // Variabel baru untuk menampung data mahasiswa gagal
         
         for (const sheetName in globalData) {
             const nameUpper = sheetName.toUpperCase();
             if (nameUpper.includes('ASH')) dataASH = globalData[sheetName];
             if (nameUpper.includes('PBA')) dataPBA = globalData[sheetName];
             if (nameUpper.includes('KURIKULUM')) dataKurikulum = globalData[sheetName];
+            if (nameUpper.includes('GAGAL')) dataGagal = globalData[sheetName]; // Membaca sheet GAGAL
         }
 
-        // Gabungkan semua data nilai
+        // ==========================================
+        // 1. CEK STATUS MAHASISWA GAGAL TERLEBIH DAHULU
+        // ==========================================
+        const mhsGagal = dataGagal.find(row => 
+            row['Mahasiswa yang GAGAL'] && 
+            row['Mahasiswa yang GAGAL'].toString().toLowerCase().includes(namaInput)
+        );
+
+        if (mhsGagal) {
+            // Tampilkan pesan error dan sembunyikan semua tabel KHS
+            setStatus("❌ AKSES DITOLAK: Mahasiswa atas nama '" + mhsGagal['Mahasiswa yang GAGAL'] + "' tidak berhak mencetak KHS.", "error");
+            document.getElementById('khsHeader').style.display = 'none';
+            document.getElementById('khsTable').style.display = 'none';
+            document.getElementById('printBtn').style.display = 'none';
+            return; // Hentikan eksekusi kode selanjutnya
+        }
+        // ==========================================
+
         const semuaNilai = [...dataASH, ...dataPBA];
         
-        // Cari Mahasiswa
         const mhsData = semuaNilai.find(row => 
             row['Nama Mahasiswa'] && row['Nama Mahasiswa'].toString().toLowerCase().includes(namaInput)
         );
 
         if (!mhsData) {
             setStatus("❌ Mahasiswa bernama '" + document.getElementById('searchInput').value + "' tidak ditemukan.", "error");
-            // Sembunyikan tabel jika tidak ketemu
             document.getElementById('khsHeader').style.display = 'none';
             document.getElementById('khsTable').style.display = 'none';
             document.getElementById('printBtn').style.display = 'none';
             return;
         }
 
-        setStatus(""); // Hapus pesan error jika ketemu
+        setStatus(""); 
 
-        // Isi Header KHS
         document.getElementById('khsHeader').style.display = 'block';
         document.getElementById('lblNama').innerText = mhsData['Nama Mahasiswa'];
         document.getElementById('lblTA').innerText = mhsData['TA'] || '2023/2024';
         
-        // Ambil data semester (handle jika format dari Excel terbaca 1.0)
         let sem = mhsData['Semester'];
         if(sem) sem = sem.toString().replace('.0', '');
         document.getElementById('lblSemester').innerText = sem || '1';
         
-        // Deteksi Prodi
         const isASH = dataASH.find(r => r['Nama Mahasiswa'] === mhsData['Nama Mahasiswa']);
         document.getElementById('lblProdi').innerText = isASH ? 'Ahwal Al-Syakhshiyyah (ASH)' : 'Pendidikan Bahasa Arab (PBA)';
 
-        // Render Tabel Nilai
         const tbody = document.getElementById('khsBody');
         tbody.innerHTML = '';
         document.getElementById('khsTable').style.display = 'table';
@@ -246,18 +260,14 @@
         let totalSKS = 0;
         let totalMutu = 0;
 
-        // Kolom yang harus diabaikan (bukan mata kuliah)
         const excludeCols = ['TA', 'Nama Mahasiswa', 'Semester', 'Semester.1', 'Semester.2', 'Semester.3', 'Semester.4', 'Semester.5', 'Semester.6', 'Semester.7', 'PPL', 'KKN', 'Skripsi', 'Pendidikan Pancasila dan Kewarganegaraan'];
 
         for (const [mkName, mkValue] of Object.entries(mhsData)) {
-            // Cek apakah kolom ini valid sebagai mata kuliah dengan nilai
             if (!excludeCols.includes(mkName) && mkValue !== null && mkValue !== '' && !isNaN(parseFloat(mkValue))) {
                 
-                // Bersihkan string nilai
                 const nilaiValid = parseFloat(mkValue);
                 
-                // Cari SKS dari data Kurikulum
-                let sks = 2; // Default jika tidak ditemukan di sheet Kurikulum
+                let sks = 2; 
                 if (dataKurikulum.length > 0) {
                     const matchMK = dataKurikulum.find(k => k['Mata Kuliah'] && k['Mata Kuliah'].toString().trim().toLowerCase() === mkName.trim().toLowerCase());
                     if (matchMK && matchMK['SKS']) {
@@ -265,14 +275,12 @@
                     }
                 }
 
-                // Kalkulasi
                 const { huruf, bobot } = konversiNilai(nilaiValid);
                 const mutu = sks * bobot;
 
                 totalSKS += sks;
                 totalMutu += mutu;
 
-                // Tambah baris ke tabel
                 const tr = document.createElement('tr');
                 tr.innerHTML = `
                     <td style="text-align: center;">${no++}</td>
@@ -286,14 +294,12 @@
             }
         }
 
-        // Hitung total dan IPS
         const ips = totalSKS > 0 ? (totalMutu / totalSKS).toFixed(2) : '0.00';
         document.getElementById('totSks').innerText = totalSKS;
         document.getElementById('totMutu').innerText = totalMutu.toFixed(2);
         document.getElementById('ips').innerText = ips;
     }
 
-    // Mulai init data secara background saat halaman dimuat
     window.onload = () => {
         initData();
     };
