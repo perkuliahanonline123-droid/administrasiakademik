@@ -5,29 +5,38 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Cetak KHS & Transkrip Mahasiswa</title>
     <style>
-        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background-color: #f4f7f6; padding: 20px; color: #333; }
+        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background-color: #f4f7f6; padding: 20px; color: #000; }
         .container { max-width: 900px; margin: 0 auto; background: #fff; padding: 30px; border-radius: 8px; box-shadow: 0 4px 6px rgba(0,0,0,0.1); }
-        h1, h2 { text-align: center; color: #2c3e50; }
         .search-box { display: flex; gap: 10px; margin-bottom: 15px; justify-content: center; flex-wrap: wrap; }
         input[type="text"] { padding: 10px; width: 45%; border: 1px solid #ccc; border-radius: 4px; font-size: 16px; }
         select { padding: 10px; border: 1px solid #ccc; border-radius: 4px; font-size: 16px; background-color: white; cursor: pointer; }
         button { padding: 10px 20px; background: #2980b9; color: white; border: none; border-radius: 4px; cursor: pointer; font-size: 16px; font-weight: bold;}
         button:hover { background: #3498db; }
         #status-msg { text-align: center; margin-bottom: 20px; font-weight: bold; color: #e67e22; padding: 15px; border-radius: 5px; line-height: 1.5; }
-        table { width: 100%; border-collapse: collapse; margin-top: 20px; font-size: 14px; }
-        th, td { border: 1px solid #ddd; padding: 8px 12px; text-align: left; }
-        th { background-color: #ecf0f1; font-weight: bold; text-align: center; }
-        .khs-header { margin-top: 30px; margin-bottom: 15px; display: none; border-bottom: 2px solid #2c3e50; padding-bottom: 15px; }
-        .khs-header table { width: 100%; border: none; margin: 0; font-size: 15px; }
-        .khs-header table td { border: none; padding: 4px; }
-        .print-btn { display: none; margin-top: 20px; width: 100%; background-color: #27ae60; }
-        .print-btn:hover { background-color: #2ecc71; }
         
+        /* DESAIN CETAKAN KHS & TRANSKRIP */
+        #cetakArea { display: none; margin-top: 30px; }
+        .judul-dokumen { text-align: center; font-size: 18px; font-weight: bold; text-decoration: underline; margin-bottom: 20px; color: #000; }
+        
+        /* Tabel Informasi Mahasiswa (Garis Tebal) */
+        .info-table-container { border-top: 3px solid #000; border-bottom: 3px solid #000; padding: 10px 0; margin-bottom: 20px; }
+        .info-table { width: 100%; border-collapse: collapse; font-size: 14px; font-weight: bold; }
+        .info-table td { padding: 4px 8px; vertical-align: top; border: none; }
+        .info-table td:nth-child(2), .info-table td:nth-child(5) { width: 10px; }
+
+        /* Tabel Nilai Utama */
+        .data-table { width: 100%; border-collapse: collapse; font-size: 13px; }
+        .data-table th, .data-table td { border: 1px solid #000; padding: 6px 8px; }
+        .data-table th { background-color: #a6a6a6; color: #000; font-weight: bold; text-align: center; vertical-align: middle; }
+        .data-table tbody td { color: #000; }
+        
+        .print-btn { display: none; margin-top: 30px; width: 100%; background-color: #27ae60; }
+        .print-btn:hover { background-color: #2ecc71; }
         .error { background-color: #fdeaea; color: #e74c3c !important; border: 1px solid #e74c3c; text-align: justify; }
         .success { color: #27ae60 !important; }
         
         @media print {
-            body { background: #fff; padding: 0; }
+            body { background: #fff; padding: 0; margin: 0; }
             .search-box, .print-btn, h1, #status-msg { display: none; }
             .container { box-shadow: none; padding: 0; margin: 0; max-width: 100%; }
         }
@@ -36,13 +45,12 @@
 <body>
 
 <div class="container">
-    <h1>Sistem Cetak KHS & Transkrip Prodi</h1>
+    <h1 style="text-align: center; color: #2c3e50; margin-bottom: 20px;">Sistem Cetak KHS & Transkrip Prodi</h1>
     
     <div class="search-box">
         <input type="text" id="searchInput" placeholder="Ketik Nama Mahasiswa (contoh: Moh Asror)" onkeypress="handleEnter(event)">
-        
         <select id="jenisCetak">
-            <option value="all">Transkrip Nilai</option>
+            <option value="all">Transkrip Nilai (Semua Semester)</option>
             <option value="1">KHS Semester 1</option>
             <option value="2">KHS Semester 2</option>
             <option value="3">KHS Semester 3</option>
@@ -52,67 +60,92 @@
             <option value="7">KHS Semester 7</option>
             <option value="8">KHS Semester 8</option>
         </select>
-
         <button onclick="cariKHS()">Cari Data</button>
     </div>
     
-    <div id="status-msg">Mohon tunggu...</div>
+    <div id="status-msg">Memeriksa koneksi database...</div>
 
-    <div class="khs-header" id="khsHeader">
-        <h2 id="judulDokumen" style="text-align: center; text-decoration: underline; margin-bottom: 20px;">KARTU HASIL STUDI (KHS)</h2>
-        <table>
-            <tr>
-                <td style="width: 150px; font-weight: bold;">Nama Mahasiswa</td>
-                <td style="width: 10px;">:</td>
-                <td id="lblNama"></td>
-                
-                <td style="width: 150px; font-weight: bold;">Tahun Akademik</td>
-                <td style="width: 10px;">:</td>
-                <td id="lblTA"></td>
-            </tr>
-            <tr>
-                <td style="font-weight: bold;">Program Studi</td>
-                <td>:</td>
-                <td id="lblProdi"></td>
-                
-                <td style="font-weight: bold;">Semester Dicetak</td>
-                <td>:</td>
-                <td id="lblSemester"></td>
-            </tr>
+    <!-- AREA YANG AKAN DICETAK -->
+    <div id="cetakArea">
+        
+        <!-- KOP SURAT (DIBUNGKUS DALAM DIV ID KOP SURAT AGAR BISA DISEMBUNYIKAN SAAT TRANSKRIP) -->
+        <div id="kopSurat">
+            <div style="text-align: center; line-height: 1.15;">
+                <div style="font-size: 14px; font-weight: bold; letter-spacing: 1px;">PUSAT ILMU KEISLAMAN INTERNASIONAL</div>
+                <div style="font-size: 18px; font-weight: bold; letter-spacing: 1px;">SEKOLAH TINGGI AGAMA ISLAM (STAI) IMAM SYAFI’I CIANJUR</div>
+                <!-- SPASI ARAB DIPERBAIKI DENGAN KODE &nbsp; AGAR TIDAK HILANG SAAT DICETAK -->
+                <div style="font-size: 20px; font-weight: bold; margin: 3px 0;">جامعة&nbsp;الإمام&nbsp;الشافعي</div>
+                <div style="font-size: 12px; margin-top: 4px;">Jl. Sarongge No. 16, RT 01/RW 04, Desa Ciputri, Kec. Pacet, Cianjur, Jawa Barat</div>
+                <div style="font-size: 12px;">Telp.: +62 851-1145-0055 | Email: staiis_cianjur@yahoo.com</div>
+            </div>
+
+            <!-- GARIS PEMBATAS KOP -->
+            <div style="margin-top: 10px; margin-bottom: 2px; border-bottom: 3px solid black;"></div>
+            <div style="margin-bottom: 15px; border-bottom: 1px solid black;"></div>
+        </div>
+
+        <div class="judul-dokumen" id="judulDokumen">KARTU HASIL STUDI (KHS)</div>
+
+        <div class="info-table-container">
+            <table class="info-table">
+                <tr>
+                    <td style="width: 15%;">Nama Mahasiswa</td>
+                    <td>:</td>
+                    <td id="lblNama" style="width: 40%;"></td>
+                    
+                    <td style="width: 15%;" id="lblNIMLabel">NIM</td>
+                    <td>:</td>
+                    <td id="lblNIM">-</td>
+                </tr>
+                <tr>
+                    <td>Program Studi</td>
+                    <td>:</td>
+                    <td id="lblProdi"></td>
+                    
+                    <td id="lblSemesterLabel">Semester</td>
+                    <td>:</td>
+                    <td id="lblSemester"></td>
+                </tr>
+            </table>
+        </div>
+
+        <table class="data-table" id="khsTable">
+            <thead>
+                <tr>
+                    <th rowspan="2" style="width: 4%;">No</th>
+                    <th rowspan="2" style="width: 12%;">Kode MK</th>
+                    <th rowspan="2" style="width: 34%;">Nama MK</th>
+                    <th rowspan="2" style="width: 8%;">Bobot MK<br>(sks)</th>
+                    <th colspan="3">Nilai</th>
+                    <th rowspan="2" style="width: 10%;">sks *<br>Indeks</th>
+                </tr>
+                <tr>
+                    <th style="width: 10%;">Angka</th>
+                    <th style="width: 8%;">Huruf</th>
+                    <th style="width: 8%;">Indeks</th>
+                </tr>
+            </thead>
+            <tbody id="khsBody"></tbody>
+            <tfoot>
+                <tr>
+                    <td colspan="3" style="text-align: right; font-weight: bold; border-right: none;">Jumlah</td>
+                    <td id="totSks" style="text-align: center; font-weight: bold; border-left: none;">0</td>
+                    <td colspan="3" style="border-right: none;"></td>
+                    <td id="totMutu" style="text-align: center; font-weight: bold; border-left: none;">0.00</td>
+                </tr>
+                <tr>
+                    <td colspan="7" style="text-align: right; font-weight: bold; border-right: none;" id="lblIndeks">IPS ( Indeks Prestasi Semester )</td>
+                    <td id="ips" style="text-align: center; font-weight: bold; border-left: none;">0.00</td>
+                </tr>
+            </tfoot>
         </table>
     </div>
-
-    <table id="khsTable" style="display: none;">
-        <thead>
-            <tr>
-                <th style="width: 5%;">No</th>
-                <th style="width: 45%;">Mata Kuliah</th>
-                <th style="width: 10%;">SKS</th>
-                <th style="width: 15%;">Nilai Angka</th>
-                <th style="width: 10%;">Huruf</th>
-                <th style="width: 15%;">Mutu</th>
-            </tr>
-        </thead>
-        <tbody id="khsBody"></tbody>
-        <tfoot>
-            <tr style="background-color: #f9f9f9; font-weight: bold;">
-                <td colspan="2" style="text-align: right;">Total SKS & Total Mutu</td>
-                <td id="totSks" style="text-align: center;">0</td>
-                <td></td>
-                <td></td>
-                <td id="totMutu" style="text-align: center;">0.00</td>
-            </tr>
-            <tr style="background-color: #ecf0f1; font-weight: bold; font-size: 16px;">
-                <td colspan="5" style="text-align: right;" id="lblIndeks">INDEKS PRESTASI SEMESTER (IPS)</td>
-                <td id="ips" style="text-align: center; color: #2980b9;">0.00</td>
-            </tr>
-        </tfoot>
-    </table>
 
     <button class="print-btn" id="printBtn" onclick="window.print()">🖨️ Cetak Dokumen (PDF / Printer)</button>
 </div>
 
 <script>
+    // --- PASTIKAN URL GOOGLE APPS SCRIPT ANDA BENAR ---
     const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbxlS2O6Z0hEzUCYVnIyuZHg-v_bV12pRKF2mG-ujQE1TDEJeSmph5mnCqIX6bAS7rls0Q/exec'; 
 
     const CACHE_KEY = 'KHS_PRODI_CACHE';
@@ -127,7 +160,7 @@
     function isColumnExcluded(colName) {
         const norm = colName.toString().toLowerCase().replace(/\s+/g, '');
         if (norm.includes('semester')) return true; 
-        const excludeList = ['ta', 'namamahasiswa', 'ppl', 'kkn', 'skripsi'];
+        const excludeList = ['ta', 'namamahasiswa', 'ppl', 'kkn', 'skripsi', 'nim'];
         return excludeList.includes(norm);
     }
 
@@ -138,6 +171,11 @@
         else if (nilai >= 60) { huruf = 'C'; bobot = 2.0; }
         else if (nilai >= 50) { huruf = 'D'; bobot = 1.0; }
         return { huruf, bobot };
+    }
+
+    // Fungsi mengubah titik ke koma khusus untuk tampilan cetak
+    function formatKoma(num) {
+        return num.toString().replace('.', ',');
     }
 
     function handleEnter(e) {
@@ -163,6 +201,7 @@
             const parsedCache = JSON.parse(cachedItem);
             if (Date.now() - parsedCache.timestamp < CACHE_EXPIRY) {
                 globalData = parsedCache.data;
+                setStatus("✅ Data siap (Menggunakan Cache Lokal)", "success");
                 setTimeout(() => setStatus(""), 3000);
                 return true;
             }
@@ -200,7 +239,7 @@
             if (!isReady) return;
         }
         
-        let dataASH = [], dataPBA = [], dataKurikulum = [], dataGagal = []; 
+        let dataASH = [], dataPBA = [], dataKurikulum = [], dataGagal = [], dataNIM = []; 
         
         for (const sheetName in globalData) {
             const nameUpper = sheetName.toUpperCase();
@@ -208,6 +247,7 @@
             if (nameUpper.includes('PBA')) dataPBA = globalData[sheetName];
             if (nameUpper.includes('KURIKULUM')) dataKurikulum = globalData[sheetName];
             if (nameUpper.includes('GAGAL')) dataGagal = globalData[sheetName]; 
+            if (nameUpper.includes('NIM') || nameUpper.includes('MAHASISWA')) dataNIM = globalData[sheetName]; 
         }
 
         // Cek Status Gagal
@@ -225,28 +265,24 @@
             }
             let teksMkGagal = mkYangGagal.length > 0 ? mkYangGagal.join(', ') : 'beberapa mata kuliah';
             setStatus(`❌ AKSES DITOLAK: Mahasiswa atas nama '${mhsGagal['Mahasiswa yang GAGAL']}' belum dapat mencetak dokumen karena terdapat mata kuliah yang belum lulus, yaitu: ${teksMkGagal}. Dokumen dapat dicetak setelah seluruh mata kuliah dinyatakan lulus.`, "error");
-            document.getElementById('khsHeader').style.display = 'none';
-            document.getElementById('khsTable').style.display = 'none';
+            document.getElementById('cetakArea').style.display = 'none';
             document.getElementById('printBtn').style.display = 'none';
             return; 
         }
 
         const semuaNilai = [...dataASH, ...dataPBA];
         
-        // PERBAIKAN UTAMA: Filter semua baris (row) milik mahasiswa ini, bukan cuma baris pertama
         const mhsRows = semuaNilai.filter(row => 
             row['Nama Mahasiswa'] && row['Nama Mahasiswa'].toString().toLowerCase().includes(namaInput)
         );
 
         if (mhsRows.length === 0) {
             setStatus(`❌ Mahasiswa bernama '${document.getElementById('searchInput').value}' tidak ditemukan.`, "error");
-            document.getElementById('khsHeader').style.display = 'none';
-            document.getElementById('khsTable').style.display = 'none';
+            document.getElementById('cetakArea').style.display = 'none';
             document.getElementById('printBtn').style.display = 'none';
             return;
         }
 
-        // GABUNGKAN SEMUA BARIS: Satukan nilai dari Semester 1, 2, 3, dst ke dalam satu data utuh
         let mhsData = {};
         mhsRows.forEach(row => {
             for (const [key, value] of Object.entries(row)) {
@@ -256,30 +292,53 @@
             }
         });
 
-        setStatus(""); 
+        // Cari NIM (Jika ada di sheet NIM / Data Mahasiswa)
+        let nimMhs = "-";
+        if (dataNIM.length > 0) {
+            // Kita asumsikan kolom pertama adalah NIM, atau mencari di kolom apapun yang cocok namanya
+            const matchNIM = dataNIM.find(row => {
+                let isMatch = false;
+                for (const key in row) {
+                    if (row[key] && row[key].toString().toLowerCase().includes(namaInput)) isMatch = true;
+                }
+                return isMatch;
+            });
 
-        // Update Judul UI
-        if (jenisCetak === 'all') {
-            document.getElementById('judulDokumen').innerText = 'TRANSKRIP NILAI AKADEMIK';
-            document.getElementById('lblSemester').innerText = 'Keseluruhan (Transkrip)';
-            document.getElementById('lblIndeks').innerText = 'INDEKS PRESTASI KUMULATIF (IPK)';
-        } else {
-            document.getElementById('judulDokumen').innerText = `KARTU HASIL STUDI (KHS) - SMT ${jenisCetak}`;
-            document.getElementById('lblSemester').innerText = jenisCetak;
-            document.getElementById('lblIndeks').innerText = 'INDEKS PRESTASI SEMESTER (IPS)';
+            if (matchNIM) {
+                // Ambil value pertama yang berbentuk angka (asumsi NIM)
+                nimMhs = Object.values(matchNIM)[0] || "-";
+            }
         }
 
-        document.getElementById('khsHeader').style.display = 'block';
+        setStatus(""); 
+
+        // Update UI Text sesuai mode
+        if (jenisCetak === 'all') {
+            document.getElementById('kopSurat').style.display = 'none'; // Transkrip biasanya tanpa Kop
+            document.getElementById('judulDokumen').innerText = 'TRANSKRIP NILAI AKADEMIK';
+            document.getElementById('lblSemesterLabel').innerText = 'Tahun Akademik';
+            document.getElementById('lblSemester').innerText = mhsData['TA'] || '2025/2026';
+            document.getElementById('lblNIMLabel').innerText = 'Semester Dicetak';
+            document.getElementById('lblNIM').innerHTML = 'Keseluruhan<br>(Transkrip)';
+            document.getElementById('lblIndeks').innerText = 'IPK ( Indeks Prestasi Kumulatif )';
+        } else {
+            document.getElementById('kopSurat').style.display = 'block'; // KHS pakai Kop
+            document.getElementById('judulDokumen').innerText = 'KARTU HASIL STUDI (KHS)';
+            document.getElementById('lblSemesterLabel').innerText = 'Semester';
+            document.getElementById('lblSemester').innerText = jenisCetak;
+            document.getElementById('lblNIMLabel').innerText = 'NIM';
+            document.getElementById('lblNIM').innerText = nimMhs;
+            document.getElementById('lblIndeks').innerText = 'IPS ( Indeks Prestasi Semester )';
+        }
+
+        document.getElementById('cetakArea').style.display = 'block';
         document.getElementById('lblNama').innerText = mhsData['Nama Mahasiswa'];
-        document.getElementById('lblTA').innerText = mhsData['TA'] || '2023/2024';
         
-        // Penentuan Prodi berdasarkan dari mana data tersebut berasal
         const isASH = dataASH.find(r => r['Nama Mahasiswa'] && r['Nama Mahasiswa'].toString().toLowerCase().includes(namaInput));
         document.getElementById('lblProdi').innerText = isASH ? 'Ahwal Al-Syakhshiyyah (ASH)' : 'Pendidikan Bahasa Arab (PBA)';
 
         const tbody = document.getElementById('khsBody');
         tbody.innerHTML = '';
-        document.getElementById('khsTable').style.display = 'table';
         document.getElementById('printBtn').style.display = 'block';
 
         let no = 1;
@@ -294,6 +353,7 @@
                 
                 let sks = 2; 
                 let semesterMK = "0"; 
+                let kodeMK = "-";
                 
                 if (dataKurikulum.length > 0) {
                     const matchMK = dataKurikulum.find(k => k['Mata Kuliah'] && normalizeMK(k['Mata Kuliah']) === normKey);
@@ -301,10 +361,10 @@
                     if (matchMK) {
                         if (matchMK['SKS']) sks = parseInt(matchMK['SKS']);
                         if (matchMK['Semester']) semesterMK = matchMK['Semester'].toString();
+                        if (matchMK['Kode MK']) kodeMK = matchMK['Kode MK'];
                     }
                 }
 
-                // Logika Filter Semester
                 if (jenisCetak !== 'all' && semesterMK !== jenisCetak) {
                     continue; 
                 }
@@ -318,11 +378,13 @@
                 const tr = document.createElement('tr');
                 tr.innerHTML = `
                     <td style="text-align: center;">${no++}</td>
+                    <td style="text-align: center;">${kodeMK}</td>
                     <td>${mkName.trim()}</td>
-                    <td style="text-align: center;">${sks}</td>
-                    <td style="text-align: center;">${nilaiValid.toFixed(2)}</td>
+                    <td style="text-align: center;">${formatKoma(sks.toFixed(2))}</td>
+                    <td style="text-align: center;">${formatKoma(nilaiValid.toFixed(1))}</td>
                     <td style="text-align: center; font-weight:bold; color: ${huruf === 'E' || huruf === 'D' ? 'red' : 'black'};">${huruf}</td>
-                    <td style="text-align: center;">${mutu.toFixed(2)}</td>
+                    <td style="text-align: center;">${formatKoma(bobot.toFixed(2))}</td>
+                    <td style="text-align: center;">${formatKoma(mutu.toFixed(2))}</td>
                 `;
                 tbody.appendChild(tr);
             }
@@ -330,14 +392,14 @@
 
         if (no === 1) {
             const tr = document.createElement('tr');
-            tr.innerHTML = `<td colspan="6" style="text-align: center; font-style: italic; color: #7f8c8d;">Data nilai untuk semester ini tidak ditemukan atau belum diinput.</td>`;
+            tr.innerHTML = `<td colspan="8" style="text-align: center; font-style: italic; color: #7f8c8d;">Data nilai untuk semester ini tidak ditemukan atau belum diinput.</td>`;
             tbody.appendChild(tr);
         }
 
         const ips = totalSKS > 0 ? (totalMutu / totalSKS).toFixed(2) : '0.00';
-        document.getElementById('totSks').innerText = totalSKS;
-        document.getElementById('totMutu').innerText = totalMutu.toFixed(2);
-        document.getElementById('ips').innerText = ips;
+        document.getElementById('totSks').innerText = formatKoma(totalSKS.toFixed(2));
+        document.getElementById('totMutu').innerText = formatKoma(totalMutu.toFixed(2));
+        document.getElementById('ips').innerText = formatKoma(ips);
     }
 
     window.onload = () => {
