@@ -10,16 +10,14 @@
         .search-box { display: flex; gap: 10px; margin-bottom: 15px; justify-content: center; flex-wrap: wrap; }
         input[type="text"] { padding: 10px; width: 45%; border: 1px solid #ccc; border-radius: 4px; font-size: 16px; }
         select { padding: 10px; border: 1px solid #ccc; border-radius: 4px; font-size: 16px; background-color: white; cursor: pointer; }
-        button { padding: 10px 20px; background: #2980b9; color: white; border: none; border-radius: 4px; cursor: pointer; font-size: 16px; font-weight: bold;}
-        button:hover { background: #3498db; }
         #status-msg { text-align: center; margin-bottom: 20px; font-weight: bold; color: #e67e22; padding: 15px; border-radius: 5px; line-height: 1.5; display: none; }
         
         /* DESAIN CETAKAN KHS & TRANSKRIP */
         #cetakArea { display: none; margin-top: 30px; }
         .judul-dokumen { text-align: center; font-size: 18px; font-weight: bold; margin-bottom: 20px; color: #000; }
         
-        /* Tabel Informasi Mahasiswa (Garis bawah dihilangkan) */
-        .info-table-container { padding-bottom: 10px; margin-bottom: 15px; }
+        /* Tabel Informasi Mahasiswa (Tanpa Garis Atas) */
+        .info-table-container { border-bottom: 3px solid #000; padding-bottom: 10px; margin-bottom: 20px; }
         .info-table { width: 100%; border-collapse: collapse; font-size: 14px; font-weight: bold; }
         .info-table td { padding: 4px 8px; vertical-align: top; border: none; }
         .info-table td:nth-child(2), .info-table td:nth-child(5) { width: 10px; }
@@ -31,7 +29,7 @@
         .data-table th { background-color: #a6a6a6; color: #000; font-weight: bold; text-align: center; vertical-align: middle; }
         .data-table tbody td { color: #000; }
         
-        .print-btn { display: none; margin-top: 30px; width: 100%; background-color: #27ae60; }
+        .print-btn { display: none; margin-top: 30px; width: 100%; background-color: #27ae60; color: white; padding: 10px 20px; border: none; border-radius: 4px; cursor: pointer; font-size: 16px; font-weight: bold; }
         .print-btn:hover { background-color: #2ecc71; }
         .error { background-color: #fdeaea; color: #e74c3c !important; border: 1px solid #e74c3c; text-align: justify; }
         .success { color: #27ae60 !important; }
@@ -49,11 +47,11 @@
     <h1 style="text-align: center; color: #2c3e50; margin-bottom: 20px;">Sistem Cetak KHS & Transkrip Prodi</h1>
     
     <div class="search-box">
-        <!-- Input dengan fitur auto-suggest dari datalist -->
-        <input type="text" id="searchInput" list="namaMahasiswaList" placeholder="Ketik Nama Mahasiswa (contoh: Moh Asror)" autocomplete="off" onkeypress="handleEnter(event)">
+        <!-- Input dengan event oninput untuk mengatur 3 huruf dan auto-fetch -->
+        <input type="text" id="searchInput" placeholder="Ketik Nama Mahasiswa (contoh: Moh Asror)" autocomplete="off" oninput="handleInput(event)" onkeypress="handleEnter(event)">
         <datalist id="namaMahasiswaList"></datalist>
 
-        <select id="jenisCetak">
+        <select id="jenisCetak" onchange="if(document.getElementById('searchInput').value.trim() !== '') cariKHS()">
             <option value="all">Transkrip Nilai (Semua Semester)</option>
             <option value="1">KHS Semester 1</option>
             <option value="2">KHS Semester 2</option>
@@ -64,7 +62,6 @@
             <option value="7">KHS Semester 7</option>
             <option value="8">KHS Semester 8</option>
         </select>
-        <button onclick="cariKHS()">Cari Data</button>
     </div>
     
     <div id="status-msg"></div>
@@ -143,6 +140,7 @@
     const CACHE_KEY = 'KHS_PRODI_CACHE';
     const CACHE_EXPIRY = 60 * 60 * 1000; 
     let globalData = null;
+    let allNames = []; // Menyimpan semua daftar nama untuk auto-fetch
 
     function normalizeMK(text) {
         if (!text) return "";
@@ -156,7 +154,6 @@
         return excludeList.includes(norm);
     }
 
-    // UPDATE: Skala Penilaian Sesuai Permintaan
     function konversiNilai(nilai) {
         let huruf = 'E', bobot = 0.00;
         
@@ -193,6 +190,26 @@
         if (e.key === 'Enter') cariKHS();
     }
 
+    // Fungsi membaca ketikan di form
+    function handleInput(e) {
+        const val = e.target.value.trim();
+        
+        // Aturan 3 Huruf: Hanya munculkan rekomendasi datalist bila karakter >= 3
+        if (val.length >= 3) {
+            e.target.setAttribute('list', 'namaMahasiswaList');
+        } else {
+            e.target.removeAttribute('list');
+        }
+
+        // Auto-fetch: Jika nama persis sama dengan yang ada di database, langsung cetak
+        if (val.length > 0) {
+            const exactMatch = allNames.find(n => n.toLowerCase() === val.toLowerCase());
+            if (exactMatch) {
+                cariKHS();
+            }
+        }
+    }
+
     function setStatus(msg, type = 'normal') {
         const statusEl = document.getElementById('status-msg');
         if(msg === "") {
@@ -205,7 +222,6 @@
         }
     }
 
-    // Fungsi untuk memunculkan nama otomatis di dropdown input
     function populateDatalist() {
         if (!globalData) return;
         const datalist = document.getElementById('namaMahasiswaList');
@@ -223,7 +239,8 @@
             }
         }
         
-        names.forEach(name => {
+        allNames = Array.from(names);
+        allNames.forEach(name => {
             const option = document.createElement('option');
             option.value = name;
             datalist.appendChild(option);
@@ -239,7 +256,7 @@
             if (Date.now() - parsedCache.timestamp < CACHE_EXPIRY) {
                 globalData = parsedCache.data;
                 populateDatalist();
-                setStatus(""); // Langsung hilangkan, tidak perlu tampil Data Siap
+                setStatus(""); 
                 return true;
             }
         }
@@ -257,7 +274,7 @@
             localStorage.setItem(CACHE_KEY, JSON.stringify({ timestamp: Date.now(), data: globalData }));
             
             populateDatalist();
-            setStatus(""); // Langsung hilangkan setelah selesai memuat
+            setStatus(""); 
             return true;
         } catch (error) {
             setStatus("❌ Error: " + error.message, "error");
@@ -269,7 +286,7 @@
         const namaInput = document.getElementById('searchInput').value.trim().toLowerCase();
         const jenisCetak = document.getElementById('jenisCetak').value;
 
-        if (!namaInput) return alert('Silakan masukkan nama mahasiswa terlebih dahulu!');
+        if (!namaInput) return;
 
         if (!globalData) {
             const isReady = await initData();
@@ -328,17 +345,19 @@
             }
         });
 
-        // PEMBARUAN PENCARIAN NIM: Langsung cek ke kolom NIM
         let nimMhs = "-";
         if (dataNIM.length > 0) {
-            const matchedRow = dataNIM.find(row => 
-                row['Nama Mahasiswa'] && row['Nama Mahasiswa'].toString().toLowerCase() === namaInput
-            ) || dataNIM.find(row => 
-                row['Nama Mahasiswa'] && row['Nama Mahasiswa'].toString().toLowerCase().includes(namaInput)
-            );
+            for (let i = 0; i < dataNIM.length; i++) {
+                let row = dataNIM[i];
+                let rowStr = JSON.stringify(row).toLowerCase(); 
 
-            if (matchedRow && matchedRow['NIM']) {
-                nimMhs = matchedRow['NIM'].toString();
+                if (rowStr.includes(namaInput)) {
+                    let match = rowStr.match(/\b\d{8}\b/);
+                    if (match) {
+                        nimMhs = match[0];
+                        break;
+                    }
+                }
             }
         }
 
