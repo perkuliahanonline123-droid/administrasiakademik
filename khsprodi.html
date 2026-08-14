@@ -18,8 +18,8 @@
         #cetakArea { display: none; margin-top: 30px; }
         .judul-dokumen { text-align: center; font-size: 18px; font-weight: bold; margin-bottom: 20px; color: #000; }
         
-        /* Tabel Informasi Mahasiswa (Garis Tebal) */
-        .info-table-container { border-top: 3px solid #000; border-bottom: 3px solid #000; padding: 10px 0; margin-bottom: 20px; }
+        /* Tabel Informasi Mahasiswa (Tanpa Garis Atas) */
+        .info-table-container { border-bottom: 3px solid #000; padding-bottom: 10px; margin-bottom: 20px; }
         .info-table { width: 100%; border-collapse: collapse; font-size: 14px; font-weight: bold; }
         .info-table td { padding: 4px 8px; vertical-align: top; border: none; }
         .info-table td:nth-child(2), .info-table td:nth-child(5) { width: 10px; }
@@ -69,12 +69,11 @@
     <!-- AREA YANG AKAN DICETAK -->
     <div id="cetakArea">
         
-        <!-- KOP SURAT (Dibuat lebih rapat spasi antar barisnya) -->
+        <!-- KOP SURAT -->
         <div id="kopSurat">
             <div style="text-align: center; line-height: 1.15;">
                 <div style="font-size: 14px; font-weight: bold; letter-spacing: 1px;">PUSAT ILMU KEISLAMAN INTERNASIONAL</div>
                 <div style="font-size: 18px; font-weight: bold; letter-spacing: 1px;">SEKOLAH TINGGI AGAMA ISLAM (STAI) IMAM SYAFI’I CIANJUR</div>
-                <!-- SPASI ARAB DIPERBAIKI DENGAN KODE &nbsp; AGAR TIDAK HILANG SAAT DICETAK -->
                 <div style="font-size: 20px; font-weight: bold; margin: 3px 0;">جامعة&nbsp;الإمام&nbsp;الشافعي</div>
                 <div style="font-size: 12px; margin-top: 4px;">Jl. Sarongge No. 16, RT 01/RW 04, Desa Ciputri, Kec. Pacet, Cianjur, Jawa Barat</div>
                 <div style="font-size: 12px;">Telp.: +62 851-1145-0055 | Email: staiis_cianjur@yahoo.com</div>
@@ -91,12 +90,12 @@
             <table class="info-table">
                 <tr>
                     <td class="label-nowrap" style="width: 15%;">Nama Mahasiswa</td>
-                    <td>:</td>
-                    <td id="lblNama" style="width: 40%;"></td>
+                    <td style="width: 1%;">:</td>
+                    <td id="lblNama" style="width: 44%;"></td>
                     
                     <td class="label-nowrap" style="width: 15%;" id="lblNIMLabel">NIM</td>
-                    <td>:</td>
-                    <td id="lblNIM">-</td>
+                    <td style="width: 1%;">:</td>
+                    <td id="lblNIM" class="label-nowrap" style="width: 24%;">-</td>
                 </tr>
                 <tr>
                     <td class="label-nowrap">Program Studi</td>
@@ -105,7 +104,7 @@
                     
                     <td class="label-nowrap" id="lblSemesterLabel">Semester</td>
                     <td>:</td>
-                    <td id="lblSemester"></td>
+                    <td id="lblSemester" class="label-nowrap"></td>
                 </tr>
             </table>
         </div>
@@ -126,19 +125,9 @@
                     <th style="width: 8%;">Indeks</th>
                 </tr>
             </thead>
+            
+            <!-- Perhatikan bahwa bagian tfoot dihapus, dan diganti inject baris langsung ke tbody melalui JS agar tidak berulang -->
             <tbody id="khsBody"></tbody>
-            <tfoot>
-                <tr>
-                    <td colspan="3" style="text-align: right; font-weight: bold; border-right: none;">Jumlah</td>
-                    <td id="totSks" style="text-align: center; font-weight: bold; border-left: none;">0</td>
-                    <td colspan="3" style="border-right: none;"></td>
-                    <td id="totMutu" style="text-align: center; font-weight: bold; border-left: none;">0.00</td>
-                </tr>
-                <tr>
-                    <td colspan="7" style="text-align: right; font-weight: bold; border-right: none;" id="lblIndeks">IPS ( Indeks Prestasi Semester )</td>
-                    <td id="ips" style="text-align: center; font-weight: bold; border-left: none;">0.00</td>
-                </tr>
-            </tfoot>
         </table>
     </div>
 
@@ -174,7 +163,6 @@
         return { huruf, bobot };
     }
 
-    // Fungsi mengubah titik ke koma khusus untuk tampilan cetak
     function formatKoma(num) {
         return num.toString().replace('.', ',');
     }
@@ -293,62 +281,45 @@
             }
         });
 
-        // Cari NIM yang 8 Digit di Sheet NIM
+        // PENCARIAN NIM DIPERKUAT DENGAN REGEX
         let nimMhs = "-";
         if (dataNIM.length > 0) {
             for (let i = 0; i < dataNIM.length; i++) {
                 let row = dataNIM[i];
-                let isMatch = false;
+                let rowStr = JSON.stringify(row).toLowerCase(); // Ubah 1 baris ke string JSON
 
-                // Cek isi values
-                let vals = Object.values(row);
-                for (let v of vals) {
-                    if (v && v.toString().toLowerCase().includes(namaInput)) isMatch = true;
-                }
-                
-                // Cek di keys (karena terkadang sheet tanpa header terbaca keys nya sebagai data)
-                let keys = Object.keys(row);
-                if (!isMatch) {
-                    for (let k of keys) {
-                        if (k.toLowerCase().includes(namaInput)) isMatch = true;
+                // Jika nama mahasiswa ada di baris ini
+                if (rowStr.includes(namaInput)) {
+                    // Cari pola angka yang jumlahnya pas 8 digit (misal: 25110455)
+                    let match = rowStr.match(/\b\d{8}\b/);
+                    if (match) {
+                        nimMhs = match[0];
+                        break;
                     }
-                }
-
-                if (isMatch) {
-                    // Cari data yang murni berisi 8 digit angka untuk format NIM
-                    let allData = [...keys, ...vals];
-                    for (let d of allData) {
-                        let strD = d ? d.toString().trim() : '';
-                        if (/^\d{8}$/.test(strD)) {
-                            nimMhs = strD;
-                            break;
-                        }
-                    }
-                    if (nimMhs !== "-") break;
                 }
             }
         }
 
         setStatus(""); 
 
-        // Tampilkan Selalu KOP SURAT
         document.getElementById('kopSurat').style.display = 'block';
 
-        // Update UI Text sesuai mode
+        let labelIndeksText = '';
+
         if (jenisCetak === 'all') {
             document.getElementById('judulDokumen').innerText = 'TRANSKRIP NILAI AKADEMIK';
             document.getElementById('lblNIMLabel').innerText = 'NIM';
             document.getElementById('lblNIM').innerText = nimMhs;
             document.getElementById('lblSemesterLabel').innerText = 'Program Pendidikan';
             document.getElementById('lblSemester').innerText = 'Strata - 1 (S1)';
-            document.getElementById('lblIndeks').innerText = 'IPK ( Indeks Prestasi Kumulatif )';
+            labelIndeksText = 'IPK ( Indeks Prestasi Kumulatif )';
         } else {
             document.getElementById('judulDokumen').innerText = 'KARTU HASIL STUDI (KHS)';
             document.getElementById('lblNIMLabel').innerText = 'NIM';
             document.getElementById('lblNIM').innerText = nimMhs;
             document.getElementById('lblSemesterLabel').innerText = 'Semester';
             document.getElementById('lblSemester').innerText = jenisCetak;
-            document.getElementById('lblIndeks').innerText = 'IPS ( Indeks Prestasi Semester )';
+            labelIndeksText = 'IPS ( Indeks Prestasi Semester )';
         }
 
         document.getElementById('cetakArea').style.display = 'block';
@@ -416,10 +387,22 @@
             tbody.appendChild(tr);
         }
 
+        // --- PENYELESAIAN MASALAH FOOTER BERULANG DI SETIAP HALAMAN ---
+        // Footer ditambahkan langsung ke bagian akhir <tbody> alih-alih menggunakan tag <tfoot>
         const ips = totalSKS > 0 ? (totalMutu / totalSKS).toFixed(2) : '0.00';
-        document.getElementById('totSks').innerText = formatKoma(totalSKS.toFixed(2));
-        document.getElementById('totMutu').innerText = formatKoma(totalMutu.toFixed(2));
-        document.getElementById('ips').innerText = formatKoma(ips);
+        
+        tbody.innerHTML += `
+            <tr style="font-weight: bold; border-top: 2px solid #000;">
+                <td colspan="3" style="text-align: right; border-right: none;">Jumlah</td>
+                <td style="text-align: center; border-left: none;">${formatKoma(totalSKS.toFixed(2))}</td>
+                <td colspan="3" style="border-right: none;"></td>
+                <td style="text-align: center; border-left: none;">${formatKoma(totalMutu.toFixed(2))}</td>
+            </tr>
+            <tr style="font-weight: bold;">
+                <td colspan="7" style="text-align: right; border-right: none;">${labelIndeksText}</td>
+                <td style="text-align: center; border-left: none;">${formatKoma(ips)}</td>
+            </tr>
+        `;
     }
 
     window.onload = () => {
