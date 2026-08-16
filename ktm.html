@@ -5,13 +5,12 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Cetak KTM Mahasiswa</title>
   
-  <!-- Cropper.js untuk fitur geser foto -->
   <link href="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.5.13/cropper.min.css" rel="stylesheet">
-  <!-- html2canvas untuk merender HTML menjadi file gambar JPG (Menggantikan PDF) -->
   <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
 
   <style>
-    body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; padding: 20px; background: #f0f2f5; margin: 0;}
+    /* Font dikunci ke Arial / Sans-serif agar tidak berubah menjadi font jadul di HP */
+    body { font-family: Arial, Helvetica, sans-serif; padding: 20px; background: #f0f2f5; margin: 0;}
     .container { max-width: 900px; margin: auto; background: #fff; padding: 25px; border-radius: 12px; box-shadow: 0 4px 12px rgba(0,0,0,0.05); }
     h2 { text-align: center; color: #333; margin-top: 0; }
     
@@ -24,9 +23,8 @@
     
     .zoom-controls { margin-top: 10px; display: none; text-align: center; background: #eef2f5; padding: 10px; border-radius: 6px; border: 1px dashed #008080;}
     .btn-zoom { background-color: #fff; color: #333; border: 1px solid #ccc; padding: 8px 20px; font-size: 20px; border-radius: 4px; cursor: pointer; margin: 0 5px; font-weight: bold; width: auto;}
-    .btn-zoom:hover { background-color: #e2e2e2; }
-
-    /* --- LIVE EDITOR TAMPILAN WEB --- */
+    
+    /* --- LIVE EDITOR RESPONSIVE (MOBILE FIX) --- */
     #editor-wrapper {
       width: 100%;
       position: relative;
@@ -35,54 +33,82 @@
       box-shadow: 0 4px 15px rgba(0,0,0,0.1);
       display: none; 
       overflow: hidden;
-      background: #e9ecef;
-    }
-    
-    #live-ktm {
-      width: 1011px;
-      height: 638px;
-      position: absolute;
-      top: 0;
-      left: 0;
-      transform-origin: top left;
+      
+      /* Background dipasang langsung di sini agar mengunci persis dengan kotak */
       background-image: url('Depan%20KTM.jpg');
-      background-size: cover;
+      background-size: 100% 100%;
       background-position: center;
+      background-repeat: no-repeat;
+      
+      /* Variable penentu skala otomatis */
+      --scale: 1; 
     }
 
-    /* BINGKAI FOTO - Posisinya diturunkan 45px agar pas di tengah */
+    /* Menggunakan rumus calc() agar posisi & ukuran otomatis mengecil di HP */
     #live-foto-container {
       position: absolute;
-      left: 90px; 
-      top: 210px; /* Sebelumnya 165px */
-      width: 240px; 
-      height: 320px; 
-      border-radius: 15px; 
+      left: calc(90px * var(--scale)); 
+      top: calc(210px * var(--scale)); 
+      width: calc(240px * var(--scale)); 
+      height: calc(320px * var(--scale)); 
+      border-radius: calc(15px * var(--scale)); 
       background-color: rgba(255, 255, 255, 0.5); 
       border: 2px dashed #008080;
       box-sizing: border-box;
       z-index: 10;
     }
 
-    /* TEKS - Semuanya ikut diturunkan 45px agar sejajar dengan foto */
-    #live-nama { position: absolute; left: 370px; top: 280px; font-size: 38px; font-weight: 700; font-family: 'Segoe UI', Arial, sans-serif; text-transform: uppercase; margin: 0; color: #1a1a1a; white-space: nowrap; letter-spacing: 0.5px;}
-    #live-nim { position: absolute; left: 370px; top: 370px; font-size: 40px; font-weight: 500; font-family: 'Segoe UI', Arial, sans-serif; margin: 0; color: #333; white-space: nowrap; letter-spacing: 1px;}
-    #live-nama-arab { position: absolute; left: 370px; top: 480px; font-size: 52px; font-weight: bold; font-family: 'Arial', sans-serif; margin: 0; color: #1a1a1a; white-space: nowrap; }
+    #live-nama { 
+      position: absolute; 
+      left: calc(370px * var(--scale)); 
+      top: calc(280px * var(--scale)); 
+      font-size: calc(38px * var(--scale)); 
+      font-weight: 700; 
+      font-family: Arial, sans-serif !important; 
+      text-transform: uppercase; 
+      margin: 0; 
+      color: #1a1a1a; 
+      white-space: nowrap; 
+    }
+    
+    #live-nim { 
+      position: absolute; 
+      left: calc(370px * var(--scale)); 
+      top: calc(370px * var(--scale)); 
+      font-size: calc(40px * var(--scale)); 
+      font-weight: 500; 
+      font-family: Arial, sans-serif !important; 
+      margin: 0; 
+      color: #333; 
+      white-space: nowrap; 
+    }
+    
+    #live-nama-arab { 
+      position: absolute; 
+      left: calc(370px * var(--scale)); 
+      top: calc(480px * var(--scale)); 
+      font-size: calc(52px * var(--scale)); 
+      font-weight: bold; 
+      font-family: Arial, sans-serif !important; 
+      margin: 0; 
+      color: #1a1a1a; 
+      white-space: nowrap; 
+    }
 
     /* Modifikasi Cropper.js */
-    .cropper-view-box { border-radius: 15px; outline: none !important; }
+    .cropper-view-box { outline: none !important; border-radius: calc(15px * var(--scale)); }
     .cropper-dashed, .cropper-point, .cropper-line, .cropper-center { display: none !important; }
     .cropper-modal { opacity: 0 !important; } 
     .cropper-bg { background: transparent !important; }
 
     /* --- TEMPAT RENDER JPG --- */
-    /* Dibuat tembus pandang (opacity 0) agar tidak terlihat pengguna, tapi tetap terbaca sempurna oleh html2canvas */
+    /* Diubah menjadi position: fixed agar tidak merusak scroll halaman di HP */
     #export-wrapper {
-      position: absolute;
+      position: fixed;
       top: 0; 
       left: 0;
       opacity: 0;
-      pointer-events: none; /* Agar tidak bisa diklik */
+      pointer-events: none; 
       z-index: -9999;
     }
 
@@ -102,11 +128,11 @@
       z-index: 0;
     }
 
-    /* Posisi persis sama dengan pengaturan Live Editor di atas */
+    /* Ukuran murni (Hardcoded Pixel) khusus untuk diexport ke JPG Resolusi Tinggi */
     #export-foto { position: absolute; left: 90px; top: 210px; width: 240px; height: 320px; object-fit: cover; border-radius: 15px; z-index: 1;}
-    #export-nama { position: absolute; left: 370px; top: 280px; font-size: 38px; font-weight: 700; font-family: 'Segoe UI', Arial, sans-serif; text-transform: uppercase; margin: 0; color: #1a1a1a; white-space: nowrap; letter-spacing: 0.5px; z-index: 1;}
-    #export-nim { position: absolute; left: 370px; top: 370px; font-size: 40px; font-weight: 500; font-family: 'Segoe UI', Arial, sans-serif; margin: 0; color: #333; white-space: nowrap; letter-spacing: 1px; z-index: 1;}
-    #export-nama-arab { position: absolute; left: 370px; top: 480px; font-size: 52px; font-weight: bold; font-family: 'Arial', sans-serif; margin: 0; color: #1a1a1a; white-space: nowrap; z-index: 1;}
+    #export-nama { position: absolute; left: 370px; top: 280px; font-size: 38px; font-weight: 700; font-family: Arial, sans-serif !important; text-transform: uppercase; margin: 0; color: #1a1a1a; white-space: nowrap; z-index: 1;}
+    #export-nim { position: absolute; left: 370px; top: 370px; font-size: 40px; font-weight: 500; font-family: Arial, sans-serif !important; margin: 0; color: #333; white-space: nowrap; z-index: 1;}
+    #export-nama-arab { position: absolute; left: 370px; top: 480px; font-size: 52px; font-weight: bold; font-family: Arial, sans-serif !important; margin: 0; color: #1a1a1a; white-space: nowrap; z-index: 1;}
   </style>
 </head>
 <body>
@@ -132,22 +158,20 @@
       <button type="button" class="btn-zoom" onclick="zoomOut()">- Perkecil</button>
     </div>
 
-    <!-- AREA LIVE EDITOR -->
+    <!-- AREA LIVE EDITOR RESPONSIVE -->
     <div id="editor-wrapper">
-      <div id="live-ktm">
-        <div id="live-foto-container">
-          <img id="live-foto" src="" style="display:none; max-width: 100%;">
-        </div>
-        <p id="live-nama"></p>
-        <p id="live-nim"></p>
-        <p id="live-nama-arab"></p>
+      <div id="live-foto-container">
+        <img id="live-foto" src="" style="display:none; max-width: 100%;">
       </div>
+      <p id="live-nama"></p>
+      <p id="live-nim"></p>
+      <p id="live-nama-arab"></p>
     </div>
 
     <button id="btn-proses" class="btn-main" style="display:none; margin-top: 25px;" onclick="prosesDanCetak()">Simpan Foto & Download JPG</button>
   </div>
 
-  <!-- AREA RENDER JPG (Transparan di layar) -->
+  <!-- AREA RENDER JPG -->
   <div id="export-wrapper">
     <div id="export-ktm">
       <img id="export-bg" src="Depan%20KTM.jpg" alt="Background"> 
@@ -184,13 +208,16 @@
         console.error(error);
       });
 
+    // SISTEM SKALA BARU (Sangat aman untuk HP)
     function resizeLiveEditor() {
       const wrapper = document.getElementById('editor-wrapper');
-      const ktm = document.getElementById('live-ktm');
       if (wrapper.style.display !== 'none') {
         const targetWidth = wrapper.clientWidth;
         const scale = targetWidth / 1011; 
-        ktm.style.transform = `scale(${scale})`;
+        
+        // Memasukkan nilai skala ke CSS Variable
+        wrapper.style.setProperty('--scale', scale);
+        // Sesuaikan tinggi container
         wrapper.style.height = (638 * scale) + 'px'; 
       }
     }
@@ -241,6 +268,7 @@
 
         if (cropper) cropper.destroy();
         
+        // Cropper kini dapat membaca ukuran HP dengan sangat presisi
         cropper = new Cropper(img, {
           aspectRatio: 240 / 320, 
           viewMode: 1,           
@@ -249,16 +277,13 @@
           cropBoxMovable: false, 
           cropBoxResizable: false, 
           toggleDragModeOnDblclick: false,
-          zoomable: true, 
-          ready: function() {
-            this.cropper.setCropBoxData({ left: 0, top: 0, width: 240, height: 320 });
-          }
+          zoomable: true
+          // Tidak perlu setCropBoxData manual, Cropper akan menyesuaikan secara otomatis!
         });
       };
       reader.readAsDataURL(file);
     });
 
-    // PROSES MERENDER JPG
     function prosesDanCetak() {
       if (!cropper) return alert("Silakan upload foto terlebih dahulu.");
       
@@ -269,27 +294,23 @@
       btn.innerText = "⏳ Sedang memproses Gambar... (Mohon tunggu)";
       btn.disabled = true;
 
-      // Ambil foto wajah saja untuk dikirim ke server (Resolusi tinggi)
       let canvasCrop = cropper.getCroppedCanvas({ width: 480, height: 640 });
       let base64Foto = canvasCrop.toDataURL('image/jpeg', 0.9);
 
-      // Injeksi data ke container tersembunyi
       document.getElementById('export-foto').src = base64Foto;
       document.getElementById('export-nama').innerText = student.nama;
       document.getElementById('export-nim').innerText = student.nim;
       document.getElementById('export-nama-arab').innerText = student.namaArab || "";
 
-      // Render keseluruhan KTM menjadi JPG menggunakan html2canvas
       let element = document.getElementById('export-ktm');
       
       html2canvas(element, {
-        scale: 2, // Kualitas HD/Resolusi Tinggi
+        scale: 2, 
         useCORS: true, 
         logging: false,
         backgroundColor: null
       }).then(canvasFinal => {
         
-        // 1. Download File JPG
         let imgData = canvasFinal.toDataURL('image/jpeg', 1.0);
         let link = document.createElement('a');
         link.download = 'KTM_' + student.nim + '.jpg';
@@ -298,7 +319,6 @@
 
         btn.innerText = "☁️ Menyimpan data foto ke server...";
         
-        // 2. Kirim Foto Wajah (Base64) ke server Google Drive
         fetch(API_URL, {
           method: 'POST',
           redirect: 'follow', 
