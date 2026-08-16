@@ -26,7 +26,8 @@
           },
           boxShadow: {
             'soft': '0 20px 50px -10px rgba(0,0,0,0.08)',
-            'up': '0 -4px 20px rgba(0,0,0,0.05)'
+            'up': '0 -4px 20px rgba(0,0,0,0.05)',
+            'float': '0 15px 35px -5px rgba(0,0,0,0.12)'
           }
         }
       }
@@ -105,11 +106,11 @@
     </div>
     
     <nav class="flex-1 p-6 space-y-4 relative z-10 mt-2 overflow-y-auto">
-      <a href="#" class="w-full text-left px-5 py-4 rounded-2xl font-bold tab-inactive transition-all duration-300 flex items-center gap-4 group">
+      <a href="https://akademikstaiis.vercel.app" class="w-full text-left px-5 py-4 rounded-2xl font-bold tab-inactive transition-all duration-300 flex items-center gap-4 group">
         <div class="w-8 h-8 rounded-lg bg-white/5 flex items-center justify-center group-hover:bg-white/20 transition-all"><i class="fas fa-layer-group text-sm"></i></div>
         Riwayat Jurnal
       </a>
-      <a href="#" class="w-full text-left px-5 py-4 rounded-2xl font-bold tab-inactive transition-all duration-300 flex items-center gap-4 group">
+      <a href="https://akademikstaiis.vercel.app/presensi.html" class="w-full text-left px-5 py-4 rounded-2xl font-bold tab-inactive transition-all duration-300 flex items-center gap-4 group">
         <div class="w-8 h-8 rounded-lg bg-white/5 flex items-center justify-center group-hover:bg-white/20 transition-all"><i class="fas fa-user-shield text-sm"></i></div>
         Presensi Mahasiswa
       </a>
@@ -120,11 +121,11 @@
         Cetak KTM
       </a>
       
-      <a href="#" class="w-full text-left px-5 py-4 rounded-2xl font-bold tab-inactive transition-all duration-300 flex items-center gap-4 group">
+      <a href="https://akademikstaiis.vercel.app/evaluasi.html" class="w-full text-left px-5 py-4 rounded-2xl font-bold tab-inactive transition-all duration-300 flex items-center gap-4 group">
         <div class="w-8 h-8 rounded-lg bg-white/5 flex items-center justify-center group-hover:bg-white/20 transition-all"><i class="fas fa-user-times text-sm"></i></div>
         Evaluasi Akademik
       </a>
-      <a href="#" class="w-full text-left px-5 py-4 rounded-2xl font-bold tab-inactive transition-all duration-300 flex items-center gap-4 group">
+      <a href="https://akademikstaiis.vercel.app/khs.html" class="w-full text-left px-5 py-4 rounded-2xl font-bold tab-inactive transition-all duration-300 flex items-center gap-4 group">
         <div class="w-8 h-8 rounded-lg bg-white/5 flex items-center justify-center group-hover:bg-white/20 transition-all"><i class="fas fa-graduation-cap text-sm"></i></div>
         Hasil Studi
       </a>
@@ -137,7 +138,7 @@
     <header class="glass-panel px-6 md:px-10 py-5 md:py-6 flex flex-col sm:flex-row justify-between items-start sm:items-center sticky top-0 z-20 shadow-sm gap-4">
       <div>
         <h2 class="text-2xl md:text-3xl font-black text-slate-800 tracking-tight">Sistem Cetak KTM</h2>
-        <p class="text-sm font-medium text-slate-500 mt-1">Pilih data dan upload pasfoto untuk mencetak Kartu Mahasiswa secara otomatis</p>
+        <p class="text-sm font-medium text-slate-500 mt-1">Cari nama Anda dan unggah pasfoto untuk mencetak Kartu Mahasiswa secara otomatis</p>
       </div>
       <div class="hidden sm:flex text-sm font-bold text-brand-800 bg-brand-50 px-6 py-3 rounded-full border border-brand-100 items-center gap-3 shadow-sm shrink-0">
         <div class="w-2.5 h-2.5 rounded-full bg-brand-500 animate-ping absolute"></div>
@@ -146,18 +147,46 @@
       </div>
     </header>
 
-    <!-- CONTAINER LEBAR (Lebar 100% dengan padding persis sama seperti header) -->
+    <!-- CONTAINER LEBAR FULL WIDTH -->
     <div class="px-6 md:px-10 py-6 md:py-8 w-full mx-auto animate-slide-up mb-10">
       
       <!-- CARD UTAMA FORM -->
       <div class="bg-white rounded-[2rem] md:rounded-[3rem] shadow-soft border border-slate-100 p-8 md:p-12 lg:p-14 flex flex-col gap-8 lg:gap-10 relative overflow-hidden">
         
-        <!-- Field 1: Pilih Nama -->
-        <div>
-          <label class="block font-bold text-slate-700 mb-3 text-base lg:text-lg"><i class="fas fa-user-graduate text-brand-500 mr-2 text-xl"></i>1. Pilih Nama Anda:</label>
-          <select id="student-select" onchange="showLiveEditor()" class="w-full bg-slate-50 px-6 py-4 lg:py-5 rounded-2xl border-2 border-slate-200 focus:border-brand-500 font-bold text-slate-700 text-base lg:text-xl outline-none focus:ring-4 focus:ring-brand-500/20 shadow-sm cursor-pointer transition-all appearance-none">
-            <option value="">🔄 Memuat data dari server...</option>
-          </select>
+        <!-- Field 1: AUTOCOMPLETE / PENCARIAN ELEGAN -->
+        <div class="relative">
+          <label class="block font-bold text-slate-700 mb-3 text-base lg:text-lg">
+            <i class="fas fa-search text-brand-500 mr-2 text-xl"></i>1. Cari Nama / NIM Anda:
+          </label>
+
+          <div class="relative flex items-center">
+            <div class="absolute left-6 text-slate-400 text-xl pointer-events-none">
+              <i class="fas fa-user-graduate"></i>
+            </div>
+            
+            <input 
+              type="text" 
+              id="student-search-input" 
+              placeholder="Ketik minimal 3 huruf nama atau NIM Anda (contoh: Agung)..." 
+              autocomplete="off" 
+              oninput="handleSearchInput(this.value)"
+              disabled
+              class="w-full bg-slate-50 pl-16 pr-14 py-4 lg:py-5 rounded-2xl border-2 border-slate-200 focus:border-brand-500 font-bold text-slate-700 text-base lg:text-xl outline-none focus:ring-4 focus:ring-brand-500/20 shadow-sm transition-all disabled:opacity-60 disabled:cursor-not-allowed"
+            />
+            
+            <button 
+              id="clear-search-btn" 
+              type="button" 
+              onclick="clearSearch()" 
+              class="hidden absolute right-5 text-slate-400 hover:text-rose-500 text-2xl transition-all"
+            >
+              <i class="fas fa-times-circle"></i>
+            </button>
+          </div>
+
+          <!-- PANEL REKOMENDASI DROPDOWN ELEGAN -->
+          <div id="autocomplete-list" class="hidden absolute top-full left-0 right-0 mt-3 bg-white/95 backdrop-blur-xl border border-slate-200/90 rounded-2xl shadow-float max-h-80 overflow-y-auto z-50 p-2 space-y-1">
+          </div>
         </div>
 
         <!-- Field 2: Upload Foto -->
@@ -178,7 +207,7 @@
           </div>
         </div>
 
-        <!-- Editor Live KTM (Secara otomatis akan memenuhi lebar Card Utama) -->
+        <!-- Editor Live KTM (Secara otomatis memenuhi lebar Card Utama) -->
         <div id="editor-wrapper" class="w-full mt-4">
           <div id="live-foto-container">
             <img id="live-foto" src="" style="display:none; max-width: 100%;">
@@ -203,11 +232,11 @@
 
   <!-- NAVIGASI BOTTOM (HP) -->
   <div class="md:hidden fixed bottom-0 left-0 w-full bg-white/95 backdrop-blur-lg border-t border-slate-200/60 flex justify-around items-center pt-3 pb-4 px-2 z-50 shadow-up rounded-t-3xl">
-    <a href="#" class="flex flex-col items-center gap-1 w-1/5 text-slate-400 hover:text-emerald-500 transition-all duration-300">
+    <a href="https://akademikstaiis.vercel.app" class="flex flex-col items-center gap-1 w-1/5 text-slate-400 hover:text-emerald-500 transition-all duration-300">
       <div class="w-10 h-10 rounded-full flex items-center justify-center"><i class="fas fa-layer-group text-lg"></i></div>
       <span class="text-[9px] font-black tracking-widest uppercase mt-[-4px]">Jurnal</span>
     </a>
-    <a href="#" class="flex flex-col items-center gap-1 w-1/5 text-slate-400 hover:text-emerald-500 transition-all duration-300">
+    <a href="https://akademikstaiis.vercel.app/presensi.html" class="flex flex-col items-center gap-1 w-1/5 text-slate-400 hover:text-emerald-500 transition-all duration-300">
       <div class="w-10 h-10 rounded-full flex items-center justify-center"><i class="fas fa-user-shield text-lg"></i></div>
       <span class="text-[9px] font-black tracking-widest uppercase mt-[-4px]">Presensi</span>
     </a>
@@ -215,17 +244,17 @@
       <div class="bg-gradient-to-br from-brand-500 to-brand-600 w-12 h-12 rounded-full flex items-center justify-center text-white shadow-lg shadow-brand-500/40"><i class="fas fa-id-card text-xl"></i></div>
       <span class="text-[9px] font-black tracking-widest uppercase">KTM</span>
     </a>
-    <a href="#" class="flex flex-col items-center gap-1 w-1/5 text-slate-400 hover:text-emerald-500 transition-all duration-300">
+    <a href="https://akademikstaiis.vercel.app/evaluasi.html" class="flex flex-col items-center gap-1 w-1/5 text-slate-400 hover:text-emerald-500 transition-all duration-300">
       <div class="w-10 h-10 rounded-full flex items-center justify-center"><i class="fas fa-user-times text-lg"></i></div>
       <span class="text-[9px] font-black tracking-widest uppercase mt-[-4px]">Evaluasi</span>
     </a>
-    <a href="#" class="flex flex-col items-center gap-1 w-1/5 text-slate-400 hover:text-emerald-500 transition-all duration-300">
+    <a href="https://akademikstaiis.vercel.app/khs.html" class="flex flex-col items-center gap-1 w-1/5 text-slate-400 hover:text-emerald-500 transition-all duration-300">
       <div class="w-10 h-10 rounded-full flex items-center justify-center"><i class="fas fa-graduation-cap text-lg"></i></div>
       <span class="text-[9px] font-black tracking-widest uppercase mt-[-4px]">Hasil</span>
     </a>
   </div>
 
-  <!-- EXPORT WRAPPER (Render Background untuk Download) -->
+  <!-- EXPORT WRAPPER -->
   <div id="export-wrapper">
     <div id="export-ktm">
       <img id="export-bg" src="Depan%20KTM.jpg?v=2" alt="Background"> 
@@ -236,7 +265,7 @@
     </div>
   </div>
 
-  <!-- JAVASCRIPT KINERJA & LOGIKA KTM -->
+  <!-- JAVASCRIPT LOGIKA UTAMA -->
   <script>
     // --- Jam Realtime Header ---
     function updateJam() {
@@ -253,32 +282,124 @@
     setInterval(updateJam, 1000);
     updateJam();
 
-    // --- Logika Utama Cetak KTM ---
+    // --- Logika Cetak KTM & Autocomplete ---
     const API_URL = "https://script.google.com/macros/s/AKfycbw7pgDjQaj0hpuOXYCc1JJ5KWjd8er1_rfm9yK0_WOSv51Jvdqo54mGz0WSqGT5NCh3MA/exec";
     
     let studentsData = [];
     let cropper;
+    let selectedStudentNim = "";
 
+    // Load data mahasiswa dari API
     fetch(API_URL + "?t=" + new Date().getTime())
       .then(response => response.json())
       .then(data => {
         studentsData = data;
-        let select = document.getElementById("student-select");
-        select.innerHTML = '<option value="">-- Ketik / Pilih Nama Anda --</option>';
-        
-        data.forEach(student => {
-          let option = document.createElement("option");
-          option.value = student.nim;
-          option.text = student.nim + " - " + student.nama;
-          select.appendChild(option);
-        });
+        const searchInput = document.getElementById("student-search-input");
+        searchInput.disabled = false;
+        searchInput.placeholder = "Ketik nama atau NIM Anda (contoh: Agung)...";
       })
       .catch(error => {
         alert("Gagal memuat data dari server.");
         console.error(error);
-        document.getElementById("student-select").innerHTML = '<option value="">Gagal memuat data</option>';
+        const searchInput = document.getElementById("student-search-input");
+        searchInput.placeholder = "Gagal memuat data mahasiswa dari server";
       });
 
+    // --- LOGIKA AUTOCOMPLETE PENCARIAN ELEGAN ---
+    function handleSearchInput(query) {
+      const clearBtn = document.getElementById("clear-search-btn");
+      const listContainer = document.getElementById("autocomplete-list");
+      
+      if (query.trim().length > 0) {
+        clearBtn.classList.remove("hidden");
+      } else {
+        clearBtn.classList.add("hidden");
+      }
+
+      const trimmed = query.trim().toLowerCase();
+
+      // Memerlukan minimal 3 huruf untuk menampilkan rekomendasi
+      if (trimmed.length < 3) {
+        listContainer.classList.add("hidden");
+        if(selectedStudentNim) resetSelection();
+        return;
+      }
+
+      const matches = studentsData.filter(s => 
+        (s.nama && s.nama.toLowerCase().includes(trimmed)) || 
+        (s.nim && s.nim.toString().toLowerCase().includes(trimmed))
+      );
+
+      if (matches.length === 0) {
+        listContainer.innerHTML = `
+          <div class="p-4 text-center text-slate-400 font-medium">
+            <i class="fas fa-user-slash text-2xl mb-1 block text-slate-300"></i>
+            Mahasiswa tidak ditemukan
+          </div>`;
+        listContainer.classList.remove("hidden");
+        return;
+      }
+
+      let html = "";
+      matches.forEach(student => {
+        html += `
+          <div onclick="selectStudent('${student.nim}')" class="flex items-center justify-between p-3.5 hover:bg-brand-50/90 rounded-xl cursor-pointer transition-all duration-200 group border border-transparent hover:border-brand-200">
+            <div class="flex items-center gap-3.5">
+              <div class="w-10 h-10 rounded-xl bg-brand-100 text-brand-700 flex items-center justify-center font-black text-sm group-hover:bg-brand-500 group-hover:text-white transition-all shadow-sm">
+                <i class="fas fa-user"></i>
+              </div>
+              <div>
+                <div class="font-bold text-slate-800 text-base group-hover:text-brand-800 transition-colors">${student.nama}</div>
+                <div class="text-xs text-slate-400 font-semibold tracking-wide">NIM: ${student.nim}</div>
+              </div>
+            </div>
+            <div class="text-xs font-bold px-3 py-1.5 rounded-lg bg-slate-100 text-slate-500 group-hover:bg-brand-600 group-hover:text-white transition-all">
+              Pilih <i class="fas fa-chevron-right ml-1 text-[10px]"></i>
+            </div>
+          </div>`;
+      });
+
+      listContainer.innerHTML = html;
+      listContainer.classList.remove("hidden");
+    }
+
+    function selectStudent(nim) {
+      const student = studentsData.find(s => s.nim.toString() === nim.toString());
+      if (!student) return;
+
+      selectedStudentNim = student.nim;
+      document.getElementById("student-search-input").value = `${student.nim} - ${student.nama}`;
+      document.getElementById("autocomplete-list").classList.add("hidden");
+      document.getElementById("clear-search-btn").classList.remove("hidden");
+
+      showLiveEditor(student.nim);
+    }
+
+    function clearSearch() {
+      document.getElementById("student-search-input").value = "";
+      document.getElementById("clear-search-btn").classList.add("hidden");
+      document.getElementById("autocomplete-list").classList.add("hidden");
+      resetSelection();
+    }
+
+    function resetSelection() {
+      selectedStudentNim = "";
+      document.getElementById("editor-wrapper").style.display = "none";
+      document.getElementById("upload-image").disabled = true;
+      document.getElementById("zoom-panel").classList.add("hidden");
+      document.getElementById("btn-proses").style.display = "none";
+    }
+
+    // Tutup popup jika klik di luar area
+    document.addEventListener("click", function(e) {
+      const container = document.getElementById("autocomplete-list");
+      const input = document.getElementById("student-search-input");
+      if (container && input && !container.contains(e.target) && e.target !== input) {
+        container.classList.add("hidden");
+      }
+    });
+
+    // --- EDITOR LIVE KTM ---
     function resizeLiveEditor() {
       const wrapper = document.getElementById('editor-wrapper');
       if (wrapper.style.display !== 'none') {
@@ -290,20 +411,17 @@
     }
     window.addEventListener('resize', resizeLiveEditor);
 
-    function showLiveEditor() {
-      let nim = document.getElementById("student-select").value;
+    function showLiveEditor(nim) {
       let wrapper = document.getElementById("editor-wrapper");
       let fileInput = document.getElementById("upload-image");
       
       if (!nim) {
-        wrapper.style.display = "none";
-        fileInput.disabled = true;
-        document.getElementById('zoom-panel').classList.add("hidden");
-        document.getElementById('btn-proses').style.display = "none";
+        resetSelection();
         return;
       }
 
-      let student = studentsData.find(s => s.nim === nim);
+      let student = studentsData.find(s => s.nim.toString() === nim.toString());
+      if (!student) return;
       
       document.getElementById("live-nama").innerText = student.nama;
       document.getElementById("live-nim").innerText = student.nim;
@@ -313,8 +431,6 @@
       fileInput.disabled = false;
       
       resizeLiveEditor();
-      
-      // Auto Scroll ke bawah sedikit agar terlihat penuh
       window.scrollTo({ top: wrapper.offsetTop - 100, behavior: 'smooth' });
     }
 
@@ -355,10 +471,10 @@
 
     function prosesDanCetak() {
       if (!cropper) return alert("Silakan upload foto terlebih dahulu.");
-      
+      if (!selectedStudentNim) return alert("Silakan pilih nama mahasiswa terlebih dahulu.");
+
       let btn = document.getElementById('btn-proses');
-      let nim = document.getElementById("student-select").value;
-      let student = studentsData.find(s => s.nim === nim);
+      let student = studentsData.find(s => s.nim.toString() === selectedStudentNim.toString());
       
       btn.innerHTML = "<i class='fas fa-spinner fa-spin text-2xl'></i> Sedang memproses Gambar...";
       btn.disabled = true;
@@ -392,7 +508,7 @@
           redirect: 'follow', 
           headers: { 'Content-Type': 'text/plain;charset=utf-8' },
           body: JSON.stringify({
-            nim: nim,
+            nim: student.nim,
             image: base64Foto
           })
         })
