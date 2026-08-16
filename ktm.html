@@ -28,7 +28,9 @@
       width: 100%;
       position: relative;
       margin-top: 25px;
-      border-radius: 8px;
+      /* Penambahan Bingkai Kartu */
+      border-radius: 25px;
+      border: 1px solid #dcdcdc; 
       box-shadow: 0 4px 15px rgba(0,0,0,0.1);
       display: none; 
       overflow: hidden;
@@ -39,7 +41,6 @@
       --scale: 1; 
     }
 
-    /* POSISI BARU: Lebih merapat ke kiri dan presisi layaknya desain asli */
     #live-foto-container {
       position: absolute;
       left: calc(85px * var(--scale)); 
@@ -53,10 +54,11 @@
       z-index: 10;
     }
 
+    /* POSISI TEKS BARU: Dinaikkan agar tidak melebihi batas bawah foto */
     #live-nama { 
       position: absolute; 
       left: calc(360px * var(--scale)); 
-      top: calc(240px * var(--scale)); 
+      top: calc(220px * var(--scale)); /* Dinaikkan */
       font-size: calc(36px * var(--scale)); 
       font-weight: 700; 
       font-family: Arial, sans-serif !important; 
@@ -69,7 +71,7 @@
     #live-nim { 
       position: absolute; 
       left: calc(360px * var(--scale)); 
-      top: calc(335px * var(--scale)); 
+      top: calc(315px * var(--scale)); /* Dinaikkan */
       font-size: calc(40px * var(--scale)); 
       font-weight: 500; 
       font-family: Arial, sans-serif !important; 
@@ -82,7 +84,7 @@
     #live-nama-arab { 
       position: absolute; 
       left: calc(360px * var(--scale)); 
-      top: calc(445px * var(--scale)); 
+      top: calc(420px * var(--scale)); /* Dinaikkan (Sejajar batas bawah foto) */
       font-size: calc(50px * var(--scale)); 
       font-weight: bold; 
       font-family: Arial, sans-serif !important; 
@@ -111,15 +113,21 @@
       height: 638px;
       position: relative;
       background-color: #fff;
+      /* Penambahan Bingkai Kartu untuk JPG Export */
+      border-radius: 25px;
+      border: 1px solid #dcdcdc; 
+      box-sizing: border-box;
+      overflow: hidden;
     }
     
     #export-bg { position: absolute; top: 0; left: 0; width: 1011px; height: 638px; z-index: 0; }
 
     /* Ukuran Fix Export (Sama persis dengan Live) */
     #export-foto { position: absolute; left: 85px; top: 180px; width: 234px; height: 312px; object-fit: cover; border-radius: 15px; z-index: 1;}
-    #export-nama { position: absolute; left: 360px; top: 240px; font-size: 36px; font-weight: 700; font-family: Arial, sans-serif !important; text-transform: uppercase; margin: 0; color: #1a1a1a; white-space: nowrap; z-index: 1;}
-    #export-nim { position: absolute; left: 360px; top: 335px; font-size: 40px; font-weight: 500; font-family: Arial, sans-serif !important; margin: 0; color: #333; white-space: nowrap; letter-spacing: 2px; z-index: 1;}
-    #export-nama-arab { position: absolute; left: 360px; top: 445px; font-size: 50px; font-weight: bold; font-family: Arial, sans-serif !important; margin: 0; color: #1a1a1a; white-space: nowrap; z-index: 1;}
+    
+    #export-nama { position: absolute; left: 360px; top: 220px; font-size: 36px; font-weight: 700; font-family: Arial, sans-serif !important; text-transform: uppercase; margin: 0; color: #1a1a1a; white-space: nowrap; z-index: 1;}
+    #export-nim { position: absolute; left: 360px; top: 315px; font-size: 40px; font-weight: 500; font-family: Arial, sans-serif !important; margin: 0; color: #333; white-space: nowrap; letter-spacing: 2px; z-index: 1;}
+    #export-nama-arab { position: absolute; left: 360px; top: 420px; font-size: 50px; font-weight: bold; font-family: Arial, sans-serif !important; margin: 0; color: #1a1a1a; white-space: nowrap; z-index: 1;}
   </style>
 </head>
 <body>
@@ -287,7 +295,7 @@
         scale: 2, 
         useCORS: true, 
         logging: false,
-        backgroundColor: null
+        backgroundColor: "#ffffff" // Background putih jika ada bagian melengkung yang kosong di luar kartu
       }).then(canvasFinal => {
         
         let imgData = canvasFinal.toDataURL('image/jpeg', 1.0);
