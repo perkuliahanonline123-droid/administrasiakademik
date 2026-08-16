@@ -402,10 +402,10 @@
 
     /* --- TEMPAT RENDER PNG TRANSPARAN --- */
     #export-wrapper {
-      position: absolute; /* Ganti fixed jadi absolute */
-      top: 0; /* Tarik ke atas, JANGAN pakai -9999px */
+      position: absolute; 
+      top: 0; 
       left: 0;
-      opacity: 0; /* Sembunyikan dengan opacity agar tetap bisa dirender utuh oleh HP */
+      opacity: 0; 
       pointer-events: none; 
       z-index: -9999;
     }
@@ -421,8 +421,10 @@
     }
     
     #export-bg { position: absolute; top: 0; left: 0; width: 1011px; height: 638px; z-index: 0; }
-    /* HAPUS 'object-fit: cover;' karena memicu bug bergeser pada html2canvas di HP */
+    
+    /* Hapus object-fit: cover agar tidak memicu bug bergeser di html2canvas mobile */
     #export-foto { position: absolute; left: 85px; top: 180px; width: 234px; height: 312px; border-radius: 15px; z-index: 1;}
+    
     #export-nama { position: absolute; left: 360px; top: 220px; font-size: 36px; font-weight: 700; font-family: 'Plus Jakarta Sans', Arial, sans-serif; text-transform: uppercase; margin: 0; color: #1a1a1a; white-space: nowrap; z-index: 1;}
     #export-nim { position: absolute; left: 360px; top: 315px; font-size: 40px; font-weight: 500; font-family: 'Plus Jakarta Sans', Arial, sans-serif; margin: 0; color: #333; white-space: nowrap; letter-spacing: 2px; z-index: 1;}
     #export-nama-arab { position: absolute; left: 360px; top: 420px; font-size: 50px; font-weight: bold; font-family: Arial, sans-serif; margin: 0; color: #1a1a1a; white-space: nowrap; z-index: 1;}
@@ -551,7 +553,7 @@
         console.error(error);
       });
 
-    // 2. Logic Pencarian Pintar
+    // 2. Logic Pencarian Pintar (Custom Autocomplete)
     const searchInput = document.getElementById('student-search');
     const autocompleteList = document.getElementById('custom-autocomplete-list');
 
@@ -643,7 +645,6 @@
         let img = document.getElementById('live-foto');
         let container = document.getElementById('live-foto-container');
         
-        // PERBAIKAN RACE CONDITION: Tunggu gambar masuk memori browser secara penuh
         img.onload = function() {
           container.style.border = 'none'; 
           
@@ -664,7 +665,6 @@
           });
         };
         
-        // Picu pemuatan gambar ke tag <img>
         img.src = event.target.result;
         img.style.display = 'block';
       };
@@ -688,13 +688,11 @@
       btn.innerHTML = `<i class="fa-solid fa-spinner fa-spin"></i> Memproses...`;
       btn.disabled = true;
 
-      // Extract canvas
       let canvasCrop = cropper.getCroppedCanvas({ width: 468, height: 624 });
       let base64Foto = canvasCrop.toDataURL('image/jpeg', 0.92);
 
       let exportFoto = document.getElementById('export-foto');
       
-      // PERBAIKAN RACE CONDITION 2: Wajib tunggu gambar di-render ke area cetak tersembunyi
       exportFoto.onload = function() {
         document.getElementById('export-nama').innerText = student.nama;
         document.getElementById('export-nim').innerText = student.nim;
@@ -702,21 +700,17 @@
 
         let element = document.getElementById('export-ktm');
         
-        let element = document.getElementById('export-ktm');
-      
         html2canvas(element, {
           scale: 2, 
           useCORS: true, 
           logging: false,
           backgroundColor: null,
-          /* TAMBAHKAN 4 BARIS INI UNTUK MENGUNCI POSISI RENDER DI HP */
           scrollY: 0,
           scrollX: 0,
           windowWidth: 1011,
           windowHeight: 638
         }).then(canvasFinal => {
           
-          // Menggunakan Blob API agar aman dari pemblokiran browser HP
           canvasFinal.toBlob(function(blob) {
             let url = URL.createObjectURL(blob);
             let link = document.createElement('a');
@@ -767,7 +761,6 @@
         });
       };
 
-      // Trigger Render Foto
       exportFoto.src = base64Foto;
     }
   </script>
