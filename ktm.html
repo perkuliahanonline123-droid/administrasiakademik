@@ -206,7 +206,7 @@
       background-color: #fff;
     }
 
-    /* --- STYLE PENCARIAN PINTAR (SESUAI DESAIN BARU) --- */
+    /* --- STYLE PENCARIAN PINTAR (KOTAK SUDUT TUMPUL) --- */
     .search-wrapper {
       position: relative;
       width: 100%;
@@ -216,9 +216,9 @@
       display: flex;
       align-items: center;
       background: #ffffff;
-      padding: 6px; /* Padding disesuaikan agar sama persis */
-      border-radius: 99px; /* Melengkung penuh (Pill shape) */
-      border: 3px solid #ffffff; /* Default: border menyatu dengan background putih */
+      padding: 6px; 
+      border-radius: 14px; /* DIUBAH DARI 99px MENJADI 14px (Kotak tumpul elegan) */
+      border: 3px solid #ffffff; 
       box-shadow: 0 4px 10px rgba(0, 0, 0, 0.03);
       transition: all 0.3s ease;
       width: 100%;
@@ -226,7 +226,6 @@
       z-index: 20;
     }
 
-    /* Saat form diklik/diketik, border berubah menjadi hijau muda */
     .custom-search-box:focus-within {
       border-color: #bceadd;
     }
@@ -234,8 +233,8 @@
     .search-icon-bg {
       width: 42px;
       height: 42px;
-      background-color: #0ba97b; /* Warna icon kotak hijau */
-      border-radius: 12px; /* Kotak dengan sudut melengkung estetik */
+      background-color: #0ba97b; 
+      border-radius: 10px; /* Disesuaikan agar serasi dengan lengkungan kotak luar */
       display: flex;
       align-items: center;
       justify-content: center;
