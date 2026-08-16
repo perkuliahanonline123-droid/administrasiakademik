@@ -17,42 +17,103 @@
     button:disabled { background-color: #ccc; cursor: not-allowed; }
     #image-container { max-width: 100%; max-height: 400px; margin-top: 15px; display: none; }
     
-    /* Tampilan Preview Layar (Tanpa Label) */
+    /* Tampilan Preview Layar */
     #preview-data { background: #eef2f5; padding: 15px; margin-top: 10px; border-left: 4px solid #008080; display: none; border-radius: 4px; line-height: 1.6;}
     #lbl-nama { font-weight: bold; font-size: 18px; color: #222;}
     #lbl-nim { font-size: 16px; color: #444;}
     #lbl-nama-arab { font-size: 22px; font-weight: bold; color: #222; margin-top: 5px;}
     
-    /* Area Cetak KTM - Persis Gambar 3 */
+    /* Area Cetak KTM */
     #print-area { display: none; }
     
+    /* --- PENGATURAN KHUSUS SAAT MENCETAK --- */
     @media print {
-      @page { size: landscape; margin: 0; }
-      body { background: white; margin: 0; padding: 0;}
-      #app-container { display: none; }
+      @page { 
+        size: A4 landscape; /* Memaksa mode lanskap pada ukuran kertas A4 */
+        margin: 0; 
+      }
       
-      /* Mengatur ukuran dan posisi elemen di atas background */
+      body { 
+        background: white; 
+        margin: 0; 
+        padding: 0;
+        /* Memosisikan kartu tepat di tengah kertas cetak */
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        height: 100vh;
+      }
+      
+      #app-container { display: none !important; }
+      
       #print-area { 
-        display: block; 
+        display: block !important; 
         position: relative; 
-        width: 1000px; /* Ukuran skala kartu */
-        height: 630px; 
-        margin: auto;
+        width: 1011px; /* Ukuran pasti kartu */
+        height: 638px; /* Ukuran pasti kartu */
+        /* Background dipindah ke CSS agar presisi 100% tanpa celah putih */
+        background-image: url('Depan%20KTM.jpg');
+        background-size: 100% 100%;
+        background-position: center;
+        background-repeat: no-repeat;
         overflow: hidden;
       }
       
-      #print-bg { position: absolute; left: 0; top: 0; width: 100%; height: 100%; z-index: -1; }
-      
       /* Posisi Foto */
-      #print-foto { position: absolute; left: 85px; top: 175px; width: 220px; height: 300px; object-fit: cover; border-radius: 20px; }
+      #print-foto { 
+        position: absolute; 
+        left: 85px; 
+        top: 172px; 
+        width: 228px; 
+        height: 312px; 
+        object-fit: cover; 
+        border-radius: 20px; /* Sudut lengkung persis desain asli */
+      }
       
-      /* Posisi Teks */
-      #print-nama { position: absolute; left: 360px; top: 250px; font-size: 38px; font-weight: bold; font-family: 'Arial', sans-serif; text-transform: uppercase; margin: 0; color: #000; }
-      #print-nim { position: absolute; left: 360px; top: 350px; font-size: 42px; font-family: 'Arial', sans-serif; margin: 0; color: #000; }
-      #print-nama-arab { position: absolute; left: 360px; top: 450px; font-size: 48px; font-weight: bold; font-family: 'Arial', sans-serif; margin: 0; color: #000; }
+      /* Posisi Teks Dirapikan */
+      #print-nama { 
+        position: absolute; 
+        left: 360px; 
+        top: 255px; 
+        font-size: 38px; 
+        font-weight: 600; 
+        font-family: 'Segoe UI', Arial, sans-serif; 
+        text-transform: uppercase; 
+        margin: 0; 
+        color: #111;
+        letter-spacing: 1px;
+      }
       
-      /* Posisi QR Code */
-      #print-qr { position: absolute; right: 90px; bottom: 120px; width: 140px; height: 140px; }
+      #print-nim { 
+        position: absolute; 
+        left: 360px; 
+        top: 360px; 
+        font-size: 42px; 
+        font-family: 'Segoe UI', Arial, sans-serif; 
+        margin: 0; 
+        color: #111;
+        letter-spacing: 2px;
+      }
+      
+      #print-nama-arab { 
+        position: absolute; 
+        left: 360px; 
+        top: 475px; 
+        font-size: 50px; /* Ukuran diperbesar */
+        font-weight: bold; 
+        font-family: 'Arial', sans-serif; 
+        margin: 0; 
+        color: #111; 
+      }
+      
+      /* Posisi QR Code Dirapikan */
+      #print-qr { 
+        position: absolute; 
+        right: 85px; 
+        bottom: 85px; 
+        width: 160px; 
+        height: 160px; 
+      }
     }
   </style>
 </head>
@@ -68,7 +129,7 @@
       </select>
     </div>
 
-    <!-- Tampilan Preview di Layar (Tanpa Label) -->
+    <!-- Tampilan Preview di Layar -->
     <div id="preview-data">
       <div id="lbl-nama"></div>
       <div id="lbl-nim"></div>
@@ -89,27 +150,24 @@
 
   <!-- Area Cetak Khusus Print (Layered Position) -->
   <div id="print-area">
-    <!-- Gambar Background dari Github Anda (Gunakan format spasi %20) -->
-    <img id="print-bg" src="Depan%20KTM.jpg" alt="Background KTM">
-    
+    <!-- Gambar Background sekarang dikontrol via CSS di atas -->
     <img id="print-foto" src="" alt="Foto">
     <p id="print-nama"></p>
     <p id="print-nim"></p>
     <p id="print-nama-arab"></p>
-    <!-- QR Code Generator -->
     <img id="print-qr" src="" alt="QR Code">
   </div>
 
   <script src="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.5.13/cropper.min.js"></script>
   <script>
-    // MASUKKAN URL APPS SCRIPT ANDA DI SINI
+    // URL API APPS SCRIPT ANDA
     const API_URL = "https://script.google.com/macros/s/AKfycbw7pgDjQaj0hpuOXYCc1JJ5KWjd8er1_rfm9yK0_WOSv51Jvdqo54mGz0WSqGT5NCh3MA/exec";
     
     let studentsData = [];
     let cropper;
 
-    // Fetch JSON dari Apps Script
-    fetch(API_URL)
+    // Fetch JSON dari Apps Script (menggunakan anti-cache parameter ?t=)
+    fetch(API_URL + "?t=" + new Date().getTime())
       .then(response => response.json())
       .then(data => {
         studentsData = data;
@@ -141,7 +199,6 @@
       }
 
       let student = studentsData.find(s => s.nim === nim);
-      // Hanya menampilkan data, tanpa label
       document.getElementById("lbl-nama").innerText = student.nama;
       document.getElementById("lbl-nim").innerText = student.nim;
       document.getElementById("lbl-nama-arab").innerText = student.namaArab || "-";
@@ -164,7 +221,7 @@
 
         if (cropper) cropper.destroy();
         cropper = new Cropper(img, {
-          aspectRatio: 220 / 300, // Rasio disesuaikan dengan bingkai foto pada desain baru
+          aspectRatio: 228 / 312, // Rasio foto disesuaikan
           viewMode: 1,
           dragMode: 'move'
         });
@@ -184,7 +241,7 @@
       btn.disabled = true;
 
       // Render image hasil crop
-      let canvas = cropper.getCroppedCanvas({ width: 440, height: 600 });
+      let canvas = cropper.getCroppedCanvas({ width: 456, height: 624 });
       let base64Data = canvas.toDataURL('image/png');
 
       // Masukkan data ke area print
@@ -193,8 +250,8 @@
       document.getElementById('print-nim').innerText = student.nim;
       document.getElementById('print-nama-arab').innerText = student.namaArab || "";
       
-      // Generate QR Code dinamis menggunakan API Publik
-      document.getElementById('print-qr').src = "https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=" + student.nim;
+      // Generate QR Code dinamis 
+      document.getElementById('print-qr').src = "https://api.qrserver.com/v1/create-qr-code/?size=160x160&data=" + student.nim;
 
       // Kirim data ke Apps Script via POST
       fetch(API_URL, {
@@ -209,7 +266,7 @@
       .then(response => response.json())
       .then(result => {
         if(result.status === "success") {
-          window.print(); // Cetak jika berhasil
+          window.print(); // Buka dialog print jika berhasil disimpan
         } else {
           alert("Gagal menyimpan foto: " + result.message);
         }
