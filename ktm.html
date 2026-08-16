@@ -248,7 +248,7 @@
 
     /* --- TOMBOL --- */
     .action-buttons {
-      display: none; /* Disembunyikan awalnya */
+      display: none; /* Awalnya disembunyikan */
       flex-direction: column;
       gap: 16px;
       margin-top: 25px;
@@ -275,7 +275,6 @@
     .btn-main:hover { background-color: #034233; transform: translateY(-2px); }
     .btn-main:disabled { background-color: #cbd5e1; box-shadow: none; cursor: not-allowed; transform: none;}
 
-    /* Style Tombol Belakang KTM */
     .btn-secondary {
       width: 100%;
       padding: 16px;
@@ -668,15 +667,20 @@
       reader.readAsDataURL(file);
     });
 
-    // 4. Logic Download PNG
+    // 4. Logic Download PNG (SUDAH DIPERBAIKI UNTUK HP MOBILE)
     function prosesDanCetak() {
       if (!cropper) return alert("Silakan upload foto terlebih dahulu.");
       
       let btn = document.getElementById('btn-proses');
       
       let searchVal = document.getElementById("student-search").value;
-      let nim = searchVal.match(/^(\d+)\s-/)[1];
+      // Pengamanan Regex jika pengguna mengedit manual form search
+      let match = searchVal.match(/^(\d+)/); 
+      if (!match) return alert("Data mahasiswa tidak valid. Silakan cari dan klik ulang nama Anda di daftar.");
+      
+      let nim = match[1];
       let student = studentsData.find(s => s.nim === nim);
+      if (!student) return alert("Data mahasiswa tidak ditemukan di database.");
       
       btn.innerHTML = `<i class="fa-solid fa-spinner fa-spin"></i> Sedang memproses...`;
       btn.disabled = true;
@@ -697,43 +701,59 @@
         logging: false,
         backgroundColor: null
       }).then(canvasFinal => {
-        let imgData = canvasFinal.toDataURL('image/png');
-        let link = document.createElement('a');
-        link.download = 'KTM_' + student.nim + '.png';
-        link.href = imgData;
-        link.click();
-
-        btn.innerHTML = `<i class="fa-solid fa-cloud-arrow-up"></i> Menyimpan ke server...`;
         
-        fetch(API_URL, {
-          method: 'POST',
-          redirect: 'follow', 
-          headers: { 'Content-Type': 'text/plain;charset=utf-8' },
-          body: JSON.stringify({
-            nim: nim,
-            image: base64Foto
+        // PENGGUNAAN BLOB API: Sangat ampuh menembus blokir download di browser HP
+        canvasFinal.toBlob(function(blob) {
+          let url = URL.createObjectURL(blob);
+          let link = document.createElement('a');
+          link.download = 'KTM_Depan_' + student.nim + '.png';
+          link.href = url;
+          
+          // Wajib di-append ke body agar terbaca sistem HP
+          document.body.appendChild(link);
+          link.click();
+          document.body.removeChild(link);
+          URL.revokeObjectURL(url); // Bersihkan memori
+
+          btn.innerHTML = `<i class="fa-solid fa-cloud-arrow-up"></i> Menyimpan ke server...`;
+          
+          fetch(API_URL, {
+            method: 'POST',
+            redirect: 'follow', 
+            headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+            body: JSON.stringify({
+              nim: nim,
+              image: base64Foto
+            })
           })
-        })
-        .then(response => response.json())
-        .then(result => {
-          if(result.status === "success") {
-            btn.innerHTML = `<i class="fa-solid fa-check"></i> Selesai Diunduh`;
-            setTimeout(() => {
+          .then(response => response.json())
+          .then(result => {
+            if(result.status === "success") {
+              btn.innerHTML = `<i class="fa-solid fa-check"></i> Selesai Diunduh`;
+              setTimeout(() => {
+                btn.innerHTML = `<i class="fa-solid fa-download"></i> Download KTM Depan`;
+                btn.disabled = false;
+              }, 3000);
+            } else {
+              alert("KTM berhasil diunduh, namun foto wajah gagal tersimpan di server: " + result.message);
               btn.innerHTML = `<i class="fa-solid fa-download"></i> Download KTM Depan`;
               btn.disabled = false;
-            }, 3000);
-          } else {
-            alert("Gambar berhasil diunduh, namun foto gagal tersimpan: " + result.message);
+            }
+          })
+          .catch(error => {
+            // Silently reset UI if server is busy, but download already success
             btn.innerHTML = `<i class="fa-solid fa-download"></i> Download KTM Depan`;
             btn.disabled = false;
-          }
-        })
-        .catch(error => {
-          alert("Jaringan terputus saat menghubungi server.");
+            console.error(error);
+          });
+          
+        }, 'image/png');
+
+      }).catch(error => {
+          alert("Terjadi kesalahan saat memproses gambar.");
           btn.innerHTML = `<i class="fa-solid fa-download"></i> Download KTM Depan`;
           btn.disabled = false;
           console.error(error);
-        });
       });
     }
   </script>
