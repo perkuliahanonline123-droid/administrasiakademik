@@ -5,6 +5,9 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Cetak KTM Mahasiswa - STAIIS Cianjur</title>
 
+  <!-- Warna yang menyatu dengan browser HP -->
+  <meta name="theme-color" content="#045844">
+
   <!-- Google Fonts & Font Awesome Icons -->
   <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
@@ -18,6 +21,7 @@
     * {
       box-sizing: border-box;
       font-family: 'Plus Jakarta Sans', Arial, sans-serif;
+      -webkit-font-smoothing: antialiased;
     }
     
     body {
@@ -185,7 +189,22 @@
       margin-bottom: 8px;
     }
 
-    select, input[type="file"] {
+    /* --- STYLE UNTUK PENCARIAN PINTAR --- */
+    .search-wrapper {
+      position: relative;
+      width: 100%;
+    }
+
+    .search-icon {
+      position: absolute;
+      left: 16px;
+      top: 50%;
+      transform: translateY(-50%);
+      color: #a0aec0;
+      font-size: 16px;
+    }
+
+    input[type="text"], input[type="file"] {
       width: 100%;
       padding: 12px 16px;
       border: 1px solid #e2e8f0;
@@ -196,7 +215,13 @@
       transition: all 0.2s;
     }
 
-    select:focus, input[type="file"]:focus {
+    input[type="text"] {
+      padding-left: 44px; /* Ruang untuk icon */
+      font-weight: 600;
+      color: #2d3748;
+    }
+
+    input[type="text"]:focus, input[type="file"]:focus {
       outline: none;
       border-color: #045844;
       background-color: #fff;
@@ -308,6 +333,7 @@
       letter-spacing: 2px;
     }
     
+    /* Font Arab Konsisten Murni (Tanpa Traditional Arabic agar tidak berubah di HP) */
     #live-nama-arab { 
       position: absolute; 
       left: calc(360px * var(--scale)); 
@@ -355,6 +381,7 @@
       body { flex-direction: column; }
       .sidebar { width: 100%; }
       .main-content { padding: 20px; }
+      .header-bar { flex-direction: column; align-items: flex-start; gap: 15px; }
     }
   </style>
 </head>
@@ -405,11 +432,15 @@
 
     <!-- MAIN FORM CARD -->
     <div class="card">
+      
+      <!-- Fungsionalitas Pencarian Interaktif 3 Huruf -->
       <div class="form-group">
-        <label>1. Pilih Nama Anda:</label>
-        <select id="student-select" onchange="showLiveEditor()">
-          <option value="">🔄 Memuat data dari server...</option>
-        </select>
+        <label>1. Cari dan Pilih Nama Anda:</label>
+        <div class="search-wrapper">
+          <i class="fa-solid fa-magnifying-glass search-icon"></i>
+          <input type="text" id="student-search" list="student-list" placeholder="⏳ Sedang memuat database..." disabled autocomplete="off">
+          <datalist id="student-list"></datalist>
+        </div>
       </div>
 
       <div class="form-group">
@@ -458,20 +489,42 @@
       .then(response => response.json())
       .then(data => {
         studentsData = data;
-        let select = document.getElementById("student-select");
-        select.innerHTML = '<option value="">-- Ketik / Pilih Nama Anda --</option>';
+        let datalist = document.getElementById("student-list");
+        let searchInput = document.getElementById("student-search");
         
         data.forEach(student => {
           let option = document.createElement("option");
-          option.value = student.nim;
-          option.text = student.nim + " - " + student.nama;
-          select.appendChild(option);
+          option.value = student.nim + " - " + student.nama;
+          datalist.appendChild(option);
         });
+
+        searchInput.disabled = false;
+        searchInput.placeholder = "Ketik minimal 3 huruf (Nama / NIM)...";
       })
       .catch(error => {
         alert("Gagal memuat data dari server.");
         console.error(error);
       });
+
+    // Deteksi Pilihan Berdasarkan Input (Pencarian 3 Huruf)
+    document.getElementById('student-search').addEventListener('input', function() {
+      let val = this.value;
+      if (val.length >= 3) {
+        let match = val.match(/^(\d+)\s-/);
+        if (match) {
+          let nim = match[1];
+          showLiveEditor(nim);
+        } else {
+          document.getElementById("editor-wrapper").style.display = "none";
+          document.getElementById("upload-image").disabled = true;
+          document.getElementById('zoom-panel').style.display = "none";
+        }
+      } else {
+        document.getElementById("editor-wrapper").style.display = "none";
+        document.getElementById("upload-image").disabled = true;
+        document.getElementById('zoom-panel').style.display = "none";
+      }
+    });
 
     function resizeLiveEditor() {
       const wrapper = document.getElementById('editor-wrapper');
@@ -484,20 +537,13 @@
     }
     window.addEventListener('resize', resizeLiveEditor);
 
-    function showLiveEditor() {
-      let nim = document.getElementById("student-select").value;
+    function showLiveEditor(nim) {
       let wrapper = document.getElementById("editor-wrapper");
       let fileInput = document.getElementById("upload-image");
       
-      if (!nim) {
-        wrapper.style.display = "none";
-        fileInput.disabled = true;
-        document.getElementById('zoom-panel').style.display = "none";
-        return;
-      }
-
       let student = studentsData.find(s => s.nim === nim);
-      
+      if (!student) return;
+
       document.getElementById("live-nama").innerText = student.nama;
       document.getElementById("live-nim").innerText = student.nim;
       document.getElementById("live-nama-arab").innerText = student.namaArab || "";
@@ -531,9 +577,9 @@
         
         cropper = new Cropper(img, {
           aspectRatio: 234 / 312, 
-          viewMode: 1,            
+          viewMode: 1,           
           dragMode: 'move',      
-          autoCropArea: 1,        
+          autoCropArea: 1,       
           cropBoxMovable: false, 
           cropBoxResizable: false, 
           toggleDragModeOnDblclick: false,
@@ -547,7 +593,9 @@
       if (!cropper) return alert("Silakan upload foto terlebih dahulu.");
       
       let btn = document.getElementById('btn-proses');
-      let nim = document.getElementById("student-select").value;
+      
+      let searchVal = document.getElementById("student-search").value;
+      let nim = searchVal.match(/^(\d+)\s-/)[1];
       let student = studentsData.find(s => s.nim === nim);
       
       btn.innerText = "⏳ Sedang memproses Gambar... (Mohon tunggu)";
