@@ -28,13 +28,12 @@
       width: 100%;
       position: relative;
       margin-top: 25px;
-      /* Penambahan Bingkai Kartu */
       border-radius: 25px;
       border: 1px solid #dcdcdc; 
       box-shadow: 0 4px 15px rgba(0,0,0,0.1);
       display: none; 
       overflow: hidden;
-      background-image: url('Depan%20KTM.jpg');
+      background-image: url('Depan%20KTM.jpg?v=2');
       background-size: 100% 100%;
       background-position: center;
       background-repeat: no-repeat;
@@ -54,11 +53,10 @@
       z-index: 10;
     }
 
-    /* POSISI TEKS BARU: Dinaikkan agar tidak melebihi batas bawah foto */
     #live-nama { 
       position: absolute; 
       left: calc(360px * var(--scale)); 
-      top: calc(220px * var(--scale)); /* Dinaikkan */
+      top: calc(220px * var(--scale)); 
       font-size: calc(36px * var(--scale)); 
       font-weight: 700; 
       font-family: Arial, sans-serif !important; 
@@ -71,7 +69,7 @@
     #live-nim { 
       position: absolute; 
       left: calc(360px * var(--scale)); 
-      top: calc(315px * var(--scale)); /* Dinaikkan */
+      top: calc(315px * var(--scale)); 
       font-size: calc(40px * var(--scale)); 
       font-weight: 500; 
       font-family: Arial, sans-serif !important; 
@@ -84,7 +82,7 @@
     #live-nama-arab { 
       position: absolute; 
       left: calc(360px * var(--scale)); 
-      top: calc(420px * var(--scale)); /* Dinaikkan (Sejajar batas bawah foto) */
+      top: calc(420px * var(--scale)); 
       font-size: calc(50px * var(--scale)); 
       font-weight: bold; 
       font-family: Arial, sans-serif !important; 
@@ -98,7 +96,7 @@
     .cropper-modal { opacity: 0 !important; } 
     .cropper-bg { background: transparent !important; }
 
-    /* --- TEMPAT RENDER JPG --- */
+    /* --- TEMPAT RENDER PNG TRANSPARAN --- */
     #export-wrapper {
       position: fixed;
       top: 0; 
@@ -112,17 +110,14 @@
       width: 1011px;
       height: 638px;
       position: relative;
-      background-color: #fff;
-      /* Penambahan Bingkai Kartu untuk JPG Export */
-      border-radius: 25px;
-      border: 1px solid #dcdcdc; 
+      background-color: transparent; /* Diubah agar mendukung PNG Transparan */
+      border-radius: 25px; /* Membuat lengkungan di hasil download */
       box-sizing: border-box;
-      overflow: hidden;
+      overflow: hidden; /* Memotong background persegi agar ikut melengkung */
     }
     
     #export-bg { position: absolute; top: 0; left: 0; width: 1011px; height: 638px; z-index: 0; }
 
-    /* Ukuran Fix Export (Sama persis dengan Live) */
     #export-foto { position: absolute; left: 85px; top: 180px; width: 234px; height: 312px; object-fit: cover; border-radius: 15px; z-index: 1;}
     
     #export-nama { position: absolute; left: 360px; top: 220px; font-size: 36px; font-weight: 700; font-family: Arial, sans-serif !important; text-transform: uppercase; margin: 0; color: #1a1a1a; white-space: nowrap; z-index: 1;}
@@ -162,12 +157,12 @@
       <p id="live-nama-arab"></p>
     </div>
 
-    <button id="btn-proses" class="btn-main" style="display:none; margin-top: 25px;" onclick="prosesDanCetak()">Simpan Foto & Download JPG</button>
+    <button id="btn-proses" class="btn-main" style="display:none; margin-top: 25px;" onclick="prosesDanCetak()">Simpan Foto & Download PNG</button>
   </div>
 
   <div id="export-wrapper">
     <div id="export-ktm">
-      <img id="export-bg" src="Depan%20KTM.jpg" alt="Background"> 
+      <img id="export-bg" src="Depan%20KTM.jpg?v=2" alt="Background"> 
       <img id="export-foto" src="" alt="Foto">
       <p id="export-nama"></p>
       <p id="export-nim"></p>
@@ -295,12 +290,13 @@
         scale: 2, 
         useCORS: true, 
         logging: false,
-        backgroundColor: "#ffffff" // Background putih jika ada bagian melengkung yang kosong di luar kartu
+        backgroundColor: null // DIUBAH KE NULL AGAR MENDUKUNG TRANSPARANSI (PNG)
       }).then(canvasFinal => {
         
-        let imgData = canvasFinal.toDataURL('image/jpeg', 1.0);
+        // DIUBAH KE PNG AGAR SUDUT MELENGKUNG TIDAK MENJADI KOTAK PUTIH
+        let imgData = canvasFinal.toDataURL('image/png');
         let link = document.createElement('a');
-        link.download = 'KTM_' + student.nim + '.jpg';
+        link.download = 'KTM_' + student.nim + '.png';
         link.href = imgData;
         link.click();
 
@@ -320,18 +316,18 @@
           if(result.status === "success") {
             btn.innerText = "✅ Selesai! Gambar Berhasil Diunduh";
             setTimeout(() => {
-              btn.innerText = "Simpan Foto & Download JPG";
+              btn.innerText = "Simpan Foto & Download PNG";
               btn.disabled = false;
             }, 3000);
           } else {
             alert("Gambar berhasil diunduh, namun foto gagal tersimpan: " + result.message);
-            btn.innerText = "Simpan Foto & Download JPG";
+            btn.innerText = "Simpan Foto & Download PNG";
             btn.disabled = false;
           }
         })
         .catch(error => {
           alert("Jaringan terputus saat menghubungi server.");
-          btn.innerText = "Simpan Foto & Download JPG";
+          btn.innerText = "Simpan Foto & Download PNG";
           btn.disabled = false;
           console.error(error);
         });
