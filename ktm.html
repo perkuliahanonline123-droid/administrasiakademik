@@ -422,7 +422,7 @@
     
     #export-bg { position: absolute; top: 0; left: 0; width: 1011px; height: 638px; z-index: 0; }
     
-    /* Hapus object-fit: cover agar tidak memicu bug bergeser di html2canvas mobile */
+    /* Menghapus object-fit agar foto tidak error tergeser saat diunduh pada Mobile */
     #export-foto { position: absolute; left: 85px; top: 180px; width: 234px; height: 312px; border-radius: 15px; z-index: 1;}
     
     #export-nama { position: absolute; left: 360px; top: 220px; font-size: 36px; font-weight: 700; font-family: 'Plus Jakarta Sans', Arial, sans-serif; text-transform: uppercase; margin: 0; color: #1a1a1a; white-space: nowrap; z-index: 1;}
@@ -437,7 +437,6 @@
 </head>
 <body>
 
-  <!-- MAIN CONTENT AREA -->
   <main class="main-content">
     <div class="header-bar">
       <div class="header-title">
@@ -445,8 +444,8 @@
           <i class="fa-solid fa-address-card"></i>
         </div>
         <div class="header-title-text">
-          <h2>Cetak KTM Mahasiswa STAIIS</h2>
-          <p>Gunakan PC atau laptop untuk mendapatkan hasil terbaik.</p>
+          <h2>Sistem Cetak KTM</h2>
+          <p>Pilih data dan upload pasfoto untuk mencetak Kartu Mahasiswa secara otomatis</p>
         </div>
       </div>
       <div class="header-badge" id="realtimeClock">
@@ -454,10 +453,8 @@
       </div>
     </div>
 
-    <!-- MAIN FORM CARD -->
     <div class="card">
       
-      <!-- PENCARIAN PINTAR CUSTOM -->
       <div class="form-group">
         <label><i class="fa-regular fa-id-badge" style="margin-right: 6px;"></i> 1. Pilih Nama Anda:</label>
         <div class="search-wrapper">
@@ -465,7 +462,7 @@
             <div class="search-icon-bg">
               <i class="fa-solid fa-magnifying-glass"></i>
             </div>
-            <input type="text" id="student-search" placeholder="⏳ Mohon tunggu sebentar..." disabled autocomplete="off">
+            <input type="text" id="student-search" placeholder="⏳ Sedang memuat database..." disabled autocomplete="off">
           </div>
           <ul id="custom-autocomplete-list" class="autocomplete-list"></ul>
         </div>
@@ -474,7 +471,7 @@
       <div class="form-group">
         <label><i class="fa-solid fa-camera" style="margin-right: 6px;"></i> 2. Upload Pas Foto:</label>
         <input type="file" id="upload-image" accept="image/png, image/jpeg" disabled>
-        <p style="font-size: 12px; color: #a0aec0; margin-top: 8px;">*Upload foto, lalu sesuaikan posisinya pada bingkai editor di bawah.</p>
+        <p style="font-size: 12px; color: #a0aec0; margin-top: 8px;">*Foto akan otomatis masuk ke dalam bingkai editor raksasa di bawah.</p>
       </div>
 
       <div class="zoom-controls" id="zoom-panel">
@@ -485,27 +482,25 @@
 
       <div id="editor-wrapper">
         <div id="live-foto-container">
-          <img id="live-foto" src="" style="display:none; max-width: 100%;">
+          <img id="live-foto" src="" style="display:none; width: 100%; max-width: 100%;">
         </div>
         <p id="live-nama"></p>
         <p id="live-nim"></p>
         <p id="live-nama-arab"></p>
       </div>
 
-      <!-- TEMPAT TOMBOL DOWNLOAD -->
       <div id="action-buttons" class="action-buttons">
         <button id="btn-proses" class="btn-main" onclick="prosesDanCetak()">
-          <i class="fa-solid fa-download"></i> Download KTM
+          <i class="fa-solid fa-download"></i> Download KTM Depan
         </button>
         <a href="https://drive.google.com/uc?export=download&id=1iSGMV2_RAQ3lN7dnwnWjvCluoBdIzFin" class="btn-secondary">
-          <i class="fa-solid fa-id-card"></i> Download Bagian Belakang KTM
+          <i class="fa-solid fa-id-card"></i> Download Belakang KTM
         </a>
       </div>
 
     </div>
   </main>
 
-  <!-- RENDER PNG EXPORT -->
   <div id="export-wrapper">
     <div id="export-ktm">
       <img id="export-bg" src="Depan%20KTM.jpg?v=2" alt="Background"> 
@@ -523,7 +518,6 @@
     let studentsData = [];
     let cropper;
 
-    // Jam Real-time Header
     function updateJam() {
       try {
         const now = new Date();
@@ -538,13 +532,11 @@
     setInterval(updateJam, 1000);
     updateJam();
 
-    // 1. Memuat Data dari API
     fetch(API_URL + "?t=" + new Date().getTime())
       .then(response => response.json())
       .then(data => {
         studentsData = data;
         let searchInput = document.getElementById("student-search");
-        
         searchInput.disabled = false;
         searchInput.placeholder = "Ketik NIM atau Nama Anda...";
       })
@@ -553,7 +545,6 @@
         console.error(error);
       });
 
-    // 2. Logic Pencarian Pintar (Custom Autocomplete)
     const searchInput = document.getElementById('student-search');
     const autocompleteList = document.getElementById('custom-autocomplete-list');
 
@@ -604,7 +595,6 @@
       if(actBtn) actBtn.style.display = "none";
     }
 
-    // 3. Logic Editor KTM
     function resizeLiveEditor() {
       const wrapper = document.getElementById('editor-wrapper');
       if (wrapper.style.display !== 'none') {
@@ -645,33 +635,45 @@
         let img = document.getElementById('live-foto');
         let container = document.getElementById('live-foto-container');
         
-        img.onload = function() {
-          container.style.border = 'none'; 
-          
-          document.getElementById('action-buttons').style.display = 'flex';
-          document.getElementById('zoom-panel').style.display = 'block'; 
-
-          if (cropper) cropper.destroy();
-          
-          cropper = new Cropper(img, {
-            aspectRatio: 234 / 312, 
-            viewMode: 1,           
-            dragMode: 'move',      
-            autoCropArea: 1,       
-            cropBoxMovable: false, 
-            cropBoxResizable: false, 
-            toggleDragModeOnDblclick: false,
-            zoomable: true
-          });
-        };
-        
+        // 1. Tampilkan Gambar Secara Penuh
         img.src = event.target.result;
         img.style.display = 'block';
+        img.style.width = '100%';
+        container.style.border = 'none'; 
+        
+        document.getElementById('action-buttons').style.display = 'flex';
+        document.getElementById('zoom-panel').style.display = 'block'; 
+
+        // 2. Beri jeda 150ms agar browser HP selesai menghitung ukuran calc() pada bingkai
+        setTimeout(() => {
+            if (cropper) cropper.destroy();
+            
+            cropper = new Cropper(img, {
+              aspectRatio: 234 / 312, 
+              viewMode: 1,           
+              dragMode: 'move',      
+              autoCropArea: 1,       
+              cropBoxMovable: false, 
+              cropBoxResizable: false, 
+              toggleDragModeOnDblclick: false,
+              zoomable: true,
+              background: false, // Hapus warna hitam bawaan cropper
+              ready: function () {
+                // Memaksa area crop untuk selalu menutupi 100% ukuran bingkai di HP
+                let containerData = this.cropper.getContainerData();
+                this.cropper.setCropBoxData({
+                  left: 0,
+                  top: 0,
+                  width: containerData.width,
+                  height: containerData.height
+                });
+              }
+            });
+        }, 150); // Jeda pengaman Memory Race Condition HP
       };
       reader.readAsDataURL(file);
     });
 
-    // 4. Logic Download PNG
     function prosesDanCetak() {
       if (!cropper) return alert("Silakan upload foto terlebih dahulu.");
       
@@ -700,6 +702,7 @@
 
         let element = document.getElementById('export-ktm');
         
+        // Konfigurasi html2canvas dikunci dari scroll layar agar tidak meleset
         html2canvas(element, {
           scale: 2, 
           useCORS: true, 
