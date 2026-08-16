@@ -4,7 +4,12 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Cetak KTM Mahasiswa</title>
+  
+  <!-- Cropper.js untuk fitur geser foto -->
   <link href="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.5.13/cropper.min.css" rel="stylesheet">
+  <!-- html2pdf.js untuk unduh PDF otomatis -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+
   <style>
     body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; padding: 20px; background: #f0f2f5; margin: 0;}
     .container { max-width: 900px; margin: auto; background: #fff; padding: 25px; border-radius: 12px; box-shadow: 0 4px 12px rgba(0,0,0,0.05); }
@@ -17,12 +22,11 @@
     .btn-main:hover { background-color: #005959; }
     .btn-main:disabled { background-color: #ccc; cursor: not-allowed; }
     
-    /* Tombol Zoom Khusus */
     .zoom-controls { margin-top: 10px; display: none; text-align: center; background: #eef2f5; padding: 10px; border-radius: 6px; border: 1px dashed #008080;}
     .btn-zoom { background-color: #fff; color: #333; border: 1px solid #ccc; padding: 8px 20px; font-size: 20px; border-radius: 4px; cursor: pointer; margin: 0 5px; font-weight: bold; width: auto;}
     .btn-zoom:hover { background-color: #e2e2e2; }
 
-    /* --- LIVE EDITOR (CANVA STYLE) --- */
+    /* --- LIVE EDITOR TAMPILAN WEB --- */
     #editor-wrapper {
       width: 100%;
       position: relative;
@@ -46,54 +50,56 @@
       background-position: center;
     }
 
-    /* Bingkai Foto Live (Diperbesar agar lebih proporsional) */
+    /* BINGKAI FOTO BARU - Lebih ramping dan proporsional (Rasio 3:4) */
     #live-foto-container {
       position: absolute;
-      left: 70px; /* Digeser sedikit ke kiri */
-      top: 140px; /* Dinaikkan sedikit */
-      width: 290px; /* Diperlebar */
-      height: 400px; /* Dipertinggi */
-      border-radius: 20px;
+      left: 90px; 
+      top: 165px; 
+      width: 240px; 
+      height: 320px; 
+      border-radius: 15px; /* Sedikit melengkung agar elegan */
       background-color: rgba(255, 255, 255, 0.5); 
       border: 2px dashed #008080;
       box-sizing: border-box;
       z-index: 10;
     }
 
-    /* Teks Live (Posisi disesuaikan dengan bingkai baru) */
-    #live-nama { position: absolute; left: 395px; top: 230px; font-size: 40px; font-weight: 600; font-family: 'Segoe UI', Arial, sans-serif; text-transform: uppercase; margin: 0; color: #111; white-space: nowrap; }
-    #live-nim { position: absolute; left: 395px; top: 335px; font-size: 44px; font-family: 'Segoe UI', Arial, sans-serif; margin: 0; color: #111; white-space: nowrap; }
-    #live-nama-arab { position: absolute; left: 395px; top: 450px; font-size: 55px; font-weight: bold; font-family: 'Arial', sans-serif; margin: 0; color: #111; white-space: nowrap; }
+    /* TEKS BARU - Jarak disesuaikan dengan foto agar bernafas */
+    #live-nama { position: absolute; left: 370px; top: 235px; font-size: 38px; font-weight: 700; font-family: 'Segoe UI', Arial, sans-serif; text-transform: uppercase; margin: 0; color: #1a1a1a; white-space: nowrap; letter-spacing: 0.5px;}
+    #live-nim { position: absolute; left: 370px; top: 325px; font-size: 40px; font-weight: 500; font-family: 'Segoe UI', Arial, sans-serif; margin: 0; color: #333; white-space: nowrap; letter-spacing: 1px;}
+    #live-nama-arab { position: absolute; left: 370px; top: 435px; font-size: 52px; font-weight: bold; font-family: 'Arial', sans-serif; margin: 0; color: #1a1a1a; white-space: nowrap; }
 
     /* Modifikasi Cropper.js */
-    .cropper-view-box { border-radius: 20px; outline: none !important; }
+    .cropper-view-box { border-radius: 15px; outline: none !important; }
     .cropper-dashed, .cropper-point, .cropper-line, .cropper-center { display: none !important; }
     .cropper-modal { opacity: 0 !important; } 
     .cropper-bg { background: transparent !important; }
 
-    /* --- PENGATURAN KHUSUS SAAT MENCETAK --- */
-    #print-area { display: none; }
-    
-    @media print {
-      @page { size: A4 landscape; margin: 0; }
-      body { background: white; margin: 0; padding: 0; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
-      .container { display: none !important; }
-      
-      #print-area { 
-        display: block !important; 
-        position: relative; 
-        width: 1011px; 
-        height: 638px; 
-        margin: 0;
-        overflow: hidden;
-      }
-      
-      #print-bg { position: absolute; top: 0; left: 0; width: 100%; height: 100%; z-index: -1; }
-      #print-foto { position: absolute; left: 70px; top: 140px; width: 290px; height: 400px; object-fit: cover; border-radius: 20px; z-index: 1; }
-      #print-nama { position: absolute; left: 395px; top: 230px; font-size: 40px; font-weight: 600; font-family: 'Segoe UI', Arial, sans-serif; text-transform: uppercase; margin: 0; color: #111; white-space: nowrap; z-index: 1; }
-      #print-nim { position: absolute; left: 395px; top: 335px; font-size: 44px; font-family: 'Segoe UI', Arial, sans-serif; margin: 0; color: #111; white-space: nowrap; z-index: 1; }
-      #print-nama-arab { position: absolute; left: 395px; top: 450px; font-size: 55px; font-weight: bold; font-family: 'Arial', sans-serif; margin: 0; color: #111; white-space: nowrap; z-index: 1; }
+    /* --- TEMPAT RENDER PDF (Disembunyikan dari layar) --- */
+    /* Kita buat kloningan khusus untuk dirender html2pdf agar kualitasnya maksimal */
+    #pdf-wrapper {
+      position: absolute;
+      width: 0;
+      height: 0;
+      overflow: hidden;
+      z-index: -9999;
     }
+
+    #export-ktm {
+      width: 1011px;
+      height: 638px;
+      position: relative;
+      background-image: url('Depan%20KTM.jpg');
+      background-size: cover;
+      background-position: center;
+      background-color: #fff;
+    }
+    
+    /* Layout kloningan sama persis dengan Live Editor */
+    #export-foto { position: absolute; left: 90px; top: 165px; width: 240px; height: 320px; object-fit: cover; border-radius: 15px; }
+    #export-nama { position: absolute; left: 370px; top: 235px; font-size: 38px; font-weight: 700; font-family: 'Segoe UI', Arial, sans-serif; text-transform: uppercase; margin: 0; color: #1a1a1a; white-space: nowrap; letter-spacing: 0.5px;}
+    #export-nim { position: absolute; left: 370px; top: 325px; font-size: 40px; font-weight: 500; font-family: 'Segoe UI', Arial, sans-serif; margin: 0; color: #333; white-space: nowrap; letter-spacing: 1px;}
+    #export-nama-arab { position: absolute; left: 370px; top: 435px; font-size: 52px; font-weight: bold; font-family: 'Arial', sans-serif; margin: 0; color: #1a1a1a; white-space: nowrap; }
   </style>
 </head>
 <body>
@@ -115,12 +121,12 @@
 
     <!-- Panel Tombol Zoom -->
     <div class="zoom-controls" id="zoom-panel">
-      <span style="font-size:14px; display:block; margin-bottom:8px; color:#555;">Sesuaikan Foto:</span>
+      <span style="font-size:14px; display:block; margin-bottom:8px; color:#555;">Sesuaikan Posisi Foto:</span>
       <button type="button" class="btn-zoom" onclick="zoomIn()">+ Perbesar</button>
       <button type="button" class="btn-zoom" onclick="zoomOut()">- Perkecil</button>
     </div>
 
-    <!-- AREA LIVE EDITOR KARTU -->
+    <!-- AREA LIVE EDITOR (Tampil di Layar) -->
     <div id="editor-wrapper">
       <div id="live-ktm">
         <div id="live-foto-container">
@@ -132,16 +138,17 @@
       </div>
     </div>
 
-    <button id="btn-proses" class="btn-main" style="display:none; margin-top: 25px;" onclick="prosesDanCetak()">Simpan Foto & Cetak KTM</button>
+    <button id="btn-proses" class="btn-main" style="display:none; margin-top: 25px;" onclick="prosesDanCetak()">Simpan Foto & Download PDF</button>
   </div>
 
-  <!-- Area Cetak Khusus Print (Tanpa Barcode) -->
-  <div id="print-area">
-    <img id="print-bg" src="Depan%20KTM.jpg" alt="Background">
-    <img id="print-foto" src="" alt="Foto">
-    <p id="print-nama"></p>
-    <p id="print-nim"></p>
-    <p id="print-nama-arab"></p>
+  <!-- AREA RENDER PDF (Tidak terlihat oleh pengguna) -->
+  <div id="pdf-wrapper">
+    <div id="export-ktm">
+      <img id="export-foto" src="" alt="Foto">
+      <p id="export-nama"></p>
+      <p id="export-nim"></p>
+      <p id="export-nama-arab"></p>
+    </div>
   </div>
 
   <script src="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.5.13/cropper.min.js"></script>
@@ -206,14 +213,8 @@
       resizeLiveEditor();
     }
 
-    // Fungsi Tombol Zoom
-    function zoomIn() {
-      if(cropper) cropper.zoom(0.1); // Perbesar 10%
-    }
-    
-    function zoomOut() {
-      if(cropper) cropper.zoom(-0.1); // Perkecil 10%
-    }
+    function zoomIn() { if(cropper) cropper.zoom(0.1); }
+    function zoomOut() { if(cropper) cropper.zoom(-0.1); }
 
     document.getElementById('upload-image').addEventListener('change', function(e) {
       let file = e.target.files[0];
@@ -229,28 +230,28 @@
         container.style.border = 'none'; 
         
         document.getElementById('btn-proses').style.display = 'block';
-        document.getElementById('zoom-panel').style.display = 'block'; // Tampilkan tombol zoom
+        document.getElementById('zoom-panel').style.display = 'block'; 
 
         if (cropper) cropper.destroy();
         
         cropper = new Cropper(img, {
-          aspectRatio: 290 / 400, // Menyesuaikan rasio bingkai baru yang lebih besar
+          aspectRatio: 240 / 320, // Rasio 3:4 yang pas dan ramping
           viewMode: 1,           
           dragMode: 'move',      
           autoCropArea: 1,       
           cropBoxMovable: false, 
           cropBoxResizable: false, 
           toggleDragModeOnDblclick: false,
-          zoomable: true, // Memastikan foto bisa di zoom
+          zoomable: true, 
           ready: function() {
-            // Kunci ukuran crop box sesuai bingkai CSS
-            this.cropper.setCropBoxData({ left: 0, top: 0, width: 290, height: 400 });
+            this.cropper.setCropBoxData({ left: 0, top: 0, width: 240, height: 320 });
           }
         });
       };
       reader.readAsDataURL(file);
     });
 
+    // PROSES GENERATE PDF DAN UPLOAD KE SCRIPT
     function prosesDanCetak() {
       if (!cropper) return alert("Silakan upload foto terlebih dahulu.");
       
@@ -258,42 +259,65 @@
       let nim = document.getElementById("student-select").value;
       let student = studentsData.find(s => s.nim === nim);
       
-      btn.innerText = "⏳ Menyimpan ke server... (Mohon tunggu)";
+      btn.innerText = "⏳ Sedang memproses PDF... (Mohon tunggu)";
       btn.disabled = true;
 
-      // Render foto (Skala output dikalikan 2 agar resolusi foto sangat jernih saat di print)
-      let canvas = cropper.getCroppedCanvas({ width: 580, height: 800 });
-      let base64Data = canvas.toDataURL('image/png');
+      // Render resolusi ganda untuk foto agar jernih saat PDF dicetak
+      let canvas = cropper.getCroppedCanvas({ width: 480, height: 640 });
+      let base64Data = canvas.toDataURL('image/jpeg', 0.9);
 
-      document.getElementById('print-foto').src = base64Data;
-      document.getElementById('print-nama').innerText = student.nama;
-      document.getElementById('print-nim').innerText = student.nim;
-      document.getElementById('print-nama-arab').innerText = student.namaArab || "";
+      // Injeksi data ke kloningan yang disembunyikan
+      document.getElementById('export-foto').src = base64Data;
+      document.getElementById('export-nama').innerText = student.nama;
+      document.getElementById('export-nim').innerText = student.nim;
+      document.getElementById('export-nama-arab').innerText = student.namaArab || "";
 
-      fetch(API_URL, {
-        method: 'POST',
-        redirect: 'follow', 
-        headers: { 'Content-Type': 'text/plain;charset=utf-8' },
-        body: JSON.stringify({
-          nim: nim,
-          image: base64Data
+      // Pengaturan html2pdf
+      let element = document.getElementById('export-ktm');
+      let opt = {
+        margin:       0,
+        filename:     'KTM_' + student.nim + '.pdf',
+        image:        { type: 'jpeg', quality: 1 },
+        html2canvas:  { scale: 2, useCORS: true, letterRendering: true }, // Scale 2 agar teks dan gambar tajam
+        jsPDF:        { unit: 'px', format: [1011, 638], orientation: 'landscape' }
+      };
+
+      // 1. Jalankan unduhan PDF di browser mahasiswa
+      html2pdf().set(opt).from(element).save().then(() => {
+        
+        btn.innerText = "☁️ Menyimpan data foto ke server...";
+        
+        // 2. Kirim data base64 ke Google Drive di latar belakang
+        fetch(API_URL, {
+          method: 'POST',
+          redirect: 'follow', 
+          headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+          body: JSON.stringify({
+            nim: nim,
+            image: base64Data
+          })
         })
-      })
-      .then(response => response.json())
-      .then(result => {
-        if(result.status === "success") {
-          window.print();
-        } else {
-          alert("Gagal menyimpan foto: " + result.message);
-        }
-      })
-      .catch(error => {
-        alert("Terjadi kesalahan jaringan.");
-        console.error(error);
-      })
-      .finally(() => {
-        btn.innerText = "Simpan Foto & Cetak KTM";
-        btn.disabled = false;
+        .then(response => response.json())
+        .then(result => {
+          if(result.status === "success") {
+            btn.innerText = "✅ Selesai! PDF Berhasil Diunduh";
+            setTimeout(() => {
+              btn.innerText = "Simpan Foto & Download PDF";
+              btn.disabled = false;
+            }, 3000);
+          } else {
+            alert("PDF berhasil diunduh, namun foto gagal tersimpan di server: " + result.message);
+            btn.innerText = "Simpan Foto & Download PDF";
+            btn.disabled = false;
+          }
+        })
+        .catch(error => {
+          alert("Jaringan terputus saat menghubungi server.");
+          btn.innerText = "Simpan Foto & Download PDF";
+          btn.disabled = false;
+          console.error(error);
+        });
+        
       });
     }
   </script>
