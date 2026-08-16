@@ -2,13 +2,13 @@
 <html lang="id">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Cetak KTM Mahasiswa - STAIIS Cianjur</title>
 
-  <meta name="theme-color" content="#0d7a5b">
+  <meta name="theme-color" content="#045844">
 
-  <!-- Google Fonts & Font Awesome -->
-  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <!-- Google Fonts & Font Awesome Icons -->
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
   
   <!-- CropperJS CSS -->
@@ -26,72 +26,93 @@
     body {
       margin: 0;
       padding: 0;
-      /* Background pola titik halus */
       background-color: #f4f7f6;
       background-image: radial-gradient(#cbd5e1 1px, transparent 1px);
       background-size: 24px 24px;
       color: #333;
       min-height: 100vh;
+      display: block; /* Menghilangkan flex agar bisa di tengah */
     }
 
-    /* --- LAYOUT UTAMA (TANPA SIDEBAR) --- */
-    .page-wrapper {
-      max-width: 900px;
-      margin: 0 auto;
+    /* --- MAIN CONTENT LAYOUT (CENTERED) --- */
+    .main-content {
+      max-width: 1000px; /* Mempertahankan lebar kartu yang lega */
+      margin: 0 auto;    /* Menaruh posisi tepat di tengah */
       padding: 40px 20px;
+      width: 100%;
     }
 
-    /* --- HERO SECTION (KOTAK HIJAU ATAS) --- */
-    .hero {
-      background: #0d7a5b; /* Hijau Elegan */
-      border-radius: 20px;
-      padding: 40px 30px 80px 30px;
-      text-align: center;
+    .header-bar {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 30px;
+      background: #ffffff;
+      padding: 20px 30px;
+      border-radius: 16px;
+      box-shadow: 0 4px 16px rgba(0, 0, 0, 0.03);
+      border: 1px solid #edf2f7;
+    }
+
+    .header-title {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+    }
+
+    .header-icon {
+      width: 48px;
+      height: 48px;
+      background-color: #045844;
       color: white;
-      box-shadow: 0 15px 30px rgba(13, 122, 91, 0.2);
-    }
-    
-    .hero-subtitle {
-      display: inline-block;
-      font-size: 11px;
-      font-weight: 700;
-      letter-spacing: 1px;
-      text-transform: uppercase;
-      color: #bceadd;
-      margin-bottom: 12px;
-      background: rgba(255, 255, 255, 0.1);
-      padding: 6px 14px;
-      border-radius: 20px;
-    }
-
-    .hero-title {
-      font-size: 32px;
-      font-weight: 800;
-      margin: 0 0 16px 0;
-      letter-spacing: -0.5px;
-    }
-
-    .hero-warning {
-      font-size: 13px;
-      color: rgba(255, 255, 255, 0.9);
+      border-radius: 12px;
       display: flex;
       align-items: center;
       justify-content: center;
-      gap: 8px;
+      font-size: 20px;
     }
 
-    /* --- CARD CONTAINER BAWAH --- */
-    .main-container {
-      margin-top: -40px; /* Menarik card ke atas agar menimpa kotak hijau */
-      position: relative;
-      z-index: 10;
+    .header-title-text h2 {
+      font-size: 22px;
+      font-weight: 700;
+      color: #1a1a1a;
+      margin: 0 0 4px 0;
     }
-    
+
+    .header-title-text p {
+      font-size: 13px;
+      color: #718096;
+      margin: 0;
+    }
+
+    .header-badge {
+      background-color: #f0fdf4;
+      padding: 8px 16px;
+      border-radius: 20px;
+      font-size: 13px;
+      font-weight: 600;
+      color: #045844;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      border: 1px solid #bceadd;
+    }
+
+    .status-dot {
+      width: 8px;
+      height: 8px;
+      background-color: #10b981;
+      border-radius: 50%;
+      display: inline-block;
+    }
+
+    /* --- CARD CONTAINER --- */
     .card {
       background: #ffffff;
-      border-radius: 20px;
+      border-radius: 16px;
       padding: 32px;
-      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.05);
+      margin-bottom: 24px;
+      box-shadow: 0 4px 16px rgba(0, 0, 0, 0.03);
       border: 1px solid #edf2f7;
     }
 
@@ -107,7 +128,25 @@
       margin-bottom: 10px;
     }
 
-    /* --- STYLE PENCARIAN PINTAR (KOTAK SUDUT TUMPUL - SESUAI PERMINTAAN) --- */
+    input[type="file"] {
+      width: 100%;
+      padding: 12px 16px;
+      border: 2px dashed #cbd5e1;
+      border-radius: 10px;
+      box-sizing: border-box;
+      font-size: 14px;
+      background-color: #f8fafc;
+      transition: all 0.2s;
+      cursor: pointer;
+    }
+
+    input[type="file"]:focus, input[type="file"]:hover {
+      outline: none;
+      border-color: #045844;
+      background-color: #f0fdf4;
+    }
+
+    /* --- STYLE PENCARIAN PINTAR (KOTAK SUDUT TUMPUL) --- */
     .search-wrapper {
       position: relative;
       width: 100%;
@@ -118,7 +157,7 @@
       align-items: center;
       background: #ffffff;
       padding: 6px; 
-      border-radius: 14px; /* Sudut tumpul */
+      border-radius: 14px; 
       border: 3px solid #f1f5f9; 
       box-shadow: 0 4px 10px rgba(0, 0, 0, 0.03);
       transition: all 0.3s ease;
@@ -193,40 +232,26 @@
       gap: 12px;
       transition: background-color 0.2s;
     }
-    .autocomplete-item:last-child { border-bottom: none; }
-    .autocomplete-item:hover { background-color: #f0fdf4; color: #045844; }
+
+    .autocomplete-item:last-child {
+      border-bottom: none;
+    }
+
+    .autocomplete-item:hover {
+      background-color: #f0fdf4;
+      color: #045844;
+    }
 
     .autocomplete-list::-webkit-scrollbar { width: 6px; }
     .autocomplete-list::-webkit-scrollbar-track { background: transparent; }
     .autocomplete-list::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 10px; }
     .autocomplete-list::-webkit-scrollbar-thumb:hover { background: #94a3b8; }
 
-    /* Input File Style Baru */
-    input[type="file"] {
-      width: 100%;
-      padding: 14px 16px;
-      border: 2px dashed #cbd5e1;
-      border-radius: 14px;
-      box-sizing: border-box;
-      font-size: 14px;
-      font-weight: 600;
-      color: #4a5568;
-      background-color: #f8fafc;
-      transition: all 0.2s;
-      cursor: pointer;
-    }
-
-    input[type="file"]:focus, input[type="file"]:hover {
-      outline: none;
-      border-color: #0ba97b;
-      background-color: #f0fdf4;
-    }
-
     /* --- TOMBOL --- */
     .btn-main {
       width: 100%;
       padding: 16px;
-      background-color: #0d7a5b;
+      background-color: #045844;
       color: white;
       border: none;
       border-radius: 14px;
@@ -234,11 +259,18 @@
       font-weight: 700;
       font-size: 16px;
       transition: background-color 0.2s;
-      box-shadow: 0 8px 16px rgba(13, 122, 91, 0.2);
+      box-shadow: 0 8px 16px rgba(4, 88, 68, 0.2);
     }
 
-    .btn-main:hover { background-color: #045844; }
-    .btn-main:disabled { background-color: #cbd5e1; box-shadow: none; cursor: not-allowed; }
+    .btn-main:hover {
+      background-color: #034233;
+    }
+
+    .btn-main:disabled {
+      background-color: #cbd5e1;
+      cursor: not-allowed;
+      box-shadow: none;
+    }
 
     .zoom-controls {
       margin-top: 15px;
@@ -247,13 +279,13 @@
       background: #f0fdf4;
       padding: 14px;
       border-radius: 14px;
-      border: 1px dashed #0ba97b;
+      border: 1px dashed #045844;
     }
 
     .btn-zoom {
       background-color: #ffffff;
-      color: #0d7a5b;
-      border: 1px solid #0d7a5b;
+      color: #045844;
+      border: 1px solid #045844;
       padding: 8px 18px;
       font-size: 16px;
       border-radius: 8px;
@@ -263,9 +295,12 @@
       transition: all 0.2s;
     }
 
-    .btn-zoom:hover { background-color: #0d7a5b; color: #ffffff; }
+    .btn-zoom:hover {
+      background-color: #045844;
+      color: #ffffff;
+    }
 
-    /* --- LIVE EDITOR RESPONSIVE (DIAMBIL DARI KODE ANDA) --- */
+    /* --- LIVE EDITOR RESPONSIVE --- */
     #editor-wrapper {
       width: 100%;
       position: relative;
@@ -364,64 +399,71 @@
     #export-nim { position: absolute; left: 360px; top: 315px; font-size: 40px; font-weight: 500; font-family: Arial, sans-serif !important; margin: 0; color: #333; white-space: nowrap; letter-spacing: 2px; z-index: 1;}
     #export-nama-arab { position: absolute; left: 360px; top: 420px; font-size: 50px; font-weight: bold; font-family: Arial, sans-serif !important; margin: 0; color: #1a1a1a; white-space: nowrap; z-index: 1;}
 
+    @media (max-width: 768px) {
+      .header-bar { flex-direction: column; align-items: flex-start; gap: 15px; }
+    }
   </style>
 </head>
 <body>
 
-  <div class="page-wrapper">
-    <!-- HERO SECTION -->
-    <header class="hero">
-      <div class="hero-subtitle">Layanan Administrasi Akademik • STAIIS Cianjur</div>
-      <h1 class="hero-title">Sistem Cetak KTM Interaktif</h1>
-      <div class="hero-warning">
-        <i class="fa-solid fa-triangle-exclamation" style="color: #fbbf24;"></i>
-        Pilih data Anda dan upload pasfoto berlatar warna untuk meng-generate Kartu Tanda Mahasiswa.
+  <!-- MAIN CONTENT AREA -->
+  <main class="main-content">
+    <div class="header-bar">
+      <div class="header-title">
+        <div class="header-icon">
+          <i class="fa-solid fa-address-card"></i>
+        </div>
+        <div class="header-title-text">
+          <h2>Sistem Cetak KTM</h2>
+          <p>Pilih data dan upload pasfoto untuk mencetak Kartu Mahasiswa secara otomatis</p>
+        </div>
       </div>
-    </header>
+      <div class="header-badge" id="realtimeClock">
+        <span class="status-dot"></span> Memuat waktu...
+      </div>
+    </div>
 
     <!-- MAIN FORM CARD -->
-    <main class="main-container">
-      <div class="card">
-        
-        <!-- PENCARIAN PINTAR CUSTOM -->
-        <div class="form-group">
-          <label><i class="fa-regular fa-id-badge" style="margin-right: 6px;"></i> 1. Cari dan Pilih Nama Anda</label>
-          <div class="search-wrapper">
-            <div class="custom-search-box">
-              <div class="search-icon-bg">
-                <i class="fa-solid fa-magnifying-glass"></i>
-              </div>
-              <input type="text" id="student-search" placeholder="⏳ Sedang memuat database..." disabled autocomplete="off">
+    <div class="card">
+      
+      <!-- PENCARIAN PINTAR CUSTOM -->
+      <div class="form-group">
+        <label><i class="fa-regular fa-id-badge" style="margin-right: 6px;"></i> 1. Pilih Nama Anda:</label>
+        <div class="search-wrapper">
+          <div class="custom-search-box">
+            <div class="search-icon-bg">
+              <i class="fa-solid fa-magnifying-glass"></i>
             </div>
-            <ul id="custom-autocomplete-list" class="autocomplete-list"></ul>
+            <input type="text" id="student-search" placeholder="⏳ Sedang memuat database..." disabled autocomplete="off">
           </div>
+          <ul id="custom-autocomplete-list" class="autocomplete-list"></ul>
         </div>
-
-        <!-- UPLOAD FOTO -->
-        <div class="form-group">
-          <label><i class="fa-solid fa-camera" style="margin-right: 6px;"></i> 2. Upload Pas Foto Anda</label>
-          <input type="file" id="upload-image" accept="image/png, image/jpeg" disabled>
-        </div>
-
-        <div class="zoom-controls" id="zoom-panel">
-          <span style="font-size:14px; display:block; margin-bottom:8px; color:#555;">Sesuaikan Posisi Foto:</span>
-          <button type="button" class="btn-zoom" onclick="zoomIn()">+ Perbesar</button>
-          <button type="button" class="btn-zoom" onclick="zoomOut()">- Perkecil</button>
-        </div>
-
-        <div id="editor-wrapper">
-          <div id="live-foto-container">
-            <img id="live-foto" src="" style="display:none; max-width: 100%;">
-          </div>
-          <p id="live-nama"></p>
-          <p id="live-nim"></p>
-          <p id="live-nama-arab"></p>
-        </div>
-
-        <button id="btn-proses" class="btn-main" style="display:none; margin-top: 25px;" onclick="prosesDanCetak()">Simpan Foto & Download PNG</button>
       </div>
-    </main>
-  </div>
+
+      <div class="form-group">
+        <label><i class="fa-solid fa-camera" style="margin-right: 6px;"></i> 2. Upload Pas Foto:</label>
+        <input type="file" id="upload-image" accept="image/png, image/jpeg" disabled>
+        <p style="font-size: 12px; color: #a0aec0; margin-top: 8px;">*Foto akan otomatis masuk ke dalam bingkai editor raksasa di bawah.</p>
+      </div>
+
+      <div class="zoom-controls" id="zoom-panel">
+        <span style="font-size:14px; display:block; margin-bottom:8px; color:#555;">Sesuaikan Posisi Foto:</span>
+        <button type="button" class="btn-zoom" onclick="zoomIn()">+ Perbesar</button>
+        <button type="button" class="btn-zoom" onclick="zoomOut()">- Perkecil</button>
+      </div>
+
+      <div id="editor-wrapper">
+        <div id="live-foto-container">
+          <img id="live-foto" src="" style="display:none; max-width: 100%;">
+        </div>
+        <p id="live-nama"></p>
+        <p id="live-nim"></p>
+        <p id="live-nama-arab"></p>
+      </div>
+
+      <button id="btn-proses" class="btn-main" style="display:none; margin-top: 25px;" onclick="prosesDanCetak()">Simpan Foto & Download PNG</button>
+    </div>
+  </main>
 
   <!-- RENDER PNG EXPORT -->
   <div id="export-wrapper">
@@ -440,6 +482,21 @@
     
     let studentsData = [];
     let cropper;
+
+    // Jam Real-time Header
+    function updateJam() {
+      try {
+        const now = new Date();
+        const hari = ["Minggu", "Senin", "Selasa", "Rabu", "Kamis", "Jumat", "Sabtu"];
+        const bulan = ["Januari", "Februari", "Maret", "April", "Mei", "Juni", "Juli", "Agustus", "September", "Oktober", "November", "Desember"];
+        const el = document.getElementById("realtimeClock");
+        if(el) {
+          el.innerHTML = `<span class="status-dot"></span> ${hari[now.getDay()]}, ${now.getDate()} ${bulan[now.getMonth()]} ${now.getFullYear()} - ${now.getHours().toString().padStart(2, '0')}:${now.getMinutes().toString().padStart(2, '0')} WIB`;
+        }
+      } catch(e){}
+    }
+    setInterval(updateJam, 1000);
+    updateJam();
 
     // 1. Memuat Data dari API
     fetch(API_URL + "?t=" + new Date().getTime())
