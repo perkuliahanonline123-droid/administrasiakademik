@@ -63,9 +63,9 @@
     .header-icon {
       width: 48px;
       height: 48px;
-      min-width: 48px; /* Kunci ukuran agar tidak mengecil */
-      min-height: 48px; /* Kunci ukuran agar tidak mengecil */
-      flex-shrink: 0; /* Mencegah ikon menjadi lonjong di HP */
+      min-width: 48px;
+      min-height: 48px;
+      flex-shrink: 0; 
       background-color: #045844;
       color: white;
       border-radius: 12px;
@@ -151,7 +151,7 @@
       background-color: #f0fdf4;
     }
 
-    /* --- STYLE PENCARIAN PINTAR (KOTAK SUDUT TUMPUL) --- */
+    /* --- STYLE PENCARIAN PINTAR --- */
     .search-wrapper {
       position: relative;
       width: 100%;
@@ -247,6 +247,13 @@
     .autocomplete-list::-webkit-scrollbar-thumb:hover { background: #94a3b8; }
 
     /* --- TOMBOL --- */
+    .action-buttons {
+      display: none; /* Disembunyikan awalnya */
+      flex-direction: column;
+      gap: 16px;
+      margin-top: 25px;
+    }
+
     .btn-main {
       width: 100%;
       padding: 16px;
@@ -257,12 +264,43 @@
       cursor: pointer;
       font-weight: 700;
       font-size: 16px;
-      transition: background-color 0.2s;
+      transition: all 0.2s;
       box-shadow: 0 8px 16px rgba(4, 88, 68, 0.2);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
     }
 
-    .btn-main:hover { background-color: #034233; }
-    .btn-main:disabled { background-color: #cbd5e1; cursor: not-allowed; box-shadow: none; }
+    .btn-main:hover { background-color: #034233; transform: translateY(-2px); }
+    .btn-main:disabled { background-color: #cbd5e1; box-shadow: none; cursor: not-allowed; transform: none;}
+
+    /* Style Tombol Belakang KTM */
+    .btn-secondary {
+      width: 100%;
+      padding: 16px;
+      background-color: #f0fdf4;
+      color: #0ba97b;
+      border: 2px solid #0ba97b;
+      border-radius: 14px;
+      cursor: pointer;
+      font-weight: 700;
+      font-size: 16px;
+      transition: all 0.2s;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      text-decoration: none;
+      box-shadow: 0 4px 10px rgba(11, 169, 123, 0.05);
+    }
+
+    .btn-secondary:hover {
+      background-color: #e6fbf0;
+      color: #045844;
+      border-color: #045844;
+      transform: translateY(-2px);
+    }
 
     .zoom-controls {
       margin-top: 15px;
@@ -271,7 +309,7 @@
       background: #f0fdf4;
       padding: 14px;
       border-radius: 14px;
-      border: 1px dashed #045844;
+      border: 1px dashed #0ba97b;
     }
 
     .btn-zoom {
@@ -317,7 +355,7 @@
       border: 2px dashed #045844;
       box-sizing: border-box;
       z-index: 10;
-      overflow: hidden; /* Mencegah foto bleber / tumpah keluar dari bingkai di HP */
+      overflow: hidden;
     }
 
     #live-nama { 
@@ -405,7 +443,7 @@
           <i class="fa-solid fa-address-card"></i>
         </div>
         <div class="header-title-text">
-          <h2>KTM Mahasiswa STAIIS</h2>
+          <h2>Sistem Cetak KTM</h2>
           <p>Pilih data dan upload pasfoto untuk mencetak Kartu Mahasiswa secara otomatis</p>
         </div>
       </div>
@@ -425,7 +463,7 @@
             <div class="search-icon-bg">
               <i class="fa-solid fa-magnifying-glass"></i>
             </div>
-            <input type="text" id="student-search" placeholder="⏳ Mohon tunggu sebentar..." disabled autocomplete="off">
+            <input type="text" id="student-search" placeholder="⏳ Sedang memuat database..." disabled autocomplete="off">
           </div>
           <ul id="custom-autocomplete-list" class="autocomplete-list"></ul>
         </div>
@@ -434,7 +472,7 @@
       <div class="form-group">
         <label><i class="fa-solid fa-camera" style="margin-right: 6px;"></i> 2. Upload Pas Foto:</label>
         <input type="file" id="upload-image" accept="image/png, image/jpeg" disabled>
-        <p style="font-size: 12px; color: #a0aec0; margin-top: 8px;">*Foto akan otomatis masuk ke dalam bingkai editor KTM.</p>
+        <p style="font-size: 12px; color: #a0aec0; margin-top: 8px;">*Foto akan otomatis masuk ke dalam bingkai editor raksasa di bawah.</p>
       </div>
 
       <div class="zoom-controls" id="zoom-panel">
@@ -452,7 +490,18 @@
         <p id="live-nama-arab"></p>
       </div>
 
-      <button id="btn-proses" class="btn-main" style="display:none; margin-top: 25px;" onclick="prosesDanCetak()">Download KTM</button>
+      <!-- TAMPAT TOMBOL DOWNLOAD (Group) -->
+      <div id="action-buttons" class="action-buttons">
+        <!-- Tombol Cetak Depan (Utama) -->
+        <button id="btn-proses" class="btn-main" onclick="prosesDanCetak()">
+          <i class="fa-solid fa-download"></i> Download KTM Depan
+        </button>
+        <!-- Tombol Download Belakang (Otomatis Direct Link) -->
+        <a href="https://drive.google.com/uc?export=download&id=1iSGMV2_RAQ3lN7dnwnWjvCluoBdIzFin" class="btn-secondary">
+          <i class="fa-solid fa-id-card"></i> Download Belakang KTM
+        </a>
+      </div>
+
     </div>
   </main>
 
@@ -551,6 +600,8 @@
       document.getElementById("editor-wrapper").style.display = "none";
       document.getElementById("upload-image").disabled = true;
       document.getElementById('zoom-panel').style.display = "none";
+      let actBtn = document.getElementById('action-buttons');
+      if(actBtn) actBtn.style.display = "none";
     }
 
     // 3. Logic Editor KTM
@@ -598,7 +649,7 @@
         img.style.display = 'block';
         container.style.border = 'none'; 
         
-        document.getElementById('btn-proses').style.display = 'block';
+        document.getElementById('action-buttons').style.display = 'flex';
         document.getElementById('zoom-panel').style.display = 'block'; 
 
         if (cropper) cropper.destroy();
@@ -627,7 +678,7 @@
       let nim = searchVal.match(/^(\d+)\s-/)[1];
       let student = studentsData.find(s => s.nim === nim);
       
-      btn.innerText = "⏳ Sedang memproses Gambar... (Mohon tunggu)";
+      btn.innerHTML = `<i class="fa-solid fa-spinner fa-spin"></i> Sedang memproses...`;
       btn.disabled = true;
 
       let canvasCrop = cropper.getCroppedCanvas({ width: 468, height: 624 });
@@ -652,7 +703,7 @@
         link.href = imgData;
         link.click();
 
-        btn.innerText = "☁️ Menyimpan data foto ke server...";
+        btn.innerHTML = `<i class="fa-solid fa-cloud-arrow-up"></i> Menyimpan ke server...`;
         
         fetch(API_URL, {
           method: 'POST',
@@ -666,20 +717,20 @@
         .then(response => response.json())
         .then(result => {
           if(result.status === "success") {
-            btn.innerText = "✅ Selesai! Gambar Berhasil Diunduh";
+            btn.innerHTML = `<i class="fa-solid fa-check"></i> Selesai Diunduh`;
             setTimeout(() => {
-              btn.innerText = "Simpan Foto & Download PNG";
+              btn.innerHTML = `<i class="fa-solid fa-download"></i> Download KTM Depan`;
               btn.disabled = false;
             }, 3000);
           } else {
             alert("Gambar berhasil diunduh, namun foto gagal tersimpan: " + result.message);
-            btn.innerText = "Simpan Foto & Download PNG";
+            btn.innerHTML = `<i class="fa-solid fa-download"></i> Download KTM Depan`;
             btn.disabled = false;
           }
         })
         .catch(error => {
           alert("Jaringan terputus saat menghubungi server.");
-          btn.innerText = "Simpan Foto & Download PNG";
+          btn.innerHTML = `<i class="fa-solid fa-download"></i> Download KTM Depan`;
           btn.disabled = false;
           console.error(error);
         });
