@@ -12,11 +12,16 @@
     
     .form-group { margin-bottom: 15px; }
     label { font-weight: bold; font-size: 14px; color: #555; }
-    select, input[type="file"], button { width: 100%; padding: 12px; margin-top: 8px; border: 1px solid #ddd; border-radius: 6px; box-sizing: border-box; font-size: 15px;}
-    button { background-color: #008080; color: white; border: none; cursor: pointer; font-weight: bold; font-size: 16px; transition: 0.3s;}
-    button:hover { background-color: #005959; }
-    button:disabled { background-color: #ccc; cursor: not-allowed; }
+    select, input[type="file"], .btn-main { width: 100%; padding: 12px; margin-top: 8px; border: 1px solid #ddd; border-radius: 6px; box-sizing: border-box; font-size: 15px;}
+    .btn-main { background-color: #008080; color: white; border: none; cursor: pointer; font-weight: bold; font-size: 16px; transition: 0.3s;}
+    .btn-main:hover { background-color: #005959; }
+    .btn-main:disabled { background-color: #ccc; cursor: not-allowed; }
     
+    /* Tombol Zoom Khusus */
+    .zoom-controls { margin-top: 10px; display: none; text-align: center; background: #eef2f5; padding: 10px; border-radius: 6px; border: 1px dashed #008080;}
+    .btn-zoom { background-color: #fff; color: #333; border: 1px solid #ccc; padding: 8px 20px; font-size: 20px; border-radius: 4px; cursor: pointer; margin: 0 5px; font-weight: bold; width: auto;}
+    .btn-zoom:hover { background-color: #e2e2e2; }
+
     /* --- LIVE EDITOR (CANVA STYLE) --- */
     #editor-wrapper {
       width: 100%;
@@ -24,7 +29,7 @@
       margin-top: 25px;
       border-radius: 8px;
       box-shadow: 0 4px 15px rgba(0,0,0,0.1);
-      display: none; /* Muncul setelah nama dipilih */
+      display: none; 
       overflow: hidden;
       background: #e9ecef;
     }
@@ -41,30 +46,29 @@
       background-position: center;
     }
 
-    /* Bingkai Foto Live */
+    /* Bingkai Foto Live (Diperbesar agar lebih proporsional) */
     #live-foto-container {
       position: absolute;
-      left: 85px; 
-      top: 172px; 
-      width: 228px; 
-      height: 312px; 
+      left: 70px; /* Digeser sedikit ke kiri */
+      top: 140px; /* Dinaikkan sedikit */
+      width: 290px; /* Diperlebar */
+      height: 400px; /* Dipertinggi */
       border-radius: 20px;
-      background-color: rgba(255, 255, 255, 0.5); /* Warna transparan sebelum upload */
+      background-color: rgba(255, 255, 255, 0.5); 
       border: 2px dashed #008080;
       box-sizing: border-box;
       z-index: 10;
     }
 
-    /* Teks Live */
-    #live-nama { position: absolute; left: 360px; top: 245px; font-size: 38px; font-weight: 600; font-family: 'Segoe UI', Arial, sans-serif; text-transform: uppercase; margin: 0; color: #111; white-space: nowrap; }
-    #live-nim { position: absolute; left: 360px; top: 345px; font-size: 42px; font-family: 'Segoe UI', Arial, sans-serif; margin: 0; color: #111; white-space: nowrap; }
-    #live-nama-arab { position: absolute; left: 360px; top: 445px; font-size: 50px; font-weight: bold; font-family: 'Arial', sans-serif; margin: 0; color: #111; white-space: nowrap; }
-    #live-qr { position: absolute; right: 85px; bottom: 85px; width: 160px; height: 160px; }
+    /* Teks Live (Posisi disesuaikan dengan bingkai baru) */
+    #live-nama { position: absolute; left: 395px; top: 230px; font-size: 40px; font-weight: 600; font-family: 'Segoe UI', Arial, sans-serif; text-transform: uppercase; margin: 0; color: #111; white-space: nowrap; }
+    #live-nim { position: absolute; left: 395px; top: 335px; font-size: 44px; font-family: 'Segoe UI', Arial, sans-serif; margin: 0; color: #111; white-space: nowrap; }
+    #live-nama-arab { position: absolute; left: 395px; top: 450px; font-size: 55px; font-weight: bold; font-family: 'Arial', sans-serif; margin: 0; color: #111; white-space: nowrap; }
 
-    /* Modifikasi Cropper.js agar terlihat seperti bingkai Canva */
+    /* Modifikasi Cropper.js */
     .cropper-view-box { border-radius: 20px; outline: none !important; }
     .cropper-dashed, .cropper-point, .cropper-line, .cropper-center { display: none !important; }
-    .cropper-modal { opacity: 0 !important; } /* Sembunyikan background hitam cropper */
+    .cropper-modal { opacity: 0 !important; } 
     .cropper-bg { background: transparent !important; }
 
     /* --- PENGATURAN KHUSUS SAAT MENCETAK --- */
@@ -85,11 +89,10 @@
       }
       
       #print-bg { position: absolute; top: 0; left: 0; width: 100%; height: 100%; z-index: -1; }
-      #print-foto { position: absolute; left: 85px; top: 172px; width: 228px; height: 312px; object-fit: cover; border-radius: 20px; z-index: 1; }
-      #print-nama { position: absolute; left: 360px; top: 245px; font-size: 38px; font-weight: 600; font-family: 'Segoe UI', Arial, sans-serif; text-transform: uppercase; margin: 0; color: #111; white-space: nowrap; z-index: 1; }
-      #print-nim { position: absolute; left: 360px; top: 345px; font-size: 42px; font-family: 'Segoe UI', Arial, sans-serif; margin: 0; color: #111; white-space: nowrap; z-index: 1; }
-      #print-nama-arab { position: absolute; left: 360px; top: 445px; font-size: 50px; font-weight: bold; font-family: 'Arial', sans-serif; margin: 0; color: #111; white-space: nowrap; z-index: 1; }
-      #print-qr { position: absolute; right: 85px; bottom: 85px; width: 160px; height: 160px; z-index: 1; }
+      #print-foto { position: absolute; left: 70px; top: 140px; width: 290px; height: 400px; object-fit: cover; border-radius: 20px; z-index: 1; }
+      #print-nama { position: absolute; left: 395px; top: 230px; font-size: 40px; font-weight: 600; font-family: 'Segoe UI', Arial, sans-serif; text-transform: uppercase; margin: 0; color: #111; white-space: nowrap; z-index: 1; }
+      #print-nim { position: absolute; left: 395px; top: 335px; font-size: 44px; font-family: 'Segoe UI', Arial, sans-serif; margin: 0; color: #111; white-space: nowrap; z-index: 1; }
+      #print-nama-arab { position: absolute; left: 395px; top: 450px; font-size: 55px; font-weight: bold; font-family: 'Arial', sans-serif; margin: 0; color: #111; white-space: nowrap; z-index: 1; }
     }
   </style>
 </head>
@@ -108,7 +111,13 @@
     <div class="form-group">
       <label>2. Upload Pas Foto (Akan otomatis masuk ke bingkai):</label>
       <input type="file" id="upload-image" accept="image/png, image/jpeg" disabled>
-      <small style="color:#666; display:block; margin-top:5px;">💡 <i>Tips: Setelah foto muncul, klik dan geser foto di dalam template untuk merapikan posisinya, atau scroll mouse untuk zoom (seperti di Canva).</i></small>
+    </div>
+
+    <!-- Panel Tombol Zoom -->
+    <div class="zoom-controls" id="zoom-panel">
+      <span style="font-size:14px; display:block; margin-bottom:8px; color:#555;">Sesuaikan Foto:</span>
+      <button type="button" class="btn-zoom" onclick="zoomIn()">+ Perbesar</button>
+      <button type="button" class="btn-zoom" onclick="zoomOut()">- Perkecil</button>
     </div>
 
     <!-- AREA LIVE EDITOR KARTU -->
@@ -120,21 +129,19 @@
         <p id="live-nama"></p>
         <p id="live-nim"></p>
         <p id="live-nama-arab"></p>
-        <img id="live-qr" src="" alt="QR">
       </div>
     </div>
 
-    <button id="btn-proses" style="display:none; margin-top: 25px;" onclick="prosesDanCetak()">Simpan Foto & Cetak KTM</button>
+    <button id="btn-proses" class="btn-main" style="display:none; margin-top: 25px;" onclick="prosesDanCetak()">Simpan Foto & Cetak KTM</button>
   </div>
 
-  <!-- Area Cetak Khusus Print (Latar Belakang) -->
+  <!-- Area Cetak Khusus Print (Tanpa Barcode) -->
   <div id="print-area">
     <img id="print-bg" src="Depan%20KTM.jpg" alt="Background">
     <img id="print-foto" src="" alt="Foto">
     <p id="print-nama"></p>
     <p id="print-nim"></p>
     <p id="print-nama-arab"></p>
-    <img id="print-qr" src="" alt="QR Code">
   </div>
 
   <script src="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.5.13/cropper.min.js"></script>
@@ -144,7 +151,6 @@
     let studentsData = [];
     let cropper;
 
-    // Fetch JSON dari Apps Script
     fetch(API_URL + "?t=" + new Date().getTime())
       .then(response => response.json())
       .then(data => {
@@ -164,20 +170,18 @@
         console.error(error);
       });
 
-    // Fitur: Skala otomatis agar template muat di layar HP/Laptop
     function resizeLiveEditor() {
       const wrapper = document.getElementById('editor-wrapper');
       const ktm = document.getElementById('live-ktm');
       if (wrapper.style.display !== 'none') {
         const targetWidth = wrapper.clientWidth;
-        const scale = targetWidth / 1011; // 1011 adalah lebar asli KTM
+        const scale = targetWidth / 1011; 
         ktm.style.transform = `scale(${scale})`;
-        wrapper.style.height = (638 * scale) + 'px'; // 638 adalah tinggi asli
+        wrapper.style.height = (638 * scale) + 'px'; 
       }
     }
     window.addEventListener('resize', resizeLiveEditor);
 
-    // Tampilkan Live Editor saat nama dipilih
     function showLiveEditor() {
       let nim = document.getElementById("student-select").value;
       let wrapper = document.getElementById("editor-wrapper");
@@ -186,25 +190,31 @@
       if (!nim) {
         wrapper.style.display = "none";
         fileInput.disabled = true;
+        document.getElementById('zoom-panel').style.display = "none";
         return;
       }
 
       let student = studentsData.find(s => s.nim === nim);
       
-      // Inject data ke Live Editor
       document.getElementById("live-nama").innerText = student.nama;
       document.getElementById("live-nim").innerText = student.nim;
       document.getElementById("live-nama-arab").innerText = student.namaArab || "";
-      document.getElementById("live-qr").src = "https://api.qrserver.com/v1/create-qr-code/?size=160x160&data=" + student.nim;
       
       wrapper.style.display = "block";
       fileInput.disabled = false;
       
-      // Panggil resize agar pas dengan layar
       resizeLiveEditor();
     }
 
-    // Setup Cropper (Gaya Canva)
+    // Fungsi Tombol Zoom
+    function zoomIn() {
+      if(cropper) cropper.zoom(0.1); // Perbesar 10%
+    }
+    
+    function zoomOut() {
+      if(cropper) cropper.zoom(-0.1); // Perkecil 10%
+    }
+
     document.getElementById('upload-image').addEventListener('change', function(e) {
       let file = e.target.files[0];
       if (!file) return;
@@ -216,30 +226,31 @@
         
         img.src = event.target.result;
         img.style.display = 'block';
-        container.style.border = 'none'; // Hilangkan garis putus-putus
+        container.style.border = 'none'; 
+        
         document.getElementById('btn-proses').style.display = 'block';
+        document.getElementById('zoom-panel').style.display = 'block'; // Tampilkan tombol zoom
 
         if (cropper) cropper.destroy();
         
-        // Konfigurasi Cropper agar bertindak seperti frame gambar Canva
         cropper = new Cropper(img, {
-          aspectRatio: 228 / 312,
-          viewMode: 1,           // Jangan biarkan gambar keluar dari frame
-          dragMode: 'move',      // Mode geser gambar
-          autoCropArea: 1,       // Penuhi seluruh area container
-          cropBoxMovable: false, // Kunci area crop
-          cropBoxResizable: false, // Kunci ukuran crop
+          aspectRatio: 290 / 400, // Menyesuaikan rasio bingkai baru yang lebih besar
+          viewMode: 1,           
+          dragMode: 'move',      
+          autoCropArea: 1,       
+          cropBoxMovable: false, 
+          cropBoxResizable: false, 
           toggleDragModeOnDblclick: false,
+          zoomable: true, // Memastikan foto bisa di zoom
           ready: function() {
-            // Paksa ukuran kotak crop persis sama dengan ukuran container di CSS
-            this.cropper.setCropBoxData({ left: 0, top: 0, width: 228, height: 312 });
+            // Kunci ukuran crop box sesuai bingkai CSS
+            this.cropper.setCropBoxData({ left: 0, top: 0, width: 290, height: 400 });
           }
         });
       };
       reader.readAsDataURL(file);
     });
 
-    // Proses Upload dan Cetak
     function prosesDanCetak() {
       if (!cropper) return alert("Silakan upload foto terlebih dahulu.");
       
@@ -250,18 +261,15 @@
       btn.innerText = "⏳ Menyimpan ke server... (Mohon tunggu)";
       btn.disabled = true;
 
-      // Render image dari kotak yang digeser user
-      let canvas = cropper.getCroppedCanvas({ width: 456, height: 624 });
+      // Render foto (Skala output dikalikan 2 agar resolusi foto sangat jernih saat di print)
+      let canvas = cropper.getCroppedCanvas({ width: 580, height: 800 });
       let base64Data = canvas.toDataURL('image/png');
 
-      // Masukkan data ke area cetak tersembunyi
       document.getElementById('print-foto').src = base64Data;
       document.getElementById('print-nama').innerText = student.nama;
       document.getElementById('print-nim').innerText = student.nim;
       document.getElementById('print-nama-arab').innerText = student.namaArab || "";
-      document.getElementById('print-qr').src = "https://api.qrserver.com/v1/create-qr-code/?size=160x160&data=" + student.nim;
 
-      // Kirim via POST
       fetch(API_URL, {
         method: 'POST',
         redirect: 'follow', 
