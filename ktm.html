@@ -2,14 +2,13 @@
 <html lang="id">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
   <title>Cetak KTM Mahasiswa - STAIIS Cianjur</title>
 
-  <!-- Warna yang menyatu dengan browser HP -->
-  <meta name="theme-color" content="#045844">
+  <meta name="theme-color" content="#0d7a5b">
 
-  <!-- Google Fonts & Font Awesome Icons -->
-  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <!-- Google Fonts & Font Awesome -->
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
   
   <!-- CropperJS CSS -->
@@ -27,186 +26,88 @@
     body {
       margin: 0;
       padding: 0;
-      background-color: #f4f6f9;
+      /* Background pola titik halus */
+      background-color: #f4f7f6;
+      background-image: radial-gradient(#cbd5e1 1px, transparent 1px);
+      background-size: 24px 24px;
       color: #333;
-      display: flex;
       min-height: 100vh;
     }
 
-    /* --- SIDEBAR STYLE --- */
-    .sidebar {
-      width: 260px;
-      background-color: #045844;
-      color: #ffffff;
-      display: flex;
-      flex-direction: column;
-      padding: 24px 16px;
-      flex-shrink: 0;
+    /* --- LAYOUT UTAMA (TANPA SIDEBAR) --- */
+    .page-wrapper {
+      max-width: 900px;
+      margin: 0 auto;
+      padding: 40px 20px;
     }
 
-    .brand {
-      display: flex;
-      align-items: center;
-      gap: 12px;
-      padding: 0 12px 28px 12px;
-      border-bottom: 1px solid rgba(255, 255, 255, 0.1);
-      margin-bottom: 24px;
+    /* --- HERO SECTION (KOTAK HIJAU ATAS) --- */
+    .hero {
+      background: #0d7a5b; /* Hijau Elegan */
+      border-radius: 20px;
+      padding: 40px 30px 80px 30px;
+      text-align: center;
+      color: white;
+      box-shadow: 0 15px 30px rgba(13, 122, 91, 0.2);
+    }
+    
+    .hero-subtitle {
+      display: inline-block;
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: 1px;
+      text-transform: uppercase;
+      color: #bceadd;
+      margin-bottom: 12px;
+      background: rgba(255, 255, 255, 0.1);
+      padding: 6px 14px;
+      border-radius: 20px;
     }
 
-    .brand-logo {
-      width: 42px;
-      height: 42px;
-      background-color: #ffffff;
-      border-radius: 50%;
+    .hero-title {
+      font-size: 32px;
+      font-weight: 800;
+      margin: 0 0 16px 0;
+      letter-spacing: -0.5px;
+    }
+
+    .hero-warning {
+      font-size: 13px;
+      color: rgba(255, 255, 255, 0.9);
       display: flex;
       align-items: center;
       justify-content: center;
-      color: #045844;
-      font-size: 20px;
-    }
-
-    .brand-text h1 {
-      font-size: 16px;
-      font-weight: 700;
-      margin: 0;
-      letter-spacing: 0.5px;
-    }
-
-    .brand-text p {
-      font-size: 11px;
-      margin: 2px 0 0 0;
-      opacity: 0.7;
-    }
-
-    .menu-list {
-      list-style: none;
-      padding: 0;
-      margin: 0;
-      display: flex;
-      flex-direction: column;
       gap: 8px;
     }
 
-    .menu-item a {
-      display: flex;
-      align-items: center;
-      gap: 14px;
-      padding: 12px 16px;
-      color: rgba(255, 255, 255, 0.75);
-      text-decoration: none;
-      font-size: 14px;
-      font-weight: 500;
-      border-radius: 10px;
-      transition: all 0.2s ease;
+    /* --- CARD CONTAINER BAWAH --- */
+    .main-container {
+      margin-top: -40px; /* Menarik card ke atas agar menimpa kotak hijau */
+      position: relative;
+      z-index: 10;
     }
-
-    .menu-item a:hover {
-      background-color: rgba(255, 255, 255, 0.1);
-      color: #ffffff;
-    }
-
-    .menu-item.active a {
-      background-color: #0d7a5b;
-      color: #ffffff;
-      font-weight: 600;
-      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
-    }
-
-    .menu-item i {
-      font-size: 16px;
-      width: 20px;
-      text-align: center;
-    }
-
-    /* --- MAIN CONTENT LAYOUT --- */
-    .main-content {
-      flex: 1;
-      padding: 30px 40px;
-      overflow-y: auto;
-    }
-
-    .header-bar {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      margin-bottom: 30px;
-    }
-
-    .header-title h2 {
-      font-size: 24px;
-      font-weight: 700;
-      color: #1a1a1a;
-      margin: 0 0 6px 0;
-    }
-
-    .header-title p {
-      font-size: 14px;
-      color: #718096;
-      margin: 0;
-    }
-
-    .header-badge {
-      background-color: #ffffff;
-      padding: 8px 16px;
-      border-radius: 20px;
-      font-size: 13px;
-      font-weight: 600;
-      color: #045844;
-      display: flex;
-      align-items: center;
-      gap: 8px;
-      box-shadow: 0 2px 6px rgba(0,0,0,0.04);
-      border: 1px solid #e2e8f0;
-    }
-
-    .status-dot {
-      width: 8px;
-      height: 8px;
-      background-color: #10b981;
-      border-radius: 50%;
-      display: inline-block;
-    }
-
-    /* --- CARD CONTAINER --- */
+    
     .card {
       background: #ffffff;
-      border-radius: 16px;
-      padding: 28px;
-      margin-bottom: 24px;
-      box-shadow: 0 4px 16px rgba(0, 0, 0, 0.03);
+      border-radius: 20px;
+      padding: 32px;
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.05);
       border: 1px solid #edf2f7;
     }
 
     .form-group {
-      margin-bottom: 20px;
+      margin-bottom: 24px;
     }
 
     label {
       display: block;
-      font-weight: 600;
+      font-weight: 700;
       font-size: 14px;
-      color: #2d3748;
-      margin-bottom: 8px;
+      color: #045844;
+      margin-bottom: 10px;
     }
 
-    input[type="file"] {
-      width: 100%;
-      padding: 12px 16px;
-      border: 1px solid #e2e8f0;
-      border-radius: 10px;
-      box-sizing: border-box;
-      font-size: 14px;
-      background-color: #f8fafc;
-      transition: all 0.2s;
-    }
-
-    input[type="file"]:focus {
-      outline: none;
-      border-color: #045844;
-      background-color: #fff;
-    }
-
-    /* --- STYLE PENCARIAN PINTAR (KOTAK SUDUT TUMPUL) --- */
+    /* --- STYLE PENCARIAN PINTAR (KOTAK SUDUT TUMPUL - SESUAI PERMINTAAN) --- */
     .search-wrapper {
       position: relative;
       width: 100%;
@@ -217,8 +118,8 @@
       align-items: center;
       background: #ffffff;
       padding: 6px; 
-      border-radius: 14px; /* DIUBAH DARI 99px MENJADI 14px (Kotak tumpul elegan) */
-      border: 3px solid #ffffff; 
+      border-radius: 14px; /* Sudut tumpul */
+      border: 3px solid #f1f5f9; 
       box-shadow: 0 4px 10px rgba(0, 0, 0, 0.03);
       transition: all 0.3s ease;
       width: 100%;
@@ -234,7 +135,7 @@
       width: 42px;
       height: 42px;
       background-color: #0ba97b; 
-      border-radius: 10px; /* Disesuaikan agar serasi dengan lengkungan kotak luar */
+      border-radius: 10px; 
       display: flex;
       align-items: center;
       justify-content: center;
@@ -260,8 +161,8 @@
       color: #899ab0;
       font-weight: 600;
     }
-    
-    /* TAMPILAN DROPDOWN CUSTOM (Mewah & Elegan) */
+
+    /* TAMPILAN DROPDOWN CUSTOM */
     .autocomplete-list {
       position: absolute;
       top: calc(100% + 8px);
@@ -277,7 +178,7 @@
       list-style: none;
       padding: 8px 0;
       margin: 0;
-      display: none; /* Disembunyikan saat tidak ada hasil */
+      display: none; 
     }
 
     .autocomplete-item {
@@ -292,38 +193,52 @@
       gap: 12px;
       transition: background-color 0.2s;
     }
+    .autocomplete-item:last-child { border-bottom: none; }
+    .autocomplete-item:hover { background-color: #f0fdf4; color: #045844; }
 
-    .autocomplete-item:last-child {
-      border-bottom: none;
-    }
-
-    .autocomplete-item:hover {
-      background-color: #f0fdf4;
-      color: #045844;
-    }
-
-    /* Scrollbar khusus untuk Dropdown */
     .autocomplete-list::-webkit-scrollbar { width: 6px; }
     .autocomplete-list::-webkit-scrollbar-track { background: transparent; }
     .autocomplete-list::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 10px; }
     .autocomplete-list::-webkit-scrollbar-thumb:hover { background: #94a3b8; }
 
+    /* Input File Style Baru */
+    input[type="file"] {
+      width: 100%;
+      padding: 14px 16px;
+      border: 2px dashed #cbd5e1;
+      border-radius: 14px;
+      box-sizing: border-box;
+      font-size: 14px;
+      font-weight: 600;
+      color: #4a5568;
+      background-color: #f8fafc;
+      transition: all 0.2s;
+      cursor: pointer;
+    }
+
+    input[type="file"]:focus, input[type="file"]:hover {
+      outline: none;
+      border-color: #0ba97b;
+      background-color: #f0fdf4;
+    }
+
     /* --- TOMBOL --- */
     .btn-main {
       width: 100%;
-      padding: 14px;
-      background-color: #045844;
+      padding: 16px;
+      background-color: #0d7a5b;
       color: white;
       border: none;
-      border-radius: 10px;
+      border-radius: 14px;
       cursor: pointer;
-      font-weight: 600;
-      font-size: 15px;
+      font-weight: 700;
+      font-size: 16px;
       transition: background-color 0.2s;
+      box-shadow: 0 8px 16px rgba(13, 122, 91, 0.2);
     }
 
-    .btn-main:hover { background-color: #034233; }
-    .btn-main:disabled { background-color: #cbd5e1; cursor: not-allowed; }
+    .btn-main:hover { background-color: #045844; }
+    .btn-main:disabled { background-color: #cbd5e1; box-shadow: none; cursor: not-allowed; }
 
     .zoom-controls {
       margin-top: 15px;
@@ -331,26 +246,26 @@
       text-align: center;
       background: #f0fdf4;
       padding: 14px;
-      border-radius: 10px;
-      border: 1px dashed #045844;
+      border-radius: 14px;
+      border: 1px dashed #0ba97b;
     }
 
     .btn-zoom {
       background-color: #ffffff;
-      color: #045844;
-      border: 1px solid #045844;
+      color: #0d7a5b;
+      border: 1px solid #0d7a5b;
       padding: 8px 18px;
       font-size: 16px;
-      border-radius: 6px;
+      border-radius: 8px;
       cursor: pointer;
       margin: 0 4px;
       font-weight: bold;
       transition: all 0.2s;
     }
 
-    .btn-zoom:hover { background-color: #045844; color: #ffffff; }
+    .btn-zoom:hover { background-color: #0d7a5b; color: #ffffff; }
 
-    /* --- LIVE EDITOR RESPONSIVE --- */
+    /* --- LIVE EDITOR RESPONSIVE (DIAMBIL DARI KODE ANDA) --- */
     #editor-wrapper {
       width: 100%;
       position: relative;
@@ -449,101 +364,64 @@
     #export-nim { position: absolute; left: 360px; top: 315px; font-size: 40px; font-weight: 500; font-family: Arial, sans-serif !important; margin: 0; color: #333; white-space: nowrap; letter-spacing: 2px; z-index: 1;}
     #export-nama-arab { position: absolute; left: 360px; top: 420px; font-size: 50px; font-weight: bold; font-family: Arial, sans-serif !important; margin: 0; color: #1a1a1a; white-space: nowrap; z-index: 1;}
 
-    @media (max-width: 900px) {
-      body { flex-direction: column; }
-      .sidebar { width: 100%; }
-      .main-content { padding: 20px; }
-      .header-bar { flex-direction: column; align-items: flex-start; gap: 15px; }
-    }
   </style>
 </head>
 <body>
 
-  <!-- SIDEBAR -->
-  <aside class="sidebar">
-    <div class="brand">
-      <div class="brand-logo">
-        <i class="fa-solid fa-graduation-cap"></i>
+  <div class="page-wrapper">
+    <!-- HERO SECTION -->
+    <header class="hero">
+      <div class="hero-subtitle">Layanan Administrasi Akademik • STAIIS Cianjur</div>
+      <h1 class="hero-title">Sistem Cetak KTM Interaktif</h1>
+      <div class="hero-warning">
+        <i class="fa-solid fa-triangle-exclamation" style="color: #fbbf24;"></i>
+        Pilih data Anda dan upload pasfoto berlatar warna untuk meng-generate Kartu Tanda Mahasiswa.
       </div>
-      <div class="brand-text">
-        <h1>AKADEMIK</h1>
-        <p>STAIIS CIANJUR</p>
-      </div>
-    </div>
-
-    <ul class="menu-list">
-      <li class="menu-item">
-        <a href="#"><i class="fa-regular fa-newspaper"></i> Riwayat Jurnal</a>
-      </li>
-      <li class="menu-item">
-        <a href="#"><i class="fa-regular fa-id-badge"></i> Presensi Mahasiswa</a>
-      </li>
-      <li class="menu-item active">
-        <a href="#"><i class="fa-solid fa-address-card"></i> Cetak KTM</a>
-      </li>
-      <li class="menu-item">
-        <a href="#"><i class="fa-regular fa-chart-bar"></i> Evaluasi Akademik</a>
-      </li>
-      <li class="menu-item">
-        <a href="#"><i class="fa-solid fa-graduation-cap"></i> Hasil Studi</a>
-      </li>
-    </ul>
-  </aside>
-
-  <!-- MAIN CONTENT AREA -->
-  <main class="main-content">
-    <div class="header-bar">
-      <div class="header-title">
-        <h2>Cetak KTM Mahasiswa</h2>
-        <p>Cari data dan upload pasfoto untuk mencetak Kartu Tanda Mahasiswa</p>
-      </div>
-      <div class="header-badge">
-        <span class="status-dot"></span> Minggu, 16 Agustus 2026 - 19:51 WIB
-      </div>
-    </div>
+    </header>
 
     <!-- MAIN FORM CARD -->
-    <div class="card">
-      
-      <!-- PENCARIAN PINTAR CUSTOM (Elegan & Dropdown Cantik) -->
-      <div class="form-group">
-        <label>1. Cari dan Pilih Nama Anda:</label>
-        <div class="search-wrapper">
-          <div class="custom-search-box">
-            <div class="search-icon-bg">
-              <i class="fa-solid fa-magnifying-glass"></i>
+    <main class="main-container">
+      <div class="card">
+        
+        <!-- PENCARIAN PINTAR CUSTOM -->
+        <div class="form-group">
+          <label><i class="fa-regular fa-id-badge" style="margin-right: 6px;"></i> 1. Cari dan Pilih Nama Anda</label>
+          <div class="search-wrapper">
+            <div class="custom-search-box">
+              <div class="search-icon-bg">
+                <i class="fa-solid fa-magnifying-glass"></i>
+              </div>
+              <input type="text" id="student-search" placeholder="⏳ Sedang memuat database..." disabled autocomplete="off">
             </div>
-            <!-- Datalist bawaan dihapus, diganti div autocomplete -->
-            <input type="text" id="student-search" placeholder="⏳ Sedang memuat database..." disabled autocomplete="off">
+            <ul id="custom-autocomplete-list" class="autocomplete-list"></ul>
           </div>
-          <!-- Area List Dropdown Baru -->
-          <ul id="custom-autocomplete-list" class="autocomplete-list"></ul>
         </div>
-      </div>
 
-      <div class="form-group">
-        <label>2. Upload Pas Foto (Akan otomatis masuk ke bingkai):</label>
-        <input type="file" id="upload-image" accept="image/png, image/jpeg" disabled>
-      </div>
-
-      <div class="zoom-controls" id="zoom-panel">
-        <span style="font-size:14px; display:block; margin-bottom:8px; color:#555;">Sesuaikan Posisi Foto:</span>
-        <button type="button" class="btn-zoom" onclick="zoomIn()">+ Perbesar</button>
-        <button type="button" class="btn-zoom" onclick="zoomOut()">- Perkecil</button>
-      </div>
-
-      <div id="editor-wrapper">
-        <div id="live-foto-container">
-          <img id="live-foto" src="" style="display:none; max-width: 100%;">
+        <!-- UPLOAD FOTO -->
+        <div class="form-group">
+          <label><i class="fa-solid fa-camera" style="margin-right: 6px;"></i> 2. Upload Pas Foto Anda</label>
+          <input type="file" id="upload-image" accept="image/png, image/jpeg" disabled>
         </div>
-        <p id="live-nama"></p>
-        <p id="live-nim"></p>
-        <p id="live-nama-arab"></p>
-      </div>
 
-      <button id="btn-proses" class="btn-main" style="display:none; margin-top: 25px;" onclick="prosesDanCetak()">Simpan Foto & Download PNG</button>
-    </div>
-  </main>
+        <div class="zoom-controls" id="zoom-panel">
+          <span style="font-size:14px; display:block; margin-bottom:8px; color:#555;">Sesuaikan Posisi Foto:</span>
+          <button type="button" class="btn-zoom" onclick="zoomIn()">+ Perbesar</button>
+          <button type="button" class="btn-zoom" onclick="zoomOut()">- Perkecil</button>
+        </div>
+
+        <div id="editor-wrapper">
+          <div id="live-foto-container">
+            <img id="live-foto" src="" style="display:none; max-width: 100%;">
+          </div>
+          <p id="live-nama"></p>
+          <p id="live-nim"></p>
+          <p id="live-nama-arab"></p>
+        </div>
+
+        <button id="btn-proses" class="btn-main" style="display:none; margin-top: 25px;" onclick="prosesDanCetak()">Simpan Foto & Download PNG</button>
+      </div>
+    </main>
+  </div>
 
   <!-- RENDER PNG EXPORT -->
   <div id="export-wrapper">
@@ -571,7 +449,6 @@
         let searchInput = document.getElementById("student-search");
         
         searchInput.disabled = false;
-        // Placeholder diperbaiki sesuai fungsi halaman cetak KTM
         searchInput.placeholder = "Ketik NIM atau Nama Anda...";
       })
       .catch(error => {
@@ -588,7 +465,6 @@
       autocompleteList.innerHTML = '';
 
       if (val.length >= 3) {
-        // Filter array data mahasiswa
         let filteredData = studentsData.filter(s => 
           s.nim.toLowerCase().includes(val) || s.nama.toLowerCase().includes(val)
         );
@@ -597,10 +473,8 @@
           filteredData.forEach(student => {
             let li = document.createElement("li");
             li.className = "autocomplete-item";
-            // Menambahkan icon kecil di dalam hasil pencarian agar lebih manis
             li.innerHTML = `<i class="fa-solid fa-user text-[#a0aec0]"></i> ${student.nim} - ${student.nama}`;
             
-            // Saat Nama Diklik
             li.onclick = function() {
               searchInput.value = student.nim + " - " + student.nama;
               autocompleteList.style.display = "none";
@@ -619,14 +493,12 @@
       }
     });
 
-    // Menutup dropdown saat user mengklik di luar area pencarian
     document.addEventListener('click', function(e) {
       if (e.target.id !== "student-search") {
         autocompleteList.style.display = "none";
       }
     });
 
-    // Fungsi sembunyikan editor
     function hideEditor() {
       document.getElementById("editor-wrapper").style.display = "none";
       document.getElementById("upload-image").disabled = true;
