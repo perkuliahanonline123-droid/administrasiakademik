@@ -2,13 +2,13 @@
 <html lang="id">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
   <title>Cetak KTM Mahasiswa - STAIIS Cianjur</title>
 
-  <meta name="theme-color" content="#045844">
+  <meta name="theme-color" content="#0d7a5b">
 
-  <!-- Google Fonts & Font Awesome Icons -->
-  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <!-- Google Fonts & Font Awesome -->
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
   
   <!-- CropperJS CSS -->
@@ -31,13 +31,13 @@
       background-size: 24px 24px;
       color: #333;
       min-height: 100vh;
-      display: block; /* Menghilangkan flex agar bisa di tengah */
+      display: block; 
     }
 
     /* --- MAIN CONTENT LAYOUT (CENTERED) --- */
     .main-content {
-      max-width: 1000px; /* Mempertahankan lebar kartu yang lega */
-      margin: 0 auto;    /* Menaruh posisi tepat di tengah */
+      max-width: 1000px; 
+      margin: 0 auto;    
       padding: 40px 20px;
       width: 100%;
     }
@@ -63,6 +63,9 @@
     .header-icon {
       width: 48px;
       height: 48px;
+      min-width: 48px; /* Kunci ukuran agar tidak mengecil */
+      min-height: 48px; /* Kunci ukuran agar tidak mengecil */
+      flex-shrink: 0; /* Mencegah ikon menjadi lonjong di HP */
       background-color: #045844;
       color: white;
       border-radius: 12px;
@@ -130,11 +133,13 @@
 
     input[type="file"] {
       width: 100%;
-      padding: 12px 16px;
+      padding: 14px 16px;
       border: 2px dashed #cbd5e1;
-      border-radius: 10px;
+      border-radius: 14px;
       box-sizing: border-box;
       font-size: 14px;
+      font-weight: 600;
+      color: #4a5568;
       background-color: #f8fafc;
       transition: all 0.2s;
       cursor: pointer;
@@ -142,7 +147,7 @@
 
     input[type="file"]:focus, input[type="file"]:hover {
       outline: none;
-      border-color: #045844;
+      border-color: #0ba97b;
       background-color: #f0fdf4;
     }
 
@@ -233,14 +238,8 @@
       transition: background-color 0.2s;
     }
 
-    .autocomplete-item:last-child {
-      border-bottom: none;
-    }
-
-    .autocomplete-item:hover {
-      background-color: #f0fdf4;
-      color: #045844;
-    }
+    .autocomplete-item:last-child { border-bottom: none; }
+    .autocomplete-item:hover { background-color: #f0fdf4; color: #045844; }
 
     .autocomplete-list::-webkit-scrollbar { width: 6px; }
     .autocomplete-list::-webkit-scrollbar-track { background: transparent; }
@@ -262,15 +261,8 @@
       box-shadow: 0 8px 16px rgba(4, 88, 68, 0.2);
     }
 
-    .btn-main:hover {
-      background-color: #034233;
-    }
-
-    .btn-main:disabled {
-      background-color: #cbd5e1;
-      cursor: not-allowed;
-      box-shadow: none;
-    }
+    .btn-main:hover { background-color: #034233; }
+    .btn-main:disabled { background-color: #cbd5e1; cursor: not-allowed; box-shadow: none; }
 
     .zoom-controls {
       margin-top: 15px;
@@ -295,10 +287,7 @@
       transition: all 0.2s;
     }
 
-    .btn-zoom:hover {
-      background-color: #045844;
-      color: #ffffff;
-    }
+    .btn-zoom:hover { background-color: #045844; color: #ffffff; }
 
     /* --- LIVE EDITOR RESPONSIVE --- */
     #editor-wrapper {
@@ -328,6 +317,7 @@
       border: 2px dashed #045844;
       box-sizing: border-box;
       z-index: 10;
+      overflow: hidden; /* Mencegah foto bleber / tumpah keluar dari bingkai di HP */
     }
 
     #live-nama { 
@@ -401,6 +391,7 @@
 
     @media (max-width: 768px) {
       .header-bar { flex-direction: column; align-items: flex-start; gap: 15px; }
+      .main-content { padding: 20px; }
     }
   </style>
 </head>
