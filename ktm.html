@@ -5,8 +5,10 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Cetak KTM Mahasiswa</title>
   
+  <!-- Cropper.js untuk fitur geser foto -->
   <link href="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.5.13/cropper.min.css" rel="stylesheet">
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+  <!-- html2canvas untuk merender HTML menjadi file gambar JPG (Menggantikan PDF) -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
 
   <style>
     body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; padding: 20px; background: #f0f2f5; margin: 0;}
@@ -48,10 +50,11 @@
       background-position: center;
     }
 
+    /* BINGKAI FOTO - Posisinya diturunkan 45px agar pas di tengah */
     #live-foto-container {
       position: absolute;
       left: 90px; 
-      top: 165px; 
+      top: 210px; /* Sebelumnya 165px */
       width: 240px; 
       height: 320px; 
       border-radius: 15px; 
@@ -61,25 +64,26 @@
       z-index: 10;
     }
 
-    #live-nama { position: absolute; left: 370px; top: 235px; font-size: 38px; font-weight: 700; font-family: 'Segoe UI', Arial, sans-serif; text-transform: uppercase; margin: 0; color: #1a1a1a; white-space: nowrap; letter-spacing: 0.5px;}
-    #live-nim { position: absolute; left: 370px; top: 325px; font-size: 40px; font-weight: 500; font-family: 'Segoe UI', Arial, sans-serif; margin: 0; color: #333; white-space: nowrap; letter-spacing: 1px;}
-    #live-nama-arab { position: absolute; left: 370px; top: 435px; font-size: 52px; font-weight: bold; font-family: 'Arial', sans-serif; margin: 0; color: #1a1a1a; white-space: nowrap; }
+    /* TEKS - Semuanya ikut diturunkan 45px agar sejajar dengan foto */
+    #live-nama { position: absolute; left: 370px; top: 280px; font-size: 38px; font-weight: 700; font-family: 'Segoe UI', Arial, sans-serif; text-transform: uppercase; margin: 0; color: #1a1a1a; white-space: nowrap; letter-spacing: 0.5px;}
+    #live-nim { position: absolute; left: 370px; top: 370px; font-size: 40px; font-weight: 500; font-family: 'Segoe UI', Arial, sans-serif; margin: 0; color: #333; white-space: nowrap; letter-spacing: 1px;}
+    #live-nama-arab { position: absolute; left: 370px; top: 480px; font-size: 52px; font-weight: bold; font-family: 'Arial', sans-serif; margin: 0; color: #1a1a1a; white-space: nowrap; }
 
+    /* Modifikasi Cropper.js */
     .cropper-view-box { border-radius: 15px; outline: none !important; }
     .cropper-dashed, .cropper-point, .cropper-line, .cropper-center { display: none !important; }
     .cropper-modal { opacity: 0 !important; } 
     .cropper-bg { background: transparent !important; }
 
-    /* --- TEMPAT RENDER PDF (PERBAIKAN ABSOLUT) --- */
-    #pdf-wrapper {
+    /* --- TEMPAT RENDER JPG --- */
+    /* Dibuat tembus pandang (opacity 0) agar tidak terlihat pengguna, tapi tetap terbaca sempurna oleh html2canvas */
+    #export-wrapper {
       position: absolute;
-      top: -9999px; /* Dilempar ke luar layar atas, TAPI ukuran tetap utuh */
-      left: -9999px;
-      width: 1011px;
-      height: 638px;
-      overflow: hidden;
+      top: 0; 
+      left: 0;
+      opacity: 0;
+      pointer-events: none; /* Agar tidak bisa diklik */
       z-index: -9999;
-      background: white;
     }
 
     #export-ktm {
@@ -89,7 +93,6 @@
       background-color: #fff;
     }
     
-    /* Gunakan elemen IMG untuk background agar 100% terbaca di PDF */
     #export-bg {
       position: absolute;
       top: 0;
@@ -99,11 +102,11 @@
       z-index: 0;
     }
 
-    /* Z-index 1 agar teks dan foto berada di atas background IMG */
-    #export-foto { position: absolute; left: 90px; top: 165px; width: 240px; height: 320px; object-fit: cover; border-radius: 15px; z-index: 1;}
-    #export-nama { position: absolute; left: 370px; top: 235px; font-size: 38px; font-weight: 700; font-family: 'Segoe UI', Arial, sans-serif; text-transform: uppercase; margin: 0; color: #1a1a1a; white-space: nowrap; letter-spacing: 0.5px; z-index: 1;}
-    #export-nim { position: absolute; left: 370px; top: 325px; font-size: 40px; font-weight: 500; font-family: 'Segoe UI', Arial, sans-serif; margin: 0; color: #333; white-space: nowrap; letter-spacing: 1px; z-index: 1;}
-    #export-nama-arab { position: absolute; left: 370px; top: 435px; font-size: 52px; font-weight: bold; font-family: 'Arial', sans-serif; margin: 0; color: #1a1a1a; white-space: nowrap; z-index: 1;}
+    /* Posisi persis sama dengan pengaturan Live Editor di atas */
+    #export-foto { position: absolute; left: 90px; top: 210px; width: 240px; height: 320px; object-fit: cover; border-radius: 15px; z-index: 1;}
+    #export-nama { position: absolute; left: 370px; top: 280px; font-size: 38px; font-weight: 700; font-family: 'Segoe UI', Arial, sans-serif; text-transform: uppercase; margin: 0; color: #1a1a1a; white-space: nowrap; letter-spacing: 0.5px; z-index: 1;}
+    #export-nim { position: absolute; left: 370px; top: 370px; font-size: 40px; font-weight: 500; font-family: 'Segoe UI', Arial, sans-serif; margin: 0; color: #333; white-space: nowrap; letter-spacing: 1px; z-index: 1;}
+    #export-nama-arab { position: absolute; left: 370px; top: 480px; font-size: 52px; font-weight: bold; font-family: 'Arial', sans-serif; margin: 0; color: #1a1a1a; white-space: nowrap; z-index: 1;}
   </style>
 </head>
 <body>
@@ -141,13 +144,13 @@
       </div>
     </div>
 
-    <button id="btn-proses" class="btn-main" style="display:none; margin-top: 25px;" onclick="prosesDanCetak()">Simpan Foto & Download PDF</button>
+    <button id="btn-proses" class="btn-main" style="display:none; margin-top: 25px;" onclick="prosesDanCetak()">Simpan Foto & Download JPG</button>
   </div>
 
-  <!-- AREA RENDER PDF (Kini ukurannya dipertahankan tapi posisinya di luar layar) -->
-  <div id="pdf-wrapper">
+  <!-- AREA RENDER JPG (Transparan di layar) -->
+  <div id="export-wrapper">
     <div id="export-ktm">
-      <img id="export-bg" src="Depan%20KTM.jpg" alt="Background"> <!-- Background jadi IMG -->
+      <img id="export-bg" src="Depan%20KTM.jpg" alt="Background"> 
       <img id="export-foto" src="" alt="Foto">
       <p id="export-nama"></p>
       <p id="export-nim"></p>
@@ -255,6 +258,7 @@
       reader.readAsDataURL(file);
     });
 
+    // PROSES MERENDER JPG
     function prosesDanCetak() {
       if (!cropper) return alert("Silakan upload foto terlebih dahulu.");
       
@@ -262,68 +266,68 @@
       let nim = document.getElementById("student-select").value;
       let student = studentsData.find(s => s.nim === nim);
       
-      btn.innerText = "⏳ Sedang memproses PDF... (Mohon tunggu)";
+      btn.innerText = "⏳ Sedang memproses Gambar... (Mohon tunggu)";
       btn.disabled = true;
 
-      let canvas = cropper.getCroppedCanvas({ width: 480, height: 640 });
-      let base64Data = canvas.toDataURL('image/jpeg', 0.9);
+      // Ambil foto wajah saja untuk dikirim ke server (Resolusi tinggi)
+      let canvasCrop = cropper.getCroppedCanvas({ width: 480, height: 640 });
+      let base64Foto = canvasCrop.toDataURL('image/jpeg', 0.9);
 
-      document.getElementById('export-foto').src = base64Data;
+      // Injeksi data ke container tersembunyi
+      document.getElementById('export-foto').src = base64Foto;
       document.getElementById('export-nama').innerText = student.nama;
       document.getElementById('export-nim').innerText = student.nim;
       document.getElementById('export-nama-arab').innerText = student.namaArab || "";
 
+      // Render keseluruhan KTM menjadi JPG menggunakan html2canvas
       let element = document.getElementById('export-ktm');
       
-      // PERBAIKAN PADA SETTINGAN HTML2PDF
-      let opt = {
-        margin:       0,
-        filename:     'KTM_' + student.nim + '.pdf',
-        image:        { type: 'jpeg', quality: 1 },
-        html2canvas:  { 
-          scale: 2, 
-          useCORS: true, 
-          scrollY: 0, /* Kunci offset agar margin putih tidak muncul */
-          scrollX: 0,
-          windowWidth: 1011,
-          windowHeight: 638
-        },
-        jsPDF: { unit: 'px', format: [1011, 638], orientation: 'landscape' }
-      };
+      html2canvas(element, {
+        scale: 2, // Kualitas HD/Resolusi Tinggi
+        useCORS: true, 
+        logging: false,
+        backgroundColor: null
+      }).then(canvasFinal => {
+        
+        // 1. Download File JPG
+        let imgData = canvasFinal.toDataURL('image/jpeg', 1.0);
+        let link = document.createElement('a');
+        link.download = 'KTM_' + student.nim + '.jpg';
+        link.href = imgData;
+        link.click();
 
-      html2pdf().set(opt).from(element).save().then(() => {
         btn.innerText = "☁️ Menyimpan data foto ke server...";
         
+        // 2. Kirim Foto Wajah (Base64) ke server Google Drive
         fetch(API_URL, {
           method: 'POST',
           redirect: 'follow', 
           headers: { 'Content-Type': 'text/plain;charset=utf-8' },
           body: JSON.stringify({
             nim: nim,
-            image: base64Data
+            image: base64Foto
           })
         })
         .then(response => response.json())
         .then(result => {
           if(result.status === "success") {
-            btn.innerText = "✅ Selesai! PDF Berhasil Diunduh";
+            btn.innerText = "✅ Selesai! Gambar Berhasil Diunduh";
             setTimeout(() => {
-              btn.innerText = "Simpan Foto & Download PDF";
+              btn.innerText = "Simpan Foto & Download JPG";
               btn.disabled = false;
             }, 3000);
           } else {
-            alert("PDF berhasil diunduh, namun foto gagal tersimpan: " + result.message);
-            btn.innerText = "Simpan Foto & Download PDF";
+            alert("Gambar berhasil diunduh, namun foto gagal tersimpan: " + result.message);
+            btn.innerText = "Simpan Foto & Download JPG";
             btn.disabled = false;
           }
         })
         .catch(error => {
           alert("Jaringan terputus saat menghubungi server.");
-          btn.innerText = "Simpan Foto & Download PDF";
+          btn.innerText = "Simpan Foto & Download JPG";
           btn.disabled = false;
           console.error(error);
         });
-        
       });
     }
   </script>
