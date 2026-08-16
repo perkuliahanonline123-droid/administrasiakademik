@@ -6,40 +6,74 @@
   <title>Cetak KTM Mahasiswa</title>
   <link href="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.5.13/cropper.min.css" rel="stylesheet">
   <style>
-    body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; padding: 20px; max-width: 600px; margin: auto; background: #f4f7f6;}
-    .container { background: #fff; padding: 25px; border-radius: 10px; box-shadow: 0 4px 6px rgba(0,0,0,0.1); }
-    h2 { text-align: center; color: #333; }
+    body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; padding: 20px; background: #f0f2f5; margin: 0;}
+    .container { max-width: 900px; margin: auto; background: #fff; padding: 25px; border-radius: 12px; box-shadow: 0 4px 12px rgba(0,0,0,0.05); }
+    h2 { text-align: center; color: #333; margin-top: 0; }
+    
     .form-group { margin-bottom: 15px; }
     label { font-weight: bold; font-size: 14px; color: #555; }
-    select, input[type="file"], button { width: 100%; padding: 12px; margin-top: 8px; border: 1px solid #ddd; border-radius: 5px; box-sizing: border-box; }
+    select, input[type="file"], button { width: 100%; padding: 12px; margin-top: 8px; border: 1px solid #ddd; border-radius: 6px; box-sizing: border-box; font-size: 15px;}
     button { background-color: #008080; color: white; border: none; cursor: pointer; font-weight: bold; font-size: 16px; transition: 0.3s;}
     button:hover { background-color: #005959; }
     button:disabled { background-color: #ccc; cursor: not-allowed; }
-    #image-container { max-width: 100%; max-height: 400px; margin-top: 15px; display: none; }
     
-    #preview-data { background: #eef2f5; padding: 15px; margin-top: 10px; border-left: 4px solid #008080; display: none; border-radius: 4px; line-height: 1.6;}
-    #lbl-nama { font-weight: bold; font-size: 18px; color: #222;}
-    #lbl-nim { font-size: 16px; color: #444;}
-    #lbl-nama-arab { font-size: 22px; font-weight: bold; color: #222; margin-top: 5px;}
+    /* --- LIVE EDITOR (CANVA STYLE) --- */
+    #editor-wrapper {
+      width: 100%;
+      position: relative;
+      margin-top: 25px;
+      border-radius: 8px;
+      box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+      display: none; /* Muncul setelah nama dipilih */
+      overflow: hidden;
+      background: #e9ecef;
+    }
     
+    #live-ktm {
+      width: 1011px;
+      height: 638px;
+      position: absolute;
+      top: 0;
+      left: 0;
+      transform-origin: top left;
+      background-image: url('Depan%20KTM.jpg');
+      background-size: cover;
+      background-position: center;
+    }
+
+    /* Bingkai Foto Live */
+    #live-foto-container {
+      position: absolute;
+      left: 85px; 
+      top: 172px; 
+      width: 228px; 
+      height: 312px; 
+      border-radius: 20px;
+      background-color: rgba(255, 255, 255, 0.5); /* Warna transparan sebelum upload */
+      border: 2px dashed #008080;
+      box-sizing: border-box;
+      z-index: 10;
+    }
+
+    /* Teks Live */
+    #live-nama { position: absolute; left: 360px; top: 245px; font-size: 38px; font-weight: 600; font-family: 'Segoe UI', Arial, sans-serif; text-transform: uppercase; margin: 0; color: #111; white-space: nowrap; }
+    #live-nim { position: absolute; left: 360px; top: 345px; font-size: 42px; font-family: 'Segoe UI', Arial, sans-serif; margin: 0; color: #111; white-space: nowrap; }
+    #live-nama-arab { position: absolute; left: 360px; top: 445px; font-size: 50px; font-weight: bold; font-family: 'Arial', sans-serif; margin: 0; color: #111; white-space: nowrap; }
+    #live-qr { position: absolute; right: 85px; bottom: 85px; width: 160px; height: 160px; }
+
+    /* Modifikasi Cropper.js agar terlihat seperti bingkai Canva */
+    .cropper-view-box { border-radius: 20px; outline: none !important; }
+    .cropper-dashed, .cropper-point, .cropper-line, .cropper-center { display: none !important; }
+    .cropper-modal { opacity: 0 !important; } /* Sembunyikan background hitam cropper */
+    .cropper-bg { background: transparent !important; }
+
+    /* --- PENGATURAN KHUSUS SAAT MENCETAK --- */
     #print-area { display: none; }
     
-    /* --- PENGATURAN KHUSUS SAAT MENCETAK --- */
     @media print {
-      @page { 
-        size: A4 landscape; 
-        margin: 0; 
-      }
-      
-      body { 
-        background: white; 
-        margin: 0; 
-        padding: 0;
-        -webkit-print-color-adjust: exact;
-        print-color-adjust: exact;
-      }
-      
-      #app-container { display: none !important; }
+      @page { size: A4 landscape; margin: 0; }
+      body { background: white; margin: 0; padding: 0; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+      .container { display: none !important; }
       
       #print-area { 
         display: block !important; 
@@ -50,108 +84,50 @@
         overflow: hidden;
       }
       
-      /* Background dikembalikan menggunakan tag Img agar ke-print tanpa settingan khusus */
-      #print-bg {
-        position: absolute;
-        top: 0;
-        left: 0;
-        width: 100%;
-        height: 100%;
-        z-index: -1;
-      }
-      
-      #print-foto { 
-        position: absolute; 
-        left: 85px; 
-        top: 172px; 
-        width: 228px; 
-        height: 312px; 
-        object-fit: cover; 
-        border-radius: 20px; 
-        z-index: 1;
-      }
-      
-      #print-nama { 
-        position: absolute; 
-        left: 360px; 
-        top: 245px; 
-        font-size: 38px; 
-        font-weight: 600; 
-        font-family: 'Segoe UI', Arial, sans-serif; 
-        text-transform: uppercase; 
-        margin: 0; 
-        color: #111;
-        white-space: nowrap; /* Mencegah teks turun ke baris baru */
-        z-index: 1;
-      }
-      
-      #print-nim { 
-        position: absolute; 
-        left: 360px; 
-        top: 345px; 
-        font-size: 42px; 
-        font-family: 'Segoe UI', Arial, sans-serif; 
-        margin: 0; 
-        color: #111;
-        white-space: nowrap; /* Mencegah teks turun ke baris baru */
-        z-index: 1;
-      }
-      
-      #print-nama-arab { 
-        position: absolute; 
-        left: 360px; 
-        top: 445px; 
-        font-size: 50px; 
-        font-weight: bold; 
-        font-family: 'Arial', sans-serif; 
-        margin: 0; 
-        color: #111; 
-        white-space: nowrap; /* Mencegah teks turun ke baris baru */
-        z-index: 1;
-      }
-      
-      #print-qr { 
-        position: absolute; 
-        right: 85px; 
-        bottom: 85px; 
-        width: 160px; 
-        height: 160px; 
-        z-index: 1;
-      }
+      #print-bg { position: absolute; top: 0; left: 0; width: 100%; height: 100%; z-index: -1; }
+      #print-foto { position: absolute; left: 85px; top: 172px; width: 228px; height: 312px; object-fit: cover; border-radius: 20px; z-index: 1; }
+      #print-nama { position: absolute; left: 360px; top: 245px; font-size: 38px; font-weight: 600; font-family: 'Segoe UI', Arial, sans-serif; text-transform: uppercase; margin: 0; color: #111; white-space: nowrap; z-index: 1; }
+      #print-nim { position: absolute; left: 360px; top: 345px; font-size: 42px; font-family: 'Segoe UI', Arial, sans-serif; margin: 0; color: #111; white-space: nowrap; z-index: 1; }
+      #print-nama-arab { position: absolute; left: 360px; top: 445px; font-size: 50px; font-weight: bold; font-family: 'Arial', sans-serif; margin: 0; color: #111; white-space: nowrap; z-index: 1; }
+      #print-qr { position: absolute; right: 85px; bottom: 85px; width: 160px; height: 160px; z-index: 1; }
     }
   </style>
 </head>
 <body>
 
   <div class="container" id="app-container">
-    <h2>Sistem Upload & Cetak KTM</h2>
+    <h2>Sistem Cetak KTM Interaktif</h2>
     
     <div class="form-group">
-      <label>Pilih Nama Anda:</label>
-      <select id="student-select" onchange="showDetails()">
+      <label>1. Pilih Nama Anda:</label>
+      <select id="student-select" onchange="showLiveEditor()">
         <option value="">🔄 Memuat data dari server...</option>
       </select>
     </div>
 
-    <div id="preview-data">
-      <div id="lbl-nama"></div>
-      <div id="lbl-nim"></div>
-      <div id="lbl-nama-arab"></div>
-    </div>
-
-    <div class="form-group" style="margin-top: 20px;">
-      <label>Upload Pas Foto (Otomatis menyesuaikan bingkai):</label>
+    <div class="form-group">
+      <label>2. Upload Pas Foto (Akan otomatis masuk ke bingkai):</label>
       <input type="file" id="upload-image" accept="image/png, image/jpeg" disabled>
+      <small style="color:#666; display:block; margin-top:5px;">💡 <i>Tips: Setelah foto muncul, klik dan geser foto di dalam template untuk merapikan posisinya, atau scroll mouse untuk zoom (seperti di Canva).</i></small>
     </div>
 
-    <div>
-      <img id="image-container" src="">
+    <!-- AREA LIVE EDITOR KARTU -->
+    <div id="editor-wrapper">
+      <div id="live-ktm">
+        <div id="live-foto-container">
+          <img id="live-foto" src="" style="display:none; max-width: 100%;">
+        </div>
+        <p id="live-nama"></p>
+        <p id="live-nim"></p>
+        <p id="live-nama-arab"></p>
+        <img id="live-qr" src="" alt="QR">
+      </div>
     </div>
 
-    <button id="btn-proses" style="display:none; margin-top: 20px;" onclick="prosesDanCetak()">Simpan Foto & Cetak KTM</button>
+    <button id="btn-proses" style="display:none; margin-top: 25px;" onclick="prosesDanCetak()">Simpan Foto & Cetak KTM</button>
   </div>
 
-  <!-- Area Cetak Khusus Print -->
+  <!-- Area Cetak Khusus Print (Latar Belakang) -->
   <div id="print-area">
     <img id="print-bg" src="Depan%20KTM.jpg" alt="Background">
     <img id="print-foto" src="" alt="Foto">
@@ -168,6 +144,7 @@
     let studentsData = [];
     let cropper;
 
+    // Fetch JSON dari Apps Script
     fetch(API_URL + "?t=" + new Date().getTime())
       .then(response => response.json())
       .then(data => {
@@ -187,49 +164,84 @@
         console.error(error);
       });
 
-    function showDetails() {
+    // Fitur: Skala otomatis agar template muat di layar HP/Laptop
+    function resizeLiveEditor() {
+      const wrapper = document.getElementById('editor-wrapper');
+      const ktm = document.getElementById('live-ktm');
+      if (wrapper.style.display !== 'none') {
+        const targetWidth = wrapper.clientWidth;
+        const scale = targetWidth / 1011; // 1011 adalah lebar asli KTM
+        ktm.style.transform = `scale(${scale})`;
+        wrapper.style.height = (638 * scale) + 'px'; // 638 adalah tinggi asli
+      }
+    }
+    window.addEventListener('resize', resizeLiveEditor);
+
+    // Tampilkan Live Editor saat nama dipilih
+    function showLiveEditor() {
       let nim = document.getElementById("student-select").value;
-      let preview = document.getElementById("preview-data");
+      let wrapper = document.getElementById("editor-wrapper");
       let fileInput = document.getElementById("upload-image");
       
       if (!nim) {
-        preview.style.display = "none";
+        wrapper.style.display = "none";
         fileInput.disabled = true;
         return;
       }
 
       let student = studentsData.find(s => s.nim === nim);
-      document.getElementById("lbl-nama").innerText = student.nama;
-      document.getElementById("lbl-nim").innerText = student.nim;
-      document.getElementById("lbl-nama-arab").innerText = student.namaArab || "-";
       
-      preview.style.display = "block";
+      // Inject data ke Live Editor
+      document.getElementById("live-nama").innerText = student.nama;
+      document.getElementById("live-nim").innerText = student.nim;
+      document.getElementById("live-nama-arab").innerText = student.namaArab || "";
+      document.getElementById("live-qr").src = "https://api.qrserver.com/v1/create-qr-code/?size=160x160&data=" + student.nim;
+      
+      wrapper.style.display = "block";
       fileInput.disabled = false;
+      
+      // Panggil resize agar pas dengan layar
+      resizeLiveEditor();
     }
 
+    // Setup Cropper (Gaya Canva)
     document.getElementById('upload-image').addEventListener('change', function(e) {
       let file = e.target.files[0];
       if (!file) return;
 
       let reader = new FileReader();
       reader.onload = function(event) {
-        let img = document.getElementById('image-container');
+        let img = document.getElementById('live-foto');
+        let container = document.getElementById('live-foto-container');
+        
         img.src = event.target.result;
         img.style.display = 'block';
+        container.style.border = 'none'; // Hilangkan garis putus-putus
         document.getElementById('btn-proses').style.display = 'block';
 
         if (cropper) cropper.destroy();
+        
+        // Konfigurasi Cropper agar bertindak seperti frame gambar Canva
         cropper = new Cropper(img, {
           aspectRatio: 228 / 312,
-          viewMode: 1,
-          dragMode: 'move'
+          viewMode: 1,           // Jangan biarkan gambar keluar dari frame
+          dragMode: 'move',      // Mode geser gambar
+          autoCropArea: 1,       // Penuhi seluruh area container
+          cropBoxMovable: false, // Kunci area crop
+          cropBoxResizable: false, // Kunci ukuran crop
+          toggleDragModeOnDblclick: false,
+          ready: function() {
+            // Paksa ukuran kotak crop persis sama dengan ukuran container di CSS
+            this.cropper.setCropBoxData({ left: 0, top: 0, width: 228, height: 312 });
+          }
         });
       };
       reader.readAsDataURL(file);
     });
 
+    // Proses Upload dan Cetak
     function prosesDanCetak() {
-      if (!cropper) return alert("Silakan upload foto.");
+      if (!cropper) return alert("Silakan upload foto terlebih dahulu.");
       
       let btn = document.getElementById('btn-proses');
       let nim = document.getElementById("student-select").value;
@@ -238,15 +250,18 @@
       btn.innerText = "⏳ Menyimpan ke server... (Mohon tunggu)";
       btn.disabled = true;
 
+      // Render image dari kotak yang digeser user
       let canvas = cropper.getCroppedCanvas({ width: 456, height: 624 });
       let base64Data = canvas.toDataURL('image/png');
 
+      // Masukkan data ke area cetak tersembunyi
       document.getElementById('print-foto').src = base64Data;
       document.getElementById('print-nama').innerText = student.nama;
       document.getElementById('print-nim').innerText = student.nim;
       document.getElementById('print-nama-arab').innerText = student.namaArab || "";
       document.getElementById('print-qr').src = "https://api.qrserver.com/v1/create-qr-code/?size=160x160&data=" + student.nim;
 
+      // Kirim via POST
       fetch(API_URL, {
         method: 'POST',
         redirect: 'follow', 
