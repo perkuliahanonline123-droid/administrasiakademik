@@ -5,9 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Cetak KTM Mahasiswa</title>
   
-  <!-- Cropper.js untuk fitur geser foto -->
   <link href="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.5.13/cropper.min.css" rel="stylesheet">
-  <!-- html2pdf.js untuk unduh PDF otomatis -->
   <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
 
   <style>
@@ -50,56 +48,62 @@
       background-position: center;
     }
 
-    /* BINGKAI FOTO BARU - Lebih ramping dan proporsional (Rasio 3:4) */
     #live-foto-container {
       position: absolute;
       left: 90px; 
       top: 165px; 
       width: 240px; 
       height: 320px; 
-      border-radius: 15px; /* Sedikit melengkung agar elegan */
+      border-radius: 15px; 
       background-color: rgba(255, 255, 255, 0.5); 
       border: 2px dashed #008080;
       box-sizing: border-box;
       z-index: 10;
     }
 
-    /* TEKS BARU - Jarak disesuaikan dengan foto agar bernafas */
     #live-nama { position: absolute; left: 370px; top: 235px; font-size: 38px; font-weight: 700; font-family: 'Segoe UI', Arial, sans-serif; text-transform: uppercase; margin: 0; color: #1a1a1a; white-space: nowrap; letter-spacing: 0.5px;}
     #live-nim { position: absolute; left: 370px; top: 325px; font-size: 40px; font-weight: 500; font-family: 'Segoe UI', Arial, sans-serif; margin: 0; color: #333; white-space: nowrap; letter-spacing: 1px;}
     #live-nama-arab { position: absolute; left: 370px; top: 435px; font-size: 52px; font-weight: bold; font-family: 'Arial', sans-serif; margin: 0; color: #1a1a1a; white-space: nowrap; }
 
-    /* Modifikasi Cropper.js */
     .cropper-view-box { border-radius: 15px; outline: none !important; }
     .cropper-dashed, .cropper-point, .cropper-line, .cropper-center { display: none !important; }
     .cropper-modal { opacity: 0 !important; } 
     .cropper-bg { background: transparent !important; }
 
-    /* --- TEMPAT RENDER PDF (Disembunyikan dari layar) --- */
-    /* Kita buat kloningan khusus untuk dirender html2pdf agar kualitasnya maksimal */
+    /* --- TEMPAT RENDER PDF (PERBAIKAN ABSOLUT) --- */
     #pdf-wrapper {
       position: absolute;
-      width: 0;
-      height: 0;
+      top: -9999px; /* Dilempar ke luar layar atas, TAPI ukuran tetap utuh */
+      left: -9999px;
+      width: 1011px;
+      height: 638px;
       overflow: hidden;
       z-index: -9999;
+      background: white;
     }
 
     #export-ktm {
       width: 1011px;
       height: 638px;
       position: relative;
-      background-image: url('Depan%20KTM.jpg');
-      background-size: cover;
-      background-position: center;
       background-color: #fff;
     }
     
-    /* Layout kloningan sama persis dengan Live Editor */
-    #export-foto { position: absolute; left: 90px; top: 165px; width: 240px; height: 320px; object-fit: cover; border-radius: 15px; }
-    #export-nama { position: absolute; left: 370px; top: 235px; font-size: 38px; font-weight: 700; font-family: 'Segoe UI', Arial, sans-serif; text-transform: uppercase; margin: 0; color: #1a1a1a; white-space: nowrap; letter-spacing: 0.5px;}
-    #export-nim { position: absolute; left: 370px; top: 325px; font-size: 40px; font-weight: 500; font-family: 'Segoe UI', Arial, sans-serif; margin: 0; color: #333; white-space: nowrap; letter-spacing: 1px;}
-    #export-nama-arab { position: absolute; left: 370px; top: 435px; font-size: 52px; font-weight: bold; font-family: 'Arial', sans-serif; margin: 0; color: #1a1a1a; white-space: nowrap; }
+    /* Gunakan elemen IMG untuk background agar 100% terbaca di PDF */
+    #export-bg {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 1011px;
+      height: 638px;
+      z-index: 0;
+    }
+
+    /* Z-index 1 agar teks dan foto berada di atas background IMG */
+    #export-foto { position: absolute; left: 90px; top: 165px; width: 240px; height: 320px; object-fit: cover; border-radius: 15px; z-index: 1;}
+    #export-nama { position: absolute; left: 370px; top: 235px; font-size: 38px; font-weight: 700; font-family: 'Segoe UI', Arial, sans-serif; text-transform: uppercase; margin: 0; color: #1a1a1a; white-space: nowrap; letter-spacing: 0.5px; z-index: 1;}
+    #export-nim { position: absolute; left: 370px; top: 325px; font-size: 40px; font-weight: 500; font-family: 'Segoe UI', Arial, sans-serif; margin: 0; color: #333; white-space: nowrap; letter-spacing: 1px; z-index: 1;}
+    #export-nama-arab { position: absolute; left: 370px; top: 435px; font-size: 52px; font-weight: bold; font-family: 'Arial', sans-serif; margin: 0; color: #1a1a1a; white-space: nowrap; z-index: 1;}
   </style>
 </head>
 <body>
@@ -119,14 +123,13 @@
       <input type="file" id="upload-image" accept="image/png, image/jpeg" disabled>
     </div>
 
-    <!-- Panel Tombol Zoom -->
     <div class="zoom-controls" id="zoom-panel">
       <span style="font-size:14px; display:block; margin-bottom:8px; color:#555;">Sesuaikan Posisi Foto:</span>
       <button type="button" class="btn-zoom" onclick="zoomIn()">+ Perbesar</button>
       <button type="button" class="btn-zoom" onclick="zoomOut()">- Perkecil</button>
     </div>
 
-    <!-- AREA LIVE EDITOR (Tampil di Layar) -->
+    <!-- AREA LIVE EDITOR -->
     <div id="editor-wrapper">
       <div id="live-ktm">
         <div id="live-foto-container">
@@ -141,9 +144,10 @@
     <button id="btn-proses" class="btn-main" style="display:none; margin-top: 25px;" onclick="prosesDanCetak()">Simpan Foto & Download PDF</button>
   </div>
 
-  <!-- AREA RENDER PDF (Tidak terlihat oleh pengguna) -->
+  <!-- AREA RENDER PDF (Kini ukurannya dipertahankan tapi posisinya di luar layar) -->
   <div id="pdf-wrapper">
     <div id="export-ktm">
+      <img id="export-bg" src="Depan%20KTM.jpg" alt="Background"> <!-- Background jadi IMG -->
       <img id="export-foto" src="" alt="Foto">
       <p id="export-nama"></p>
       <p id="export-nim"></p>
@@ -235,7 +239,7 @@
         if (cropper) cropper.destroy();
         
         cropper = new Cropper(img, {
-          aspectRatio: 240 / 320, // Rasio 3:4 yang pas dan ramping
+          aspectRatio: 240 / 320, 
           viewMode: 1,           
           dragMode: 'move',      
           autoCropArea: 1,       
@@ -251,7 +255,6 @@
       reader.readAsDataURL(file);
     });
 
-    // PROSES GENERATE PDF DAN UPLOAD KE SCRIPT
     function prosesDanCetak() {
       if (!cropper) return alert("Silakan upload foto terlebih dahulu.");
       
@@ -262,32 +265,35 @@
       btn.innerText = "⏳ Sedang memproses PDF... (Mohon tunggu)";
       btn.disabled = true;
 
-      // Render resolusi ganda untuk foto agar jernih saat PDF dicetak
       let canvas = cropper.getCroppedCanvas({ width: 480, height: 640 });
       let base64Data = canvas.toDataURL('image/jpeg', 0.9);
 
-      // Injeksi data ke kloningan yang disembunyikan
       document.getElementById('export-foto').src = base64Data;
       document.getElementById('export-nama').innerText = student.nama;
       document.getElementById('export-nim').innerText = student.nim;
       document.getElementById('export-nama-arab').innerText = student.namaArab || "";
 
-      // Pengaturan html2pdf
       let element = document.getElementById('export-ktm');
+      
+      // PERBAIKAN PADA SETTINGAN HTML2PDF
       let opt = {
         margin:       0,
         filename:     'KTM_' + student.nim + '.pdf',
         image:        { type: 'jpeg', quality: 1 },
-        html2canvas:  { scale: 2, useCORS: true, letterRendering: true }, // Scale 2 agar teks dan gambar tajam
-        jsPDF:        { unit: 'px', format: [1011, 638], orientation: 'landscape' }
+        html2canvas:  { 
+          scale: 2, 
+          useCORS: true, 
+          scrollY: 0, /* Kunci offset agar margin putih tidak muncul */
+          scrollX: 0,
+          windowWidth: 1011,
+          windowHeight: 638
+        },
+        jsPDF: { unit: 'px', format: [1011, 638], orientation: 'landscape' }
       };
 
-      // 1. Jalankan unduhan PDF di browser mahasiswa
       html2pdf().set(opt).from(element).save().then(() => {
-        
         btn.innerText = "☁️ Menyimpan data foto ke server...";
         
-        // 2. Kirim data base64 ke Google Drive di latar belakang
         fetch(API_URL, {
           method: 'POST',
           redirect: 'follow', 
@@ -306,7 +312,7 @@
               btn.disabled = false;
             }, 3000);
           } else {
-            alert("PDF berhasil diunduh, namun foto gagal tersimpan di server: " + result.message);
+            alert("PDF berhasil diunduh, namun foto gagal tersimpan: " + result.message);
             btn.innerText = "Simpan Foto & Download PDF";
             btn.disabled = false;
           }
