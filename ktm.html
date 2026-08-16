@@ -1,0 +1,196 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Cetak KTM Mahasiswa</title>
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.5.13/cropper.min.css" rel="stylesheet">
+  <style>
+    body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; padding: 20px; max-width: 600px; margin: auto; background: #f4f7f6;}
+    .container { background: #fff; padding: 25px; border-radius: 10px; box-shadow: 0 4px 6px rgba(0,0,0,0.1); }
+    h2 { text-align: center; color: #333; }
+    .form-group { margin-bottom: 15px; }
+    label { font-weight: bold; font-size: 14px; color: #555; }
+    select, input[type="file"], button { width: 100%; padding: 12px; margin-top: 8px; border: 1px solid #ddd; border-radius: 5px; box-sizing: border-box; }
+    button { background-color: #008080; color: white; border: none; cursor: pointer; font-weight: bold; font-size: 16px; transition: 0.3s;}
+    button:hover { background-color: #005959; }
+    button:disabled { background-color: #ccc; cursor: not-allowed; }
+    #image-container { max-width: 100%; max-height: 400px; margin-top: 15px; display: none; }
+    #preview-data { background: #eef2f5; padding: 15px; margin-top: 10px; border-left: 4px solid #008080; display: none; border-radius: 4px;}
+    
+    /* Area Cetak KTM - Disembunyikan saat mode layar */
+    #print-area { display: none; text-align: center; border: 2px solid #000; padding: 20px; width: 300px; margin: auto; background: white;}
+    #print-area img { width: 120px; height: 160px; object-fit: cover; border: 2px solid #008080; }
+    
+    @media print {
+      body { background: white; }
+      #app-container { display: none; }
+      #print-area { display: block; position: absolute; left: 0; top: 0; border: none; }
+    }
+  </style>
+</head>
+<body>
+
+  <div class="container" id="app-container">
+    <h2>Sistem Upload & Cetak KTM</h2>
+    
+    <div class="form-group">
+      <label>Pilih Nama Anda:</label>
+      <select id="student-select" onchange="showDetails()">
+        <option value="">🔄 Memuat data dari server...</option>
+      </select>
+    </div>
+
+    <div id="preview-data">
+      <strong>NIM:</strong> <span id="lbl-nim"></span><br>
+      <strong>Nama:</strong> <span id="lbl-nama"></span><br>
+      <strong>Prodi:</strong> <span id="lbl-prodi"></span>
+    </div>
+
+    <div class="form-group" style="margin-top: 20px;">
+      <label>Upload Pas Foto (Rasio 3:4):</label>
+      <input type="file" id="upload-image" accept="image/png, image/jpeg" disabled>
+    </div>
+
+    <div>
+      <img id="image-container" src="">
+    </div>
+
+    <button id="btn-proses" style="display:none; margin-top: 20px;" onclick="prosesDanCetak()">Simpan Foto & Cetak KTM</button>
+  </div>
+
+  <!-- Area Cetak Khusus Print -->
+  <div id="print-area">
+    <h3 style="color:#008080; margin-bottom:5px;">KARTU TANDA MAHASISWA</h3>
+    <hr style="margin-bottom:15px;">
+    <img id="print-foto" src="" alt="Foto">
+    <h4 id="print-nama" style="margin: 10px 0 5px 0;"></h4>
+    <p id="print-nim" style="margin: 0; font-weight:bold;"></p>
+    <p id="print-prodi" style="margin: 5px 0 0 0; font-size:14px; color:#555;"></p>
+  </div>
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.5.13/cropper.min.js"></script>
+  <script>
+    // MASUKKAN URL APPS SCRIPT ANDA DI SINI
+    const API_URL = "https://script.google.com/macros/s/AKfycbw7pgDjQaj0hpuOXYCc1JJ5KWjd8er1_rfm9yK0_WOSv51Jvdqo54mGz0WSqGT5NCh3MA/exec";
+    
+    let studentsData = [];
+    let cropper;
+
+    // 1. Fetch JSON dari Apps Script saat web dibuka
+    fetch(API_URL)
+      .then(response => response.json())
+      .then(data => {
+        studentsData = data;
+        let select = document.getElementById("student-select");
+        select.innerHTML = '<option value="">-- Ketik / Pilih Nama Anda --</option>';
+        
+        data.forEach(student => {
+          let option = document.createElement("option");
+          option.value = student.nim;
+          option.text = student.nim + " - " + student.nama;
+          select.appendChild(option);
+        });
+      })
+      .catch(error => {
+        alert("Gagal memuat data dari server.");
+        console.error(error);
+      });
+
+    // 2. Tampilkan Info Mahasiswa
+    function showDetails() {
+      let nim = document.getElementById("student-select").value;
+      let preview = document.getElementById("preview-data");
+      let fileInput = document.getElementById("upload-image");
+      
+      if (!nim) {
+        preview.style.display = "none";
+        fileInput.disabled = true;
+        return;
+      }
+
+      let student = studentsData.find(s => s.nim === nim);
+      document.getElementById("lbl-nim").innerText = student.nim;
+      document.getElementById("lbl-nama").innerText = student.nama;
+      document.getElementById("lbl-prodi").innerText = student.prodi;
+      
+      preview.style.display = "block";
+      fileInput.disabled = false;
+    }
+
+    // 3. Setup Cropper saat gambar diupload
+    document.getElementById('upload-image').addEventListener('change', function(e) {
+      let file = e.target.files[0];
+      if (!file) return;
+
+      let reader = new FileReader();
+      reader.onload = function(event) {
+        let img = document.getElementById('image-container');
+        img.src = event.target.result;
+        img.style.display = 'block';
+        document.getElementById('btn-proses').style.display = 'block';
+
+        if (cropper) cropper.destroy();
+        cropper = new Cropper(img, {
+          aspectRatio: 3 / 4, // Rasio foto standar
+          viewMode: 1,
+          dragMode: 'move'
+        });
+      };
+      reader.readAsDataURL(file);
+    });
+
+    // 4. Proses Upload via POST (Fetch API) dan Print
+    function prosesDanCetak() {
+      if (!cropper) return alert("Silakan upload foto.");
+      
+      let btn = document.getElementById('btn-proses');
+      let nim = document.getElementById("student-select").value;
+      let student = studentsData.find(s => s.nim === nim);
+      
+      btn.innerText = "⏳ Menyimpan ke server... (Mohon tunggu)";
+      btn.disabled = true;
+
+      // Render image ke resolusi cetak
+      let canvas = cropper.getCroppedCanvas({ width: 600, height: 800 });
+      let base64Data = canvas.toDataURL('image/png');
+
+      // Setup tampilan area print
+      document.getElementById('print-foto').src = base64Data;
+      document.getElementById('print-nama').innerText = student.nama;
+      document.getElementById('print-nim').innerText = student.nim;
+      document.getElementById('print-prodi').innerText = student.prodi;
+
+      // Request POST ke Apps Script API
+      // 'text/plain' digunakan untuk bypass CORS Preflight di Google Apps Script
+      fetch(API_URL, {
+        method: 'POST',
+        redirect: 'follow', 
+        headers: {
+          'Content-Type': 'text/plain;charset=utf-8', 
+        },
+        body: JSON.stringify({
+          nim: nim,
+          image: base64Data
+        })
+      })
+      .then(response => response.json())
+      .then(result => {
+        if(result.status === "success") {
+          window.print(); // Buka dialog print jika berhasil disimpan
+        } else {
+          alert("Gagal menyimpan foto: " + result.message);
+        }
+      })
+      .catch(error => {
+        alert("Terjadi kesalahan jaringan.");
+        console.error(error);
+      })
+      .finally(() => {
+        btn.innerText = "Simpan Foto & Cetak KTM";
+        btn.disabled = false;
+      });
+    }
+  </script>
+</body>
+</html>
