@@ -206,7 +206,7 @@
       background-color: #fff;
     }
 
-    /* --- PENCARIAN PINTAR & DROPDOWN CUSTOM --- */
+    /* --- STYLE PENCARIAN PINTAR (SESUAI DESAIN BARU) --- */
     .search-wrapper {
       position: relative;
       width: 100%;
@@ -216,9 +216,9 @@
       display: flex;
       align-items: center;
       background: #ffffff;
-      padding: 6px 8px 6px 6px; 
-      border-radius: 99px; 
-      border: 3px solid #bceadd; 
+      padding: 6px; /* Padding disesuaikan agar sama persis */
+      border-radius: 99px; /* Melengkung penuh (Pill shape) */
+      border: 3px solid #ffffff; /* Default: border menyatu dengan background putih */
       box-shadow: 0 4px 10px rgba(0, 0, 0, 0.03);
       transition: all 0.3s ease;
       width: 100%;
@@ -226,16 +226,16 @@
       z-index: 20;
     }
 
+    /* Saat form diklik/diketik, border berubah menjadi hijau muda */
     .custom-search-box:focus-within {
-      border-color: #0d7a5b;
-      box-shadow: 0 4px 15px rgba(13, 122, 91, 0.15);
+      border-color: #bceadd;
     }
 
     .search-icon-bg {
       width: 42px;
       height: 42px;
-      background-color: #0ba97b; 
-      border-radius: 12px; 
+      background-color: #0ba97b; /* Warna icon kotak hijau */
+      border-radius: 12px; /* Kotak dengan sudut melengkung estetik */
       display: flex;
       align-items: center;
       justify-content: center;
@@ -248,7 +248,7 @@
       flex: 1;
       border: none !important; 
       background: transparent !important;
-      padding: 10px 16px;
+      padding: 4px 16px;
       font-size: 15px;
       font-weight: 700;
       color: #2d3748;
@@ -261,7 +261,7 @@
       color: #899ab0;
       font-weight: 600;
     }
-
+    
     /* TAMPILAN DROPDOWN CUSTOM (Mewah & Elegan) */
     .autocomplete-list {
       position: absolute;
