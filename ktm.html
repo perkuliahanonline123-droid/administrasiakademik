@@ -370,7 +370,7 @@
         </div>
         <div class="header-title-text">
           <h2>KTM Mahasiswa STAIIS</h2>
-          <p>Sistem layanan cetak mandiri Kartu Tanda Mahasiswa</p>
+          <p>Gunakan PC atau laptop untuk mendapatkan hasil terbaik.</p>
         </div>
       </div>
       <div class="header-badge" id="realtimeClock">
@@ -403,7 +403,8 @@
 
       <div id="editor-wrapper">
         <div id="live-foto-container">
-          <img id="live-foto" src="" style="display:none; max-width: 100%;">
+          <!-- DIHAPUS max-width: 100% karena memicu bug HP membesar sendiri -->
+          <img id="live-foto" src="" style="display:none;">
         </div>
         <p id="live-nama"></p>
         <p id="live-nim"></p>
@@ -412,7 +413,7 @@
 
       <div id="action-buttons" class="action-buttons">
         <button id="btn-proses" class="btn-main" onclick="prosesDanCetak()">
-          <i class="fa-solid fa-download"></i> Download KTM Depan
+          <i class="fa-solid fa-download"></i> Download KTM
         </button>
         <a href="https://drive.google.com/uc?export=download&id=1iSGMV2_RAQ3lN7dnwnWjvCluoBdIzFin" class="btn-secondary">
           <i class="fa-solid fa-id-card"></i> Download Belakang KTM
@@ -584,7 +585,7 @@
             
             cropper = new Cropper(img, {
               aspectRatio: 234 / 312, 
-              viewMode: 3, 
+              viewMode: 0, 
               dragMode: 'move',      
               autoCropArea: 1,       
               cropBoxMovable: false, 
@@ -606,6 +607,7 @@
                   height: contData.height
                 });
                 
+                // Menempatkan foto otomatis ke tengah saat load
                 let canvasData = this.cropper.getCanvasData();
                 this.cropper.setCanvasData({
                   left: (contData.width - canvasData.width) / 2,
@@ -618,7 +620,6 @@
         
         img.src = event.target.result;
         img.style.display = 'block';
-        img.style.width = '100%'; 
       };
       reader.readAsDataURL(file);
     });
@@ -630,10 +631,13 @@
       let btn = document.getElementById('btn-proses');
       
       let searchVal = document.getElementById("student-search").value;
-      let match = searchVal.match(/^(\d+)/); 
-      if (!match) return alert("Data tidak valid. Silakan cari dan klik ulang nama Anda di daftar.");
       
-      let nim = match[1];
+      // PERBAIKAN REGEX: Menggunakan pemisahan string agar bisa mendeteksi format NIM apapun yang memiliki titik (.)
+      if (!searchVal.includes(" - ")) {
+          return alert("Data tidak valid. Silakan cari dan klik ulang nama Anda di daftar.");
+      }
+      
+      let nim = searchVal.split(" - ")[0].trim();
       let student = studentsData.find(s => s.nim === nim);
       if (!student) return alert("Data tidak ditemukan.");
       
@@ -695,7 +699,7 @@
           canvas.toBlob(function(blob) {
               let url = URL.createObjectURL(blob);
               let link = document.createElement('a');
-              link.download = 'KTM_Depan_' + student.nim + '.png';
+              link.download = 'KTM_' + student.nim + '.png';
               link.href = url;
 
               document.body.appendChild(link);
@@ -711,10 +715,10 @@
                   headers: { 'Content-Type': 'text/plain;charset=utf-8' },
                   body: JSON.stringify({ nim: nim, image: base64Foto })
               }).then(r => r.json()).then(res => {
-                  btn.innerHTML = `<i class="fa-solid fa-download"></i> Download KTM Depan`;
+                  btn.innerHTML = `<i class="fa-solid fa-download"></i> Download KTM`;
                   btn.disabled = false;
               }).catch(e => {
-                  btn.innerHTML = `<i class="fa-solid fa-download"></i> Download KTM Depan`;
+                  btn.innerHTML = `<i class="fa-solid fa-download"></i> Download KTM`;
                   btn.disabled = false;
               });
               
@@ -723,7 +727,7 @@
       
       bgImg.onerror = function() {
           alert("Gagal memuat template background KTM.");
-          btn.innerHTML = `<i class="fa-solid fa-download"></i> Download KTM Depan`;
+          btn.innerHTML = `<i class="fa-solid fa-download"></i> Download KTM`;
           btn.disabled = false;
       };
       
