@@ -370,7 +370,7 @@
         </div>
         <div class="header-title-text">
           <h2>KTM Mahasiswa STAIIS</h2>
-          <p>Gunakan PC atau laptop untuk mendapatkan hasil terbaik</p>
+          <p>Sistem layanan cetak mandiri Kartu Tanda Mahasiswa</p>
         </div>
       </div>
       <div class="header-badge" id="realtimeClock">
@@ -397,7 +397,7 @@
         <label><i class="fa-solid fa-camera" style="margin-right: 6px;"></i> 2. Upload Pas Foto:</label>
         <input type="file" id="upload-image" accept="image/png, image/jpeg" disabled>
         <p style="font-size: 12px; color: #a0aec0; margin-top: 8px;">
-          <i class="fa-solid fa-hand-pointer"></i> <b>Tips:</b> Gunakan dua jari (cubit) untuk memperbesar/memperkecil foto dan usap untuk menggeser.
+          <i class="fa-solid fa-hand-pointer"></i> <b>Tips:</b> Gunakan dua jari (cubit) untuk memperbesar/memperkecil foto dan usap untuk menggeser posisinya.
         </p>
       </div>
 
@@ -412,7 +412,7 @@
 
       <div id="action-buttons" class="action-buttons">
         <button id="btn-proses" class="btn-main" onclick="prosesDanCetak()">
-          <i class="fa-solid fa-download"></i> Download KTM
+          <i class="fa-solid fa-download"></i> Download KTM Depan
         </button>
         <a href="https://drive.google.com/uc?export=download&id=1iSGMV2_RAQ3lN7dnwnWjvCluoBdIzFin" class="btn-secondary">
           <i class="fa-solid fa-id-card"></i> Download Belakang KTM
@@ -423,6 +423,7 @@
   </main>
 
   <script src="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.5.13/cropper.min.js"></script>
+  
   <script>
     const API_URL = "https://script.google.com/macros/s/AKfycbw7pgDjQaj0hpuOXYCc1JJ5KWjd8er1_rfm9yK0_WOSv51Jvdqo54mGz0WSqGT5NCh3MA/exec";
     
@@ -509,7 +510,7 @@
       if(actBtn) actBtn.style.display = "none";
     }
 
-    // 3. Logic Editor KTM (DIHITUNG PAKAI JS AGAR AKURAT 100% DI HP)
+    // 3. Logic Editor KTM 
     function resizeLiveEditor() {
       const wrapper = document.getElementById('editor-wrapper');
       if (wrapper.style.display !== 'none') {
@@ -541,7 +542,6 @@
         arab.style.top = (420 * scale) + 'px';
         arab.style.fontSize = (50 * scale) + 'px';
 
-        // [PERBAIKAN]: Paksa pembaruan (refresh) cropper jika layar HP berubah ukuran saat scroll
         if(cropper) {
            setTimeout(() => cropper.resize(), 50);
         }
@@ -579,7 +579,6 @@
           container.style.border = 'none'; 
           document.getElementById('action-buttons').style.display = 'flex';
 
-          // [PERBAIKAN]: Beri jeda 150ms agar DOM HP selesai me-render layout sebelum Cropper memotongnya
           setTimeout(function() {
             if (cropper) cropper.destroy();
             
@@ -599,7 +598,6 @@
               highlight: false,
               background: false,
               ready: function () {
-                // Kunci area crop persis menutupi 100% ukuran bingkai container
                 let contData = this.cropper.getContainerData();
                 this.cropper.setCropBoxData({
                   left: 0,
@@ -608,7 +606,6 @@
                   height: contData.height
                 });
                 
-                // Posisikan gambar pas di tengah secara otomatis
                 let canvasData = this.cropper.getCanvasData();
                 this.cropper.setCanvasData({
                   left: (contData.width - canvasData.width) / 2,
@@ -621,12 +618,12 @@
         
         img.src = event.target.result;
         img.style.display = 'block';
-        // [PERBAIKAN]: Paksa lebar gambar 100% dari container untuk kalibrasi awal HP
         img.style.width = '100%'; 
       };
       reader.readAsDataURL(file);
     });
-    // 4. Logic Download HTML5 Pure Canvas (AKURASI 100% DI HP TANPA HTML2CANVAS)
+
+    // 4. Logic Download PURE HTML5 CANVAS (AKURASI 100%)
     function prosesDanCetak() {
       if (!cropper) return alert("Silakan upload foto terlebih dahulu.");
       
@@ -643,11 +640,11 @@
       btn.innerHTML = `<i class="fa-solid fa-spinner fa-spin"></i> Memproses...`;
       btn.disabled = true;
 
-      // 4A. Ambil hasil potongan pasfoto (Resolusi 2x Lipat agar jernih)
+      // Ambil potongan foto murni
       let canvasCrop = cropper.getCroppedCanvas({ width: 468, height: 624 });
       let base64Foto = canvasCrop.toDataURL('image/jpeg', 0.92);
 
-      // 4B. Bangun Kanvas Matematika Murni (Sangat Cepat & Tanpa Bug Mobile)
+      // Render menggunakan sistem komputasi Canvas internal
       const canvas = document.createElement('canvas');
       canvas.width = 1011 * 2; 
       canvas.height = 638 * 2;
@@ -657,10 +654,10 @@
       const bgImg = new Image();
       bgImg.crossOrigin = "anonymous";
       bgImg.onload = function() {
-          // Cetak Latar Belakang
+          // Latar belakang
           ctx.drawImage(bgImg, 0, 0, 1011, 638);
 
-          // Cetak Pasfoto dengan efek Sudut Melengkung (Radius 15px)
+          // Pasfoto berbingkai tumpul
           ctx.save();
           ctx.beginPath();
           const x = 85, y = 180, w = 234, h = 312, r = 15;
@@ -678,7 +675,7 @@
           ctx.drawImage(canvasCrop, x, y, w, h);
           ctx.restore();
 
-          // Cetak Teks (Nama, NIM, Arab) persis posisinya
+          // Cetak Teks Data Diri
           ctx.textBaseline = "top";
           
           ctx.fillStyle = "#1a1a1a";
@@ -694,7 +691,7 @@
           ctx.font = "bold 50px Arial, sans-serif";
           ctx.fillText(student.namaArab || "", 360, 420 + 5);
 
-          // Render & Download!
+          // Mulai Unduh Gambar
           canvas.toBlob(function(blob) {
               let url = URL.createObjectURL(blob);
               let link = document.createElement('a');
@@ -706,7 +703,7 @@
               document.body.removeChild(link);
               URL.revokeObjectURL(url);
 
-              // Kirim foto ke Google Sheet Background
+              // Backup Foto ke Google Sheets
               btn.innerHTML = `<i class="fa-solid fa-cloud-arrow-up"></i> Menyimpan ke server...`;
               fetch(API_URL, {
                   method: 'POST',
@@ -714,10 +711,10 @@
                   headers: { 'Content-Type': 'text/plain;charset=utf-8' },
                   body: JSON.stringify({ nim: nim, image: base64Foto })
               }).then(r => r.json()).then(res => {
-                  btn.innerHTML = `<i class="fa-solid fa-download"></i> Download KTM`;
+                  btn.innerHTML = `<i class="fa-solid fa-download"></i> Download KTM Depan`;
                   btn.disabled = false;
               }).catch(e => {
-                  btn.innerHTML = `<i class="fa-solid fa-download"></i> Download KTM`;
+                  btn.innerHTML = `<i class="fa-solid fa-download"></i> Download KTM Depan`;
                   btn.disabled = false;
               });
               
@@ -726,7 +723,7 @@
       
       bgImg.onerror = function() {
           alert("Gagal memuat template background KTM.");
-          btn.innerHTML = `<i class="fa-solid fa-download"></i> Download KTM`;
+          btn.innerHTML = `<i class="fa-solid fa-download"></i> Download KTM Depan`;
           btn.disabled = false;
       };
       
