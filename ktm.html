@@ -363,15 +363,15 @@
     #live-nama-arab { 
       position: absolute; 
       left: 360px; 
-      top: 420px; 
+      top: 395px; /* Angka diperkecil dari 420px agar teks naik ke atas */
       font-size: 50px; 
       font-weight: bold; 
-      font-family: 'Amiri', serif; /* FONT DIUBAH KE AMIRI */
+      font-family: 'Amiri', serif;
       margin: 0; 
       color: #1a1a1a; 
       white-space: nowrap; 
+      line-height: 1; /* Ditambahkan untuk membuang jarak kosong bawaan font */
     }
-
     /* Tampilan Twibbonize */
     .cropper-view-box { outline: none !important; border-radius: inherit; }
     .cropper-point, .cropper-line, .cropper-center { display: none !important; }
