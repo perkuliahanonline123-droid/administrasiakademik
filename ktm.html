@@ -293,24 +293,38 @@
       transform: translateY(-2px);
     }
 
-    /* --- LIVE EDITOR RESPONSIVE --- */
-    #editor-wrapper {
+    /* --- SOLUSI LIVE EDITOR RESPONSIVE AKURAT 100% --- */
+    #editor-outer-wrapper {
       width: 100%;
       position: relative;
       margin-top: 25px;
+      display: none;
+    }
+
+    #editor-wrapper {
+      width: 1011px;
+      height: 638px;
+      position: absolute;
+      top: 0;
+      left: 0;
       border-radius: 20px;
       border: 1px solid #dcdcdc; 
       box-shadow: 0 8px 24px rgba(0,0,0,0.08);
-      display: none; 
       overflow: hidden;
       background-image: url('Depan%20KTM.jpg?v=2');
       background-size: 100% 100%;
       background-position: center;
       background-repeat: no-repeat;
+      transform-origin: top left; /* Vital untuk mengecilkan layar dari sudut kiri atas */
     }
 
     #live-foto-container {
       position: absolute;
+      left: 85px; 
+      top: 180px; 
+      width: 234px; 
+      height: 312px; 
+      border-radius: 15px; 
       background-color: rgba(255, 255, 255, 0.8); 
       border: 2px dashed #045844;
       box-sizing: border-box;
@@ -320,6 +334,9 @@
 
     #live-nama { 
       position: absolute; 
+      left: 360px; 
+      top: 220px; 
+      font-size: 36px; 
       font-weight: 700; 
       font-family: 'Plus Jakarta Sans', Arial, sans-serif;
       text-transform: uppercase; 
@@ -330,15 +347,22 @@
     
     #live-nim { 
       position: absolute; 
+      left: 360px; 
+      top: 315px; 
+      font-size: 40px; 
       font-weight: 500; 
       font-family: 'Plus Jakarta Sans', Arial, sans-serif;
       margin: 0; 
       color: #333; 
       white-space: nowrap; 
+      letter-spacing: 2px;
     }
     
     #live-nama-arab { 
       position: absolute; 
+      left: 360px; 
+      top: 420px; 
+      font-size: 50px; 
       font-weight: bold; 
       font-family: Arial, sans-serif;
       margin: 0; 
@@ -401,14 +425,16 @@
         </p>
       </div>
 
-      <div id="editor-wrapper">
-        <div id="live-foto-container">
-          <!-- DIHAPUS max-width: 100% karena memicu bug HP membesar sendiri -->
-          <img id="live-foto" src="" style="display:none;">
+      <!-- KONTainer BARU agar kalkulasi Cropper sempurna seperti di PC -->
+      <div id="editor-outer-wrapper">
+        <div id="editor-wrapper">
+          <div id="live-foto-container">
+            <img id="live-foto" src="" style="display:none;">
+          </div>
+          <p id="live-nama"></p>
+          <p id="live-nim"></p>
+          <p id="live-nama-arab"></p>
         </div>
-        <p id="live-nama"></p>
-        <p id="live-nim"></p>
-        <p id="live-nama-arab"></p>
       </div>
 
       <div id="action-buttons" class="action-buttons">
@@ -505,61 +531,30 @@
     });
 
     function hideEditor() {
-      document.getElementById("editor-wrapper").style.display = "none";
+      document.getElementById("editor-outer-wrapper").style.display = "none";
       document.getElementById("upload-image").disabled = true;
       let actBtn = document.getElementById('action-buttons');
       if(actBtn) actBtn.style.display = "none";
     }
 
-    // 3. Logic Editor KTM (DIHITUNG PAKAI JS AGAR AKURAT 100% DI HP)
+    // 3. Logic Editor KTM Menggunakan Skala CSS Asli
     function resizeLiveEditor() {
-      const wrapper = document.getElementById('editor-wrapper');
-      if (wrapper.style.display !== 'none') {
-        const targetWidth = wrapper.clientWidth;
+      const outerWrapper = document.getElementById('editor-outer-wrapper');
+      const innerWrapper = document.getElementById('editor-wrapper');
+      
+      if (outerWrapper.style.display !== 'none') {
+        const targetWidth = outerWrapper.clientWidth;
         const scale = targetWidth / 1011; 
         
-        wrapper.style.height = (638 * scale) + 'px'; 
-
-        const container = document.getElementById('live-foto-container');
-        container.style.width = (234 * scale) + 'px';
-        container.style.height = (312 * scale) + 'px';
-        container.style.left = (85 * scale) + 'px';
-        container.style.top = (180 * scale) + 'px';
-        container.style.borderRadius = (15 * scale) + 'px';
-
-        const nama = document.getElementById('live-nama');
-        nama.style.left = (360 * scale) + 'px';
-        nama.style.top = (220 * scale) + 'px';
-        nama.style.fontSize = (36 * scale) + 'px';
-
-        const nimEl = document.getElementById('live-nim');
-        nimEl.style.left = (360 * scale) + 'px';
-        nimEl.style.top = (315 * scale) + 'px';
-        nimEl.style.fontSize = (40 * scale) + 'px';
-        nimEl.style.letterSpacing = (2 * scale) + 'px';
-
-        const arab = document.getElementById('live-nama-arab');
-        arab.style.left = (360 * scale) + 'px';
-        arab.style.top = (420 * scale) + 'px';
-        arab.style.fontSize = (50 * scale) + 'px';
-
-        if(cropper) {
-           cropper.resize();
-        }
+        // Cukup ubah visualnya (scale) TANPA merusak titik ukur pixel Cropper
+        innerWrapper.style.transform = `scale(${scale})`;
+        outerWrapper.style.height = (638 * scale) + 'px'; // Menyesuaikan tinggi agar tata letak tidak rusak
       }
     }
-
-    // KUNCI ANTI-BUG SCROLL HP: Hanya me-resize jika LEBAR layar berubah (Misal rotasi HP)
-    let lastWindowWidth = window.innerWidth;
-    window.addEventListener('resize', function() {
-      if (window.innerWidth !== lastWindowWidth) {
-        lastWindowWidth = window.innerWidth;
-        resizeLiveEditor();
-      }
-    });
+    window.addEventListener('resize', resizeLiveEditor);
 
     function showLiveEditor(nim) {
-      let wrapper = document.getElementById("editor-wrapper");
+      let outerWrapper = document.getElementById("editor-outer-wrapper");
       let fileInput = document.getElementById("upload-image");
       
       let student = studentsData.find(s => s.nim === nim);
@@ -569,7 +564,7 @@
       document.getElementById("live-nim").innerText = student.nim;
       document.getElementById("live-nama-arab").innerText = student.namaArab || "";
       
-      wrapper.style.display = "block";
+      outerWrapper.style.display = "block";
       fileInput.disabled = false;
       
       resizeLiveEditor();
@@ -591,14 +586,14 @@
           setTimeout(function() {
             if (cropper) cropper.destroy();
             
-            // Kembalikan style dasar agar kalkulasi dimensi natural foto normal (Anti-Zoom Ekstrem)
+            // Jaga dimensi image selalu normal & murni
             img.style.width = '100%';
             img.style.maxWidth = '100%';
             img.style.height = 'auto';
-            
+
             cropper = new Cropper(img, {
               aspectRatio: 234 / 312, 
-              viewMode: 0, // Mode bebas digeser ala Twibbonize
+              viewMode: 0, 
               dragMode: 'move',      
               autoCropArea: 1,       
               cropBoxMovable: false, 
@@ -611,28 +606,17 @@
               center: false,
               highlight: false,
               background: false,
-              responsive: false, // Mengunci agar tak loncat saat HP di-scroll
+              responsive: false, // Aman karena ukuran DOM kini bersifat statis 234x312px
               ready: function () {
-                // 1. Kunci kotak potongan (Crop Box) seukuran bingkai HP
                 let contData = this.cropper.getContainerData();
-                this.cropper.setCropBoxData({
-                  left: 0,
-                  top: 0,
-                  width: contData.width,
-                  height: contData.height
-                });
+                this.cropper.setCropBoxData({ left: 0, top: 0, width: contData.width, height: contData.height });
                 
-                // 2. Kalkulasi skala ideal pakai fungsi bawaan agar foto menutupi bingkai (cover)
                 let imgData = this.cropper.getImageData();
-                let minZoom = Math.max(
-                  contData.width / imgData.naturalWidth, 
-                  contData.height / imgData.naturalHeight
-                );
+                let minZoom = Math.max(contData.width / imgData.naturalWidth, contData.height / imgData.naturalHeight);
                 
-                // 3. Terapkan zoom dan geser otomatis ke tengah persis (Dijamin akurat saat didownload)
                 this.cropper.zoomTo(minZoom);
                 this.cropper.moveTo(
-                  (contData.width - (imgData.naturalWidth * minZoom)) / 2,
+                  (contData.width - (imgData.naturalWidth * minZoom)) / 2, 
                   (contData.height - (imgData.naturalHeight * minZoom)) / 2
                 );
               }
@@ -644,15 +628,15 @@
       };
       reader.readAsDataURL(file);
     });
-    // 4. Logic Download PURE HTML5 CANVAS (AKURASI 100%)
+
+    // 4. Logic Download PURE HTML5 CANVAS (AKURASI DIJAMIN 100%)
     function prosesDanCetak() {
       if (!cropper) return alert("Silakan upload foto terlebih dahulu.");
       
       let btn = document.getElementById('btn-proses');
-      
       let searchVal = document.getElementById("student-search").value;
       
-      // PERBAIKAN: Menggunakan split agar bisa membaca format NIM dengan titik (misal: 23.2.1.0256)
+      // Ambil NIM pakai split (memecahkan masalah titik di NIM)
       if (!searchVal.includes(" - ")) {
           return alert("Data tidak valid. Silakan cari dan klik ulang nama Anda di daftar.");
       }
@@ -664,11 +648,11 @@
       btn.innerHTML = `<i class="fa-solid fa-spinner fa-spin"></i> Memproses...`;
       btn.disabled = true;
 
-      // Ambil potongan foto murni
+      // Ambil potongan foto murni dari bingkai
       let canvasCrop = cropper.getCroppedCanvas({ width: 468, height: 624 });
       let base64Foto = canvasCrop.toDataURL('image/jpeg', 0.92);
 
-      // Render menggunakan sistem komputasi Canvas internal
+      // Render menggunakan sistem komputasi Canvas internal browser
       const canvas = document.createElement('canvas');
       canvas.width = 1011 * 2; 
       canvas.height = 638 * 2;
@@ -681,7 +665,7 @@
           // Latar belakang
           ctx.drawImage(bgImg, 0, 0, 1011, 638);
 
-          // Pasfoto berbingkai tumpul
+          // Bingkai Foto Sudut Melengkung 15px
           ctx.save();
           ctx.beginPath();
           const x = 85, y = 180, w = 234, h = 312, r = 15;
@@ -715,7 +699,7 @@
           ctx.font = "bold 50px Arial, sans-serif";
           ctx.fillText(student.namaArab || "", 360, 420 + 5);
 
-          // Mulai Unduh Gambar
+          // Unduh
           canvas.toBlob(function(blob) {
               let url = URL.createObjectURL(blob);
               let link = document.createElement('a');
@@ -727,7 +711,6 @@
               document.body.removeChild(link);
               URL.revokeObjectURL(url);
 
-              // Backup Foto ke Google Sheets
               btn.innerHTML = `<i class="fa-solid fa-cloud-arrow-up"></i> Menyimpan ke server...`;
               fetch(API_URL, {
                   method: 'POST',
