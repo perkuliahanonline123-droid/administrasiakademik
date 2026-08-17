@@ -518,7 +518,6 @@
         
         wrapper.style.height = (638 * scale) + 'px'; 
 
-        // Set semua ukuran dalam pixel pasti, anti-melenceng di Safari/Chrome Mobile
         const container = document.getElementById('live-foto-container');
         container.style.width = (234 * scale) + 'px';
         container.style.height = (312 * scale) + 'px';
@@ -542,8 +541,9 @@
         arab.style.top = (420 * scale) + 'px';
         arab.style.fontSize = (50 * scale) + 'px';
 
+        // [PERBAIKAN]: Paksa pembaruan (refresh) cropper jika layar HP berubah ukuran saat scroll
         if(cropper) {
-           cropper.resize();
+           setTimeout(() => cropper.resize(), 50);
         }
       }
     }
@@ -579,42 +579,53 @@
           container.style.border = 'none'; 
           document.getElementById('action-buttons').style.display = 'flex';
 
-          if (cropper) cropper.destroy();
-          
-          cropper = new Cropper(img, {
-            aspectRatio: 234 / 312, 
-            viewMode: 3, // Mengunci agar foto tidak ada ruang putih kosong     
-            dragMode: 'move',      
-            autoCropArea: 1,       
-            cropBoxMovable: false, 
-            cropBoxResizable: false, 
-            toggleDragModeOnDblclick: false,
-            zoomable: true,
-            zoomOnTouch: true,
-            zoomOnWheel: true,
-            guides: true, // Garis panduan 3x3 layaknya Twibbonize
-            center: false,
-            highlight: false,
-            background: false,
-            ready: function () {
-              // Mengunci area potong persis seukuran bingkai (Anti-geser)
-              let contData = this.cropper.getContainerData();
-              this.cropper.setCropBoxData({
-                left: 0,
-                top: 0,
-                width: contData.width,
-                height: contData.height
-              });
-            }
-          });
+          // [PERBAIKAN]: Beri jeda 150ms agar DOM HP selesai me-render layout sebelum Cropper memotongnya
+          setTimeout(function() {
+            if (cropper) cropper.destroy();
+            
+            cropper = new Cropper(img, {
+              aspectRatio: 234 / 312, 
+              viewMode: 3, 
+              dragMode: 'move',      
+              autoCropArea: 1,       
+              cropBoxMovable: false, 
+              cropBoxResizable: false, 
+              toggleDragModeOnDblclick: false,
+              zoomable: true,
+              zoomOnTouch: true,
+              zoomOnWheel: true,
+              guides: true, 
+              center: false,
+              highlight: false,
+              background: false,
+              ready: function () {
+                // Kunci area crop persis menutupi 100% ukuran bingkai container
+                let contData = this.cropper.getContainerData();
+                this.cropper.setCropBoxData({
+                  left: 0,
+                  top: 0,
+                  width: contData.width,
+                  height: contData.height
+                });
+                
+                // Posisikan gambar pas di tengah secara otomatis
+                let canvasData = this.cropper.getCanvasData();
+                this.cropper.setCanvasData({
+                  left: (contData.width - canvasData.width) / 2,
+                  top: (contData.height - canvasData.height) / 2
+                });
+              }
+            });
+          }, 150);
         };
         
         img.src = event.target.result;
         img.style.display = 'block';
+        // [PERBAIKAN]: Paksa lebar gambar 100% dari container untuk kalibrasi awal HP
+        img.style.width = '100%'; 
       };
       reader.readAsDataURL(file);
     });
-
     // 4. Logic Download HTML5 Pure Canvas (AKURASI 100% DI HP TANPA HTML2CANVAS)
     function prosesDanCetak() {
       if (!cropper) return alert("Silakan upload foto terlebih dahulu.");
