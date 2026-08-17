@@ -13,8 +13,6 @@
   
   <!-- CropperJS CSS -->
   <link href="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.5.13/cropper.min.css" rel="stylesheet">
-  <!-- html2canvas JS -->
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
 
   <style>
     * {
@@ -34,7 +32,6 @@
       display: block; 
     }
 
-    /* --- MAIN CONTENT LAYOUT (CENTERED) --- */
     .main-content {
       max-width: 1000px; 
       margin: 0 auto;    
@@ -109,7 +106,6 @@
       display: inline-block;
     }
 
-    /* --- CARD CONTAINER --- */
     .card {
       background: #ffffff;
       border-radius: 16px;
@@ -151,7 +147,6 @@
       background-color: #f0fdf4;
     }
 
-    /* --- STYLE PENCARIAN PINTAR --- */
     .search-wrapper {
       position: relative;
       width: 100%;
@@ -206,7 +201,6 @@
       font-weight: 600;
     }
 
-    /* TAMPILAN DROPDOWN CUSTOM */
     .autocomplete-list {
       position: absolute;
       top: calc(100% + 8px);
@@ -244,9 +238,7 @@
     .autocomplete-list::-webkit-scrollbar { width: 6px; }
     .autocomplete-list::-webkit-scrollbar-track { background: transparent; }
     .autocomplete-list::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 10px; }
-    .autocomplete-list::-webkit-scrollbar-thumb:hover { background: #94a3b8; }
 
-    /* --- TOMBOL --- */
     .action-buttons {
       display: none;
       flex-direction: column;
@@ -315,17 +307,12 @@
       background-size: 100% 100%;
       background-position: center;
       background-repeat: no-repeat;
-      --scale: 1; 
     }
 
     #live-foto-container {
       position: absolute;
-      left: calc(85px * var(--scale)); 
-      top: calc(180px * var(--scale)); 
-      width: calc(234px * var(--scale)); 
-      height: calc(312px * var(--scale)); 
-      border-radius: calc(15px * var(--scale)); 
-      background-color: rgba(255, 255, 255, 0.5); 
+      background-color: rgba(255, 255, 255, 0.8); 
+      border: 2px dashed #045844;
       box-sizing: border-box;
       z-index: 10;
       overflow: hidden;
@@ -333,9 +320,6 @@
 
     #live-nama { 
       position: absolute; 
-      left: calc(360px * var(--scale)); 
-      top: calc(220px * var(--scale)); 
-      font-size: calc(36px * var(--scale)); 
       font-weight: 700; 
       font-family: 'Plus Jakarta Sans', Arial, sans-serif;
       text-transform: uppercase; 
@@ -346,22 +330,15 @@
     
     #live-nim { 
       position: absolute; 
-      left: calc(360px * var(--scale)); 
-      top: calc(315px * var(--scale)); 
-      font-size: calc(40px * var(--scale)); 
       font-weight: 500; 
       font-family: 'Plus Jakarta Sans', Arial, sans-serif;
       margin: 0; 
       color: #333; 
       white-space: nowrap; 
-      letter-spacing: 2px;
     }
     
     #live-nama-arab { 
       position: absolute; 
-      left: calc(360px * var(--scale)); 
-      top: calc(420px * var(--scale)); 
-      font-size: calc(50px * var(--scale)); 
       font-weight: bold; 
       font-family: Arial, sans-serif;
       margin: 0; 
@@ -369,43 +346,16 @@
       white-space: nowrap; 
     }
 
-    /* Style Cropper.js Ala Twibbonize */
-    .cropper-view-box { outline: none !important; border-radius: calc(15px * var(--scale)); }
-    /* Titik dan garis resize dihilangkan, menyisakan grid dashed di tengah */
-    .cropper-point, .cropper-line { display: none !important; }
+    /* Tampilan Twibbonize: transparan, bersih, ada panduan saat disentuh */
+    .cropper-view-box { outline: none !important; border-radius: inherit; }
+    .cropper-point, .cropper-line, .cropper-center { display: none !important; }
     .cropper-modal { opacity: 0 !important; } 
     .cropper-bg { background: transparent !important; }
-
-    /* --- TEMPAT RENDER PNG TRANSPARAN --- */
-    #export-wrapper {
-      position: absolute; 
-      top: 0; 
-      left: 0;
-      opacity: 0; 
-      pointer-events: none; 
-      z-index: -9999;
-    }
-
-    #export-ktm {
-      width: 1011px;
-      height: 638px;
-      position: relative;
-      background-color: transparent;
-      border-radius: 25px;
-      box-sizing: border-box;
-      overflow: hidden;
-    }
-    
-    #export-bg { position: absolute; top: 0; left: 0; width: 1011px; height: 638px; z-index: 0; }
-    #export-foto { position: absolute; left: 85px; top: 180px; width: 234px; height: 312px; border-radius: 15px; z-index: 1;}
-    
-    #export-nama { position: absolute; left: 360px; top: 220px; font-size: 36px; font-weight: 700; font-family: 'Plus Jakarta Sans', Arial, sans-serif; text-transform: uppercase; margin: 0; color: #1a1a1a; white-space: nowrap; z-index: 1;}
-    #export-nim { position: absolute; left: 360px; top: 315px; font-size: 40px; font-weight: 500; font-family: 'Plus Jakarta Sans', Arial, sans-serif; margin: 0; color: #333; white-space: nowrap; letter-spacing: 2px; z-index: 1;}
-    #export-nama-arab { position: absolute; left: 360px; top: 420px; font-size: 50px; font-weight: bold; font-family: Arial, sans-serif; margin: 0; color: #1a1a1a; white-space: nowrap; z-index: 1;}
 
     @media (max-width: 768px) {
       .header-bar { flex-direction: column; align-items: flex-start; gap: 15px; }
       .main-content { padding: 20px; }
+      .card { padding: 20px; }
     }
   </style>
 </head>
@@ -428,10 +378,8 @@
       </div>
     </div>
 
-    <!-- MAIN FORM CARD -->
     <div class="card">
       
-      <!-- PENCARIAN PINTAR CUSTOM -->
       <div class="form-group">
         <label><i class="fa-regular fa-id-badge" style="margin-right: 6px;"></i> 1. Pilih Nama Anda:</label>
         <div class="search-wrapper">
@@ -448,7 +396,9 @@
       <div class="form-group">
         <label><i class="fa-solid fa-camera" style="margin-right: 6px;"></i> 2. Upload Pas Foto:</label>
         <input type="file" id="upload-image" accept="image/png, image/jpeg" disabled>
-        <p style="font-size: 12px; color: #a0aec0; margin-top: 8px;">*Cubit foto untuk memperbesar/memperkecil, dan tahan untuk menggeser posisinya.</p>
+        <p style="font-size: 12px; color: #a0aec0; margin-top: 8px;">
+          <i class="fa-solid fa-hand-pointer"></i> <b>Tips:</b> Gunakan dua jari (cubit) untuk memperbesar/memperkecil foto dan usap untuk menggeser.
+        </p>
       </div>
 
       <div id="editor-wrapper">
@@ -460,7 +410,6 @@
         <p id="live-nama-arab"></p>
       </div>
 
-      <!-- TEMPAT TOMBOL DOWNLOAD -->
       <div id="action-buttons" class="action-buttons">
         <button id="btn-proses" class="btn-main" onclick="prosesDanCetak()">
           <i class="fa-solid fa-download"></i> Download KTM Depan
@@ -473,17 +422,6 @@
     </div>
   </main>
 
-  <!-- RENDER PNG EXPORT -->
-  <div id="export-wrapper">
-    <div id="export-ktm">
-      <img id="export-bg" src="Depan%20KTM.jpg?v=2" alt="Background"> 
-      <img id="export-foto" src="" alt="Foto">
-      <p id="export-nama"></p>
-      <p id="export-nim"></p>
-      <p id="export-nama-arab"></p>
-    </div>
-  </div>
-
   <script src="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.5.13/cropper.min.js"></script>
   <script>
     const API_URL = "https://script.google.com/macros/s/AKfycbw7pgDjQaj0hpuOXYCc1JJ5KWjd8er1_rfm9yK0_WOSv51Jvdqo54mGz0WSqGT5NCh3MA/exec";
@@ -491,6 +429,7 @@
     let studentsData = [];
     let cropper;
 
+    // Jam Real-time Header
     function updateJam() {
       try {
         const now = new Date();
@@ -505,6 +444,7 @@
     setInterval(updateJam, 1000);
     updateJam();
 
+    // 1. Memuat Data
     fetch(API_URL + "?t=" + new Date().getTime())
       .then(response => response.json())
       .then(data => {
@@ -519,6 +459,7 @@
         console.error(error);
       });
 
+    // 2. Logic Pencarian
     const searchInput = document.getElementById('student-search');
     const autocompleteList = document.getElementById('custom-autocomplete-list');
 
@@ -568,13 +509,42 @@
       if(actBtn) actBtn.style.display = "none";
     }
 
+    // 3. Logic Editor KTM (DIHITUNG PAKAI JS AGAR AKURAT 100% DI HP)
     function resizeLiveEditor() {
       const wrapper = document.getElementById('editor-wrapper');
       if (wrapper.style.display !== 'none') {
         const targetWidth = wrapper.clientWidth;
         const scale = targetWidth / 1011; 
-        wrapper.style.setProperty('--scale', scale);
+        
         wrapper.style.height = (638 * scale) + 'px'; 
+
+        // Set semua ukuran dalam pixel pasti, anti-melenceng di Safari/Chrome Mobile
+        const container = document.getElementById('live-foto-container');
+        container.style.width = (234 * scale) + 'px';
+        container.style.height = (312 * scale) + 'px';
+        container.style.left = (85 * scale) + 'px';
+        container.style.top = (180 * scale) + 'px';
+        container.style.borderRadius = (15 * scale) + 'px';
+
+        const nama = document.getElementById('live-nama');
+        nama.style.left = (360 * scale) + 'px';
+        nama.style.top = (220 * scale) + 'px';
+        nama.style.fontSize = (36 * scale) + 'px';
+
+        const nimEl = document.getElementById('live-nim');
+        nimEl.style.left = (360 * scale) + 'px';
+        nimEl.style.top = (315 * scale) + 'px';
+        nimEl.style.fontSize = (40 * scale) + 'px';
+        nimEl.style.letterSpacing = (2 * scale) + 'px';
+
+        const arab = document.getElementById('live-nama-arab');
+        arab.style.left = (360 * scale) + 'px';
+        arab.style.top = (420 * scale) + 'px';
+        arab.style.fontSize = (50 * scale) + 'px';
+
+        if(cropper) {
+           cropper.resize();
+        }
       }
     }
     window.addEventListener('resize', resizeLiveEditor);
@@ -606,13 +576,14 @@
         let container = document.getElementById('live-foto-container');
         
         img.onload = function() {
+          container.style.border = 'none'; 
           document.getElementById('action-buttons').style.display = 'flex';
 
           if (cropper) cropper.destroy();
           
           cropper = new Cropper(img, {
             aspectRatio: 234 / 312, 
-            viewMode: 0, // Mengizinkan pergeseran bebas tanpa batasan zoom
+            viewMode: 3, // Mengunci agar foto tidak ada ruang putih kosong     
             dragMode: 'move',      
             autoCropArea: 1,       
             cropBoxMovable: false, 
@@ -621,25 +592,18 @@
             zoomable: true,
             zoomOnTouch: true,
             zoomOnWheel: true,
-            guides: true, // Memunculkan garis kotak 3x3 layaknya twibbonize
-            center: true,
+            guides: true, // Garis panduan 3x3 layaknya Twibbonize
+            center: false,
             highlight: false,
             background: false,
             ready: function () {
-              // Mengunci ukuran frame potong persis dengan ukuran bingkai kotak
+              // Mengunci area potong persis seukuran bingkai (Anti-geser)
               let contData = this.cropper.getContainerData();
               this.cropper.setCropBoxData({
                 left: 0,
                 top: 0,
                 width: contData.width,
                 height: contData.height
-              });
-              
-              // Memusatkan foto yang di-upload tepat di tengah
-              let canvasData = this.cropper.getCanvasData();
-              this.cropper.setCanvasData({
-                left: (contData.width - canvasData.width) / 2,
-                top: (contData.height - canvasData.height) / 2
               });
             }
           });
@@ -651,6 +615,7 @@
       reader.readAsDataURL(file);
     });
 
+    // 4. Logic Download HTML5 Pure Canvas (AKURASI 100% DI HP TANPA HTML2CANVAS)
     function prosesDanCetak() {
       if (!cropper) return alert("Silakan upload foto terlebih dahulu.");
       
@@ -667,81 +632,94 @@
       btn.innerHTML = `<i class="fa-solid fa-spinner fa-spin"></i> Memproses...`;
       btn.disabled = true;
 
-      // Extract canvas persis sesuai batasan bingkai crop
+      // 4A. Ambil hasil potongan pasfoto (Resolusi 2x Lipat agar jernih)
       let canvasCrop = cropper.getCroppedCanvas({ width: 468, height: 624 });
       let base64Foto = canvasCrop.toDataURL('image/jpeg', 0.92);
 
-      let exportFoto = document.getElementById('export-foto');
-      
-      exportFoto.onload = function() {
-        document.getElementById('export-nama').innerText = student.nama;
-        document.getElementById('export-nim').innerText = student.nim;
-        document.getElementById('export-nama-arab').innerText = student.namaArab || "";
+      // 4B. Bangun Kanvas Matematika Murni (Sangat Cepat & Tanpa Bug Mobile)
+      const canvas = document.createElement('canvas');
+      canvas.width = 1011 * 2; 
+      canvas.height = 638 * 2;
+      const ctx = canvas.getContext('2d');
+      ctx.scale(2, 2); 
 
-        let element = document.getElementById('export-ktm');
-        
-        html2canvas(element, {
-          scale: 2, 
-          useCORS: true, 
-          logging: false,
-          backgroundColor: null,
-          scrollY: 0,
-          scrollX: 0,
-          windowWidth: 1011,
-          windowHeight: 638
-        }).then(canvasFinal => {
+      const bgImg = new Image();
+      bgImg.crossOrigin = "anonymous";
+      bgImg.onload = function() {
+          // Cetak Latar Belakang
+          ctx.drawImage(bgImg, 0, 0, 1011, 638);
+
+          // Cetak Pasfoto dengan efek Sudut Melengkung (Radius 15px)
+          ctx.save();
+          ctx.beginPath();
+          const x = 85, y = 180, w = 234, h = 312, r = 15;
+          ctx.moveTo(x + r, y);
+          ctx.lineTo(x + w - r, y);
+          ctx.quadraticCurveTo(x + w, y, x + w, y + r);
+          ctx.lineTo(x + w, y + h - r);
+          ctx.quadraticCurveTo(x + w, y + h, x + w - r, y + h);
+          ctx.lineTo(x + r, y + h);
+          ctx.quadraticCurveTo(x, y + h, x, y + h - r);
+          ctx.lineTo(x, y + r);
+          ctx.quadraticCurveTo(x, y, x + r, y);
+          ctx.closePath();
+          ctx.clip();
+          ctx.drawImage(canvasCrop, x, y, w, h);
+          ctx.restore();
+
+          // Cetak Teks (Nama, NIM, Arab) persis posisinya
+          ctx.textBaseline = "top";
           
-          canvasFinal.toBlob(function(blob) {
-            let url = URL.createObjectURL(blob);
-            let link = document.createElement('a');
-            link.download = 'KTM_Depan_' + student.nim + '.png';
-            link.href = url;
-            
-            document.body.appendChild(link);
-            link.click();
-            document.body.removeChild(link);
-            URL.revokeObjectURL(url);
+          ctx.fillStyle = "#1a1a1a";
+          ctx.font = "700 36px 'Plus Jakarta Sans', Arial, sans-serif";
+          ctx.fillText(student.nama.toUpperCase(), 360, 220 + 5); 
 
-            btn.innerHTML = `<i class="fa-solid fa-cloud-arrow-up"></i> Menyimpan ke server...`;
-            
-            fetch(API_URL, {
-              method: 'POST',
-              redirect: 'follow', 
-              headers: { 'Content-Type': 'text/plain;charset=utf-8' },
-              body: JSON.stringify({
-                nim: nim,
-                image: base64Foto
-              })
-            })
-            .then(response => response.json())
-            .then(result => {
-              if(result.status === "success") {
-                btn.innerHTML = `<i class="fa-solid fa-check"></i> Selesai Diunduh`;
-                setTimeout(() => {
+          ctx.fillStyle = "#333333";
+          ctx.font = "500 40px 'Plus Jakarta Sans', Arial, sans-serif";
+          if ('letterSpacing' in ctx) ctx.letterSpacing = "2px";
+          ctx.fillText(student.nim, 360, 315 + 5);
+
+          ctx.fillStyle = "#1a1a1a";
+          ctx.font = "bold 50px Arial, sans-serif";
+          ctx.fillText(student.namaArab || "", 360, 420 + 5);
+
+          // Render & Download!
+          canvas.toBlob(function(blob) {
+              let url = URL.createObjectURL(blob);
+              let link = document.createElement('a');
+              link.download = 'KTM_Depan_' + student.nim + '.png';
+              link.href = url;
+
+              document.body.appendChild(link);
+              link.click();
+              document.body.removeChild(link);
+              URL.revokeObjectURL(url);
+
+              // Kirim foto ke Google Sheet Background
+              btn.innerHTML = `<i class="fa-solid fa-cloud-arrow-up"></i> Menyimpan ke server...`;
+              fetch(API_URL, {
+                  method: 'POST',
+                  redirect: 'follow', 
+                  headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+                  body: JSON.stringify({ nim: nim, image: base64Foto })
+              }).then(r => r.json()).then(res => {
                   btn.innerHTML = `<i class="fa-solid fa-download"></i> Download KTM Depan`;
                   btn.disabled = false;
-                }, 3000);
-              } else {
-                alert("Gagal simpan foto: " + result.message);
-                btn.innerHTML = `<i class="fa-solid fa-download"></i> Download KTM Depan`;
-                btn.disabled = false;
-              }
-            })
-            .catch(error => {
-              btn.innerHTML = `<i class="fa-solid fa-download"></i> Download KTM Depan`;
-              btn.disabled = false;
-            });
-            
+              }).catch(e => {
+                  btn.innerHTML = `<i class="fa-solid fa-download"></i> Download KTM Depan`;
+                  btn.disabled = false;
+              });
+              
           }, 'image/png');
-
-        }).catch(err => {
-            alert("Terjadi kesalahan rendering gambar.");
-            btn.innerHTML = `<i class="fa-solid fa-download"></i> Download KTM Depan`;
-            btn.disabled = false;
-        });
       };
-
-      exportFoto.src = base64Foto;
+      
+      bgImg.onerror = function() {
+          alert("Gagal memuat template background KTM.");
+          btn.innerHTML = `<i class="fa-solid fa-download"></i> Download KTM Depan`;
+          btn.disabled = false;
+      };
+      
+      bgImg.src = "Depan%20KTM.jpg?v=2";
     }
   </script>
 </body>
