@@ -586,61 +586,60 @@
         
         img.onload = function() {
           container.style.border = 'none'; 
-          
-          let actBtn = document.getElementById('action-buttons');
-          if (actBtn) actBtn.style.display = 'flex';
+          document.getElementById('action-buttons').style.display = 'flex';
 
-          if (cropper) cropper.destroy();
-          
-          cropper = new Cropper(img, {
-            aspectRatio: 234 / 312, 
-            viewMode: 0, // Bebas digeser ala Twibbonize
-            dragMode: 'move',      
-            autoCropArea: 1,       
-            cropBoxMovable: false, 
-            cropBoxResizable: false, 
-            toggleDragModeOnDblclick: false,
-            zoomable: true,
-            zoomOnTouch: true,
-            zoomOnWheel: true,
-            guides: true, 
-            center: false,
-            highlight: false,
-            background: false,
-            responsive: false, // MATIKAN RESPONSIVE BAWAAN AGAR TIDAK ERROR SAAT HP DI-SCROLL
-            ready: function () {
-              // 1. Kunci ukuran bingkai (Crop Box) persis
-              let contData = this.cropper.getContainerData();
-              this.cropper.setCropBoxData({
-                left: 0,
-                top: 0,
-                width: contData.width,
-                height: contData.height
-              });
-              
-              // 2. Kalkulasi Matematika presisi agar foto menutupi bingkai (Cover) & persis di tengah (Center)
-              let canvasData = this.cropper.getCanvasData();
-              let scaleX = contData.width / canvasData.naturalWidth;
-              let scaleY = contData.height / canvasData.naturalHeight;
-              let scale = Math.max(scaleX, scaleY); // Mencari skala yang pas tanpa ruang kosong
-              
-              let newWidth = canvasData.naturalWidth * scale;
-              let newHeight = canvasData.naturalHeight * scale;
-              
-              this.cropper.setCanvasData({
-                width: newWidth,
-                height: newHeight,
-                left: (contData.width - newWidth) / 2, // Kunci X di tengah
-                top: (contData.height - newHeight) / 2 // Kunci Y di tengah
-              });
-            }
-          });
+          setTimeout(function() {
+            if (cropper) cropper.destroy();
+            
+            // Kembalikan style dasar agar kalkulasi dimensi natural foto normal (Anti-Zoom Ekstrem)
+            img.style.width = '100%';
+            img.style.maxWidth = '100%';
+            img.style.height = 'auto';
+            
+            cropper = new Cropper(img, {
+              aspectRatio: 234 / 312, 
+              viewMode: 0, // Mode bebas digeser ala Twibbonize
+              dragMode: 'move',      
+              autoCropArea: 1,       
+              cropBoxMovable: false, 
+              cropBoxResizable: false, 
+              toggleDragModeOnDblclick: false,
+              zoomable: true,
+              zoomOnTouch: true,
+              zoomOnWheel: true,
+              guides: true, 
+              center: false,
+              highlight: false,
+              background: false,
+              responsive: false, // Mengunci agar tak loncat saat HP di-scroll
+              ready: function () {
+                // 1. Kunci kotak potongan (Crop Box) seukuran bingkai HP
+                let contData = this.cropper.getContainerData();
+                this.cropper.setCropBoxData({
+                  left: 0,
+                  top: 0,
+                  width: contData.width,
+                  height: contData.height
+                });
+                
+                // 2. Kalkulasi skala ideal pakai fungsi bawaan agar foto menutupi bingkai (cover)
+                let imgData = this.cropper.getImageData();
+                let minZoom = Math.max(
+                  contData.width / imgData.naturalWidth, 
+                  contData.height / imgData.naturalHeight
+                );
+                
+                // 3. Terapkan zoom dan geser otomatis ke tengah persis (Dijamin akurat saat didownload)
+                this.cropper.zoomTo(minZoom);
+                this.cropper.moveTo(
+                  (contData.width - (imgData.naturalWidth * minZoom)) / 2,
+                  (contData.height - (imgData.naturalHeight * minZoom)) / 2
+                );
+              }
+            });
+          }, 150);
         };
         
-        // Membersihkan atribut CSS yang mengganggu kalkulasi natural gambar
-        img.removeAttribute('style');
-        img.style.display = 'block';
-        img.style.maxWidth = '100%';
         img.src = event.target.result;
       };
       reader.readAsDataURL(file);
