@@ -9,6 +9,8 @@
 
   <!-- Google Fonts & Font Awesome -->
   <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <!-- TAMBAHKAN BARIS INI UNTUK FONT ARAB AMIRI -->
+  <link href="https://fonts.googleapis.com/css2?family=Amiri:wght@400;700&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
   
   <!-- CropperJS CSS -->
@@ -364,7 +366,7 @@
       top: 420px; 
       font-size: 50px; 
       font-weight: bold; 
-      font-family: Arial, sans-serif;
+      font-family: 'Amiri', serif; /* FONT DIUBAH KE AMIRI */
       margin: 0; 
       color: #1a1a1a; 
       white-space: nowrap; 
@@ -720,8 +722,9 @@
           ctx.textBaseline = "top";
           
           ctx.fillStyle = "#1a1a1a";
-          ctx.font = "700 36px 'Plus Jakarta Sans', Arial, sans-serif";
-          ctx.fillText(student.nama.toUpperCase(), 360, 220 + 5); 
+          // FONT DIUBAH KE AMIRI UNTUK HASIL DOWNLOAD
+          ctx.font = "bold 50px 'Amiri', serif";
+          ctx.fillText(student.namaArab || "", 360, 420 + 5); 
 
           ctx.fillStyle = "#333333";
           ctx.font = "500 40px 'Plus Jakarta Sans', Arial, sans-serif";
