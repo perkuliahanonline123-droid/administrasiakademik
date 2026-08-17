@@ -719,20 +719,35 @@
           }
           ctx.restore();
 
+          // Cetak Teks Data Diri
           ctx.textBaseline = "top";
           
+          // 1. CETAK NAMA LATIN
           ctx.fillStyle = "#1a1a1a";
-          // FONT DIUBAH KE AMIRI UNTUK HASIL DOWNLOAD
-          ctx.font = "bold 50px 'Amiri', serif";
-          ctx.fillText(student.namaArab || "", 360, 420 + 5); 
+          ctx.font = "700 36px 'Plus Jakarta Sans', Arial, sans-serif";
+          if ('letterSpacing' in ctx) ctx.letterSpacing = "0px"; // Kunci jarak normal
+          ctx.fillText(student.nama.toUpperCase(), 360, 220 + 5); 
 
+          // 2. CETAK NIM
           ctx.fillStyle = "#333333";
           ctx.font = "500 40px 'Plus Jakarta Sans', Arial, sans-serif";
-          if ('letterSpacing' in ctx) ctx.letterSpacing = "2px";
+          if ('letterSpacing' in ctx) ctx.letterSpacing = "2px"; // Beri jarak 2px khusus NIM
           ctx.fillText(student.nim, 360, 315 + 5);
 
+          // 3. CETAK NAMA ARAB (FONT AMIRI)
           ctx.fillStyle = "#1a1a1a";
-          ctx.font = "bold 50px Arial, sans-serif";
+          ctx.font = "bold 50px 'Amiri', serif";
+          if ('letterSpacing' in ctx) ctx.letterSpacing = "0px"; // WAJIB DI-RESET ke 0 agar huruf Arab menyambung dengan sempurna
+          
+          // Tambahkan pengaturan RTL (Right-to-Left) sebagai pengaman ekstra untuk format Arab di Kanvas HTML5
+          ctx.direction = "rtl"; 
+          ctx.textAlign = "right";
+          
+          // Karena textAlign "right", koordinat x disesuaikan (misal 360 + panjang area yang diperkirakan, kita set kira-kira di 920 agar rata kiri dengan teks lainnya)
+          // Menggunakan metode default left lebih aman jika sistem Canvas sudah RTL otomatis.
+          ctx.direction = "ltr";
+          ctx.textAlign = "left";
+          
           ctx.fillText(student.namaArab || "", 360, 420 + 5);
 
           canvas.toBlob(function(blob) {
