@@ -548,7 +548,15 @@
         }
       }
     }
-    window.addEventListener('resize', resizeLiveEditor);
+    // Simpan lebar awal untuk mendeteksi perubahan rotasi layar saja
+    // Mencegah cropper error/mengecil saat scroll atas-bawah di HP
+    let lastWindowWidth = window.innerWidth;
+    window.addEventListener('resize', function() {
+      if (window.innerWidth !== lastWindowWidth) {
+        lastWindowWidth = window.innerWidth;
+        resizeLiveEditor();
+      }
+    });
 
     function showLiveEditor(nim) {
       let wrapper = document.getElementById("editor-wrapper");
@@ -632,12 +640,12 @@
       
       let searchVal = document.getElementById("student-search").value;
       
-      // PERBAIKAN REGEX: Menggunakan pemisahan string agar bisa mendeteksi format NIM apapun yang memiliki titik (.)
+      // PERBAIKAN: Menggunakan split agar bisa membaca format NIM dengan titik (misal: 23.2.1.0256)
       if (!searchVal.includes(" - ")) {
           return alert("Data tidak valid. Silakan cari dan klik ulang nama Anda di daftar.");
       }
-      
       let nim = searchVal.split(" - ")[0].trim();
+      
       let student = studentsData.find(s => s.nim === nim);
       if (!student) return alert("Data tidak ditemukan.");
       
