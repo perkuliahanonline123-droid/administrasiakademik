@@ -307,7 +307,7 @@
       position: absolute;
       top: 0;
       left: 0;
-      border-radius: 35px; /* Dipertegas untuk pojok tumpul di web */
+      border-radius: 35px; /* Pojok tumpul KTM yang ditegaskan */
       border: 1px solid #dcdcdc; 
       box-shadow: 0 8px 24px rgba(0,0,0,0.08);
       overflow: hidden;
@@ -315,7 +315,7 @@
       background-size: 100% 100%;
       background-position: center;
       background-repeat: no-repeat;
-      transform-origin: top left;
+      transform-origin: top left; 
     }
 
     #live-foto-container {
@@ -425,11 +425,12 @@
         </p>
       </div>
 
+      <!-- KONTainer BARU agar kalkulasi Cropper sempurna seperti di PC -->
       <div id="editor-outer-wrapper">
         <div id="editor-wrapper">
           <div id="live-foto-container">
-            <!-- Ditambahkan object-position: bottom agar fotobanat merapat ke bawah bingkai -->
-            <img id="live-foto" src="fotobanat.png" style="width: 100%; height: 100%; object-fit: cover; object-position: bottom; display: block;">
+            <!-- Foto Default: Digeser ke bawah dan diperbesar menggunakan CSS Transform -->
+            <img id="live-foto" src="fotobanat.png" style="width: 100%; height: 100%; object-fit: cover; object-position: center bottom; transform: scale(1.15) translateY(8%); display: block;">
           </div>
           <p id="live-nama"></p>
           <p id="live-nim"></p>
@@ -594,7 +595,7 @@
           setTimeout(function() {
             if (cropper) cropper.destroy();
             
-            // Bersihkan gaya bawaan agar dimensi murni terjaga
+            // Bersihkan gaya bawaan agar dimensi murni gambar terbaca sempurna
             img.removeAttribute('style');
             img.style.display = 'block';
             img.style.width = '100%';
@@ -655,7 +656,6 @@
       btn.innerHTML = `<i class="fa-solid fa-spinner fa-spin"></i> Memproses...`;
       btn.disabled = true;
 
-      // Ambil potongan foto jika cropper aktif
       let canvasCrop = null;
       let base64Foto = "";
       if (cropper) {
@@ -674,10 +674,10 @@
       bgImg.crossOrigin = "anonymous";
       bgImg.onload = function() {
           
-          // Klip Sudut Tumpul KTM Keseluruhan Dipertegas
+          // Klip Sudut Tumpul KTM Keseluruhan Dipertegas (Radius 35px)
           ctx.save();
           ctx.beginPath();
-          const rKtm = 35; // Radius sudut tumpul lebih besar
+          const rKtm = 35;
           ctx.moveTo(rKtm, 0);
           ctx.lineTo(1011 - rKtm, 0);
           ctx.quadraticCurveTo(1011, 0, 1011, rKtm);
@@ -715,14 +715,16 @@
               ctx.drawImage(canvasCrop, x, y, w, h);
           } else {
               const defaultImg = document.getElementById('live-foto');
-              // Kalkulasi presisi agar gambar bawaan proporsional dan rapat ke bawah (bottom)
-              const iw = defaultImg.naturalWidth || defaultImg.width;
-              const ih = defaultImg.naturalHeight || defaultImg.height;
-              const scale = Math.max(w / iw, h / ih);
+              // WAJIB pakai ukuran natural agar tidak melonjong saat diekstrak
+              const iw = defaultImg.naturalWidth;
+              const ih = defaultImg.naturalHeight;
+              
+              // Rumus Skala presisi: Zoom 15% & Geser ke Bawah 8% agar sisa putih lenyap 
+              const scale = Math.max(w / iw, h / ih) * 1.15; 
               const nw = iw * scale;
               const nh = ih * scale;
               const nx = x + (w - nw) / 2; // Tengahkan secara horizontal
-              const ny = y + (h - nh);     // Rata mentok ke bawah (bottom)
+              const ny = y + h - nh + (h * 0.08); // Rata bawah + dorong 8%
               
               ctx.drawImage(defaultImg, nx, ny, nw, nh);
           }
@@ -744,7 +746,7 @@
           ctx.font = "bold 50px Arial, sans-serif";
           ctx.fillText(student.namaArab || "", 360, 420 + 5);
 
-          // Unduh Gambar Final (PNG Transparan pada Sudut Tumpul)
+          // Unduh Gambar Final 
           canvas.toBlob(function(blob) {
               let url = URL.createObjectURL(blob);
               let link = document.createElement('a');
@@ -756,7 +758,7 @@
               document.body.removeChild(link);
               URL.revokeObjectURL(url);
 
-              // Amankan Backup Foto ke Database (Hanya jika foto baru di-upload)
+              // Amankan Backup Foto ke Database (Hanya jika foto di-upload)
               btn.innerHTML = `<i class="fa-solid fa-cloud-arrow-up"></i> Menyimpan ke server...`;
               
               let payload = { nim: nim, image: base64Foto || "" };
