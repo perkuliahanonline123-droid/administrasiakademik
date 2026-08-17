@@ -511,7 +511,7 @@
       if(actBtn) actBtn.style.display = "none";
     }
 
-    // 3. Logic Editor KTM 
+    // 3. Logic Editor KTM (DIHITUNG PAKAI JS AGAR AKURAT 100% DI HP)
     function resizeLiveEditor() {
       const wrapper = document.getElementById('editor-wrapper');
       if (wrapper.style.display !== 'none') {
@@ -544,12 +544,12 @@
         arab.style.fontSize = (50 * scale) + 'px';
 
         if(cropper) {
-           setTimeout(() => cropper.resize(), 50);
+           cropper.resize();
         }
       }
     }
-    // Simpan lebar awal untuk mendeteksi perubahan rotasi layar saja
-    // Mencegah cropper error/mengecil saat scroll atas-bawah di HP
+
+    // KUNCI ANTI-BUG SCROLL HP: Hanya me-resize jika LEBAR layar berubah (Misal rotasi HP)
     let lastWindowWidth = window.innerWidth;
     window.addEventListener('resize', function() {
       if (window.innerWidth !== lastWindowWidth) {
@@ -586,52 +586,65 @@
         
         img.onload = function() {
           container.style.border = 'none'; 
-          document.getElementById('action-buttons').style.display = 'flex';
+          
+          let actBtn = document.getElementById('action-buttons');
+          if (actBtn) actBtn.style.display = 'flex';
 
-          setTimeout(function() {
-            if (cropper) cropper.destroy();
-            
-            cropper = new Cropper(img, {
-              aspectRatio: 234 / 312, 
-              viewMode: 0, 
-              dragMode: 'move',      
-              autoCropArea: 1,       
-              cropBoxMovable: false, 
-              cropBoxResizable: false, 
-              toggleDragModeOnDblclick: false,
-              zoomable: true,
-              zoomOnTouch: true,
-              zoomOnWheel: true,
-              guides: true, 
-              center: false,
-              highlight: false,
-              background: false,
-              ready: function () {
-                let contData = this.cropper.getContainerData();
-                this.cropper.setCropBoxData({
-                  left: 0,
-                  top: 0,
-                  width: contData.width,
-                  height: contData.height
-                });
-                
-                // Menempatkan foto otomatis ke tengah saat load
-                let canvasData = this.cropper.getCanvasData();
-                this.cropper.setCanvasData({
-                  left: (contData.width - canvasData.width) / 2,
-                  top: (contData.height - canvasData.height) / 2
-                });
-              }
-            });
-          }, 150);
+          if (cropper) cropper.destroy();
+          
+          cropper = new Cropper(img, {
+            aspectRatio: 234 / 312, 
+            viewMode: 0, // Bebas digeser ala Twibbonize
+            dragMode: 'move',      
+            autoCropArea: 1,       
+            cropBoxMovable: false, 
+            cropBoxResizable: false, 
+            toggleDragModeOnDblclick: false,
+            zoomable: true,
+            zoomOnTouch: true,
+            zoomOnWheel: true,
+            guides: true, 
+            center: false,
+            highlight: false,
+            background: false,
+            responsive: false, // MATIKAN RESPONSIVE BAWAAN AGAR TIDAK ERROR SAAT HP DI-SCROLL
+            ready: function () {
+              // 1. Kunci ukuran bingkai (Crop Box) persis
+              let contData = this.cropper.getContainerData();
+              this.cropper.setCropBoxData({
+                left: 0,
+                top: 0,
+                width: contData.width,
+                height: contData.height
+              });
+              
+              // 2. Kalkulasi Matematika presisi agar foto menutupi bingkai (Cover) & persis di tengah (Center)
+              let canvasData = this.cropper.getCanvasData();
+              let scaleX = contData.width / canvasData.naturalWidth;
+              let scaleY = contData.height / canvasData.naturalHeight;
+              let scale = Math.max(scaleX, scaleY); // Mencari skala yang pas tanpa ruang kosong
+              
+              let newWidth = canvasData.naturalWidth * scale;
+              let newHeight = canvasData.naturalHeight * scale;
+              
+              this.cropper.setCanvasData({
+                width: newWidth,
+                height: newHeight,
+                left: (contData.width - newWidth) / 2, // Kunci X di tengah
+                top: (contData.height - newHeight) / 2 // Kunci Y di tengah
+              });
+            }
+          });
         };
         
-        img.src = event.target.result;
+        // Membersihkan atribut CSS yang mengganggu kalkulasi natural gambar
+        img.removeAttribute('style');
         img.style.display = 'block';
+        img.style.maxWidth = '100%';
+        img.src = event.target.result;
       };
       reader.readAsDataURL(file);
     });
-
     // 4. Logic Download PURE HTML5 CANVAS (AKURASI 100%)
     function prosesDanCetak() {
       if (!cropper) return alert("Silakan upload foto terlebih dahulu.");
