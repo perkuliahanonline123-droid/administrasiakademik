@@ -369,8 +369,8 @@
           <i class="fa-solid fa-address-card"></i>
         </div>
         <div class="header-title-text">
-          <h2>Sistem Cetak KTM</h2>
-          <p>Pilih data dan upload pasfoto untuk mencetak Kartu Mahasiswa secara otomatis</p>
+          <h2>KTM Mahasiswa STAIIS</h2>
+          <p>Gunakan PC atau laptop untuk mendapatkan hasil terbaik</p>
         </div>
       </div>
       <div class="header-badge" id="realtimeClock">
@@ -387,7 +387,7 @@
             <div class="search-icon-bg">
               <i class="fa-solid fa-magnifying-glass"></i>
             </div>
-            <input type="text" id="student-search" placeholder="⏳ Sedang memuat database..." disabled autocomplete="off">
+            <input type="text" id="student-search" placeholder="⏳ Mohon tunggu sebentar..." disabled autocomplete="off">
           </div>
           <ul id="custom-autocomplete-list" class="autocomplete-list"></ul>
         </div>
@@ -412,7 +412,7 @@
 
       <div id="action-buttons" class="action-buttons">
         <button id="btn-proses" class="btn-main" onclick="prosesDanCetak()">
-          <i class="fa-solid fa-download"></i> Download KTM Depan
+          <i class="fa-solid fa-download"></i> Download KTM
         </button>
         <a href="https://drive.google.com/uc?export=download&id=1iSGMV2_RAQ3lN7dnwnWjvCluoBdIzFin" class="btn-secondary">
           <i class="fa-solid fa-id-card"></i> Download Belakang KTM
@@ -703,10 +703,10 @@
                   headers: { 'Content-Type': 'text/plain;charset=utf-8' },
                   body: JSON.stringify({ nim: nim, image: base64Foto })
               }).then(r => r.json()).then(res => {
-                  btn.innerHTML = `<i class="fa-solid fa-download"></i> Download KTM Depan`;
+                  btn.innerHTML = `<i class="fa-solid fa-download"></i> Download KTM`;
                   btn.disabled = false;
               }).catch(e => {
-                  btn.innerHTML = `<i class="fa-solid fa-download"></i> Download KTM Depan`;
+                  btn.innerHTML = `<i class="fa-solid fa-download"></i> Download KTM`;
                   btn.disabled = false;
               });
               
@@ -715,7 +715,7 @@
       
       bgImg.onerror = function() {
           alert("Gagal memuat template background KTM.");
-          btn.innerHTML = `<i class="fa-solid fa-download"></i> Download KTM Depan`;
+          btn.innerHTML = `<i class="fa-solid fa-download"></i> Download KTM`;
           btn.disabled = false;
       };
       
