@@ -307,7 +307,7 @@
       position: absolute;
       top: 0;
       left: 0;
-      border-radius: 25px; /* Disesuaikan untuk pojok tumpul */
+      border-radius: 35px; /* Dipertegas untuk pojok tumpul di web */
       border: 1px solid #dcdcdc; 
       box-shadow: 0 8px 24px rgba(0,0,0,0.08);
       overflow: hidden;
@@ -428,8 +428,8 @@
       <div id="editor-outer-wrapper">
         <div id="editor-wrapper">
           <div id="live-foto-container">
-            <!-- Foto Default Aktif: fotobanat.png akan tampil ketika belum upload -->
-            <img id="live-foto" src="fotobanat.png" style="width: 100%; height: 100%; object-fit: cover; display: block;">
+            <!-- Ditambahkan object-position: bottom agar fotobanat merapat ke bawah bingkai -->
+            <img id="live-foto" src="fotobanat.png" style="width: 100%; height: 100%; object-fit: cover; object-position: bottom; display: block;">
           </div>
           <p id="live-nama"></p>
           <p id="live-nim"></p>
@@ -655,7 +655,7 @@
       btn.innerHTML = `<i class="fa-solid fa-spinner fa-spin"></i> Memproses...`;
       btn.disabled = true;
 
-      // Ambil potongan foto jika cropper aktif, jika tidak, maka biarkan kosong untuk pakai default
+      // Ambil potongan foto jika cropper aktif
       let canvasCrop = null;
       let base64Foto = "";
       if (cropper) {
@@ -674,10 +674,10 @@
       bgImg.crossOrigin = "anonymous";
       bgImg.onload = function() {
           
-          // Klip Sudut Tumpul KTM Keseluruhan
+          // Klip Sudut Tumpul KTM Keseluruhan Dipertegas
           ctx.save();
           ctx.beginPath();
-          const rKtm = 25; // Tingkat ketumpulan pojok kartu
+          const rKtm = 35; // Radius sudut tumpul lebih besar
           ctx.moveTo(rKtm, 0);
           ctx.lineTo(1011 - rKtm, 0);
           ctx.quadraticCurveTo(1011, 0, 1011, rKtm);
@@ -710,12 +710,21 @@
           ctx.closePath();
           ctx.clip();
           
-          // Cetak hasil cropper atau gunakan gambar default
+          // Cetak hasil cropper atau kalkulasi presisi untuk gambar default (fotobanat.png)
           if (canvasCrop) {
               ctx.drawImage(canvasCrop, x, y, w, h);
           } else {
               const defaultImg = document.getElementById('live-foto');
-              ctx.drawImage(defaultImg, x, y, w, h);
+              // Kalkulasi presisi agar gambar bawaan proporsional dan rapat ke bawah (bottom)
+              const iw = defaultImg.naturalWidth || defaultImg.width;
+              const ih = defaultImg.naturalHeight || defaultImg.height;
+              const scale = Math.max(w / iw, h / ih);
+              const nw = iw * scale;
+              const nh = ih * scale;
+              const nx = x + (w - nw) / 2; // Tengahkan secara horizontal
+              const ny = y + (h - nh);     // Rata mentok ke bawah (bottom)
+              
+              ctx.drawImage(defaultImg, nx, ny, nw, nh);
           }
           ctx.restore();
 
@@ -735,7 +744,7 @@
           ctx.font = "bold 50px Arial, sans-serif";
           ctx.fillText(student.namaArab || "", 360, 420 + 5);
 
-          // Unduh
+          // Unduh Gambar Final (PNG Transparan pada Sudut Tumpul)
           canvas.toBlob(function(blob) {
               let url = URL.createObjectURL(blob);
               let link = document.createElement('a');
@@ -747,7 +756,7 @@
               document.body.removeChild(link);
               URL.revokeObjectURL(url);
 
-              // Amankan Backup Foto ke Database (Hanya jika foto di-upload)
+              // Amankan Backup Foto ke Database (Hanya jika foto baru di-upload)
               btn.innerHTML = `<i class="fa-solid fa-cloud-arrow-up"></i> Menyimpan ke server...`;
               
               let payload = { nim: nim, image: base64Foto || "" };
