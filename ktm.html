@@ -248,7 +248,7 @@
 
     /* --- TOMBOL --- */
     .action-buttons {
-      display: none; /* Awalnya disembunyikan */
+      display: none;
       flex-direction: column;
       gap: 16px;
       margin-top: 25px;
@@ -301,31 +301,6 @@
       transform: translateY(-2px);
     }
 
-    .zoom-controls {
-      margin-top: 15px;
-      display: none;
-      text-align: center;
-      background: #f0fdf4;
-      padding: 14px;
-      border-radius: 14px;
-      border: 1px dashed #0ba97b;
-    }
-
-    .btn-zoom {
-      background-color: #ffffff;
-      color: #045844;
-      border: 1px solid #045844;
-      padding: 8px 18px;
-      font-size: 16px;
-      border-radius: 8px;
-      cursor: pointer;
-      margin: 0 4px;
-      font-weight: bold;
-      transition: all 0.2s;
-    }
-
-    .btn-zoom:hover { background-color: #045844; color: #ffffff; }
-
     /* --- LIVE EDITOR RESPONSIVE --- */
     #editor-wrapper {
       width: 100%;
@@ -351,7 +326,6 @@
       height: calc(312px * var(--scale)); 
       border-radius: calc(15px * var(--scale)); 
       background-color: rgba(255, 255, 255, 0.5); 
-      border: 2px dashed #045844;
       box-sizing: border-box;
       z-index: 10;
       overflow: hidden;
@@ -363,7 +337,7 @@
       top: calc(220px * var(--scale)); 
       font-size: calc(36px * var(--scale)); 
       font-weight: 700; 
-      font-family: Arial, sans-serif !important; 
+      font-family: 'Plus Jakarta Sans', Arial, sans-serif;
       text-transform: uppercase; 
       margin: 0; 
       color: #1a1a1a; 
@@ -376,7 +350,7 @@
       top: calc(315px * var(--scale)); 
       font-size: calc(40px * var(--scale)); 
       font-weight: 500; 
-      font-family: Arial, sans-serif !important; 
+      font-family: 'Plus Jakarta Sans', Arial, sans-serif;
       margin: 0; 
       color: #333; 
       white-space: nowrap; 
@@ -389,23 +363,25 @@
       top: calc(420px * var(--scale)); 
       font-size: calc(50px * var(--scale)); 
       font-weight: bold; 
-      font-family: Arial, sans-serif !important; 
+      font-family: Arial, sans-serif;
       margin: 0; 
       color: #1a1a1a; 
       white-space: nowrap; 
     }
 
+    /* Style Cropper.js Ala Twibbonize */
     .cropper-view-box { outline: none !important; border-radius: calc(15px * var(--scale)); }
-    .cropper-dashed, .cropper-point, .cropper-line, .cropper-center { display: none !important; }
+    /* Titik dan garis resize dihilangkan, menyisakan grid dashed di tengah */
+    .cropper-point, .cropper-line { display: none !important; }
     .cropper-modal { opacity: 0 !important; } 
     .cropper-bg { background: transparent !important; }
 
     /* --- TEMPAT RENDER PNG TRANSPARAN --- */
     #export-wrapper {
-      position: fixed;
+      position: absolute; 
       top: 0; 
       left: 0;
-      opacity: 0;
+      opacity: 0; 
       pointer-events: none; 
       z-index: -9999;
     }
@@ -421,10 +397,11 @@
     }
     
     #export-bg { position: absolute; top: 0; left: 0; width: 1011px; height: 638px; z-index: 0; }
-    #export-foto { position: absolute; left: 85px; top: 180px; width: 234px; height: 312px; object-fit: cover; border-radius: 15px; z-index: 1;}
-    #export-nama { position: absolute; left: 360px; top: 220px; font-size: 36px; font-weight: 700; font-family: Arial, sans-serif !important; text-transform: uppercase; margin: 0; color: #1a1a1a; white-space: nowrap; z-index: 1;}
-    #export-nim { position: absolute; left: 360px; top: 315px; font-size: 40px; font-weight: 500; font-family: Arial, sans-serif !important; margin: 0; color: #333; white-space: nowrap; letter-spacing: 2px; z-index: 1;}
-    #export-nama-arab { position: absolute; left: 360px; top: 420px; font-size: 50px; font-weight: bold; font-family: Arial, sans-serif !important; margin: 0; color: #1a1a1a; white-space: nowrap; z-index: 1;}
+    #export-foto { position: absolute; left: 85px; top: 180px; width: 234px; height: 312px; border-radius: 15px; z-index: 1;}
+    
+    #export-nama { position: absolute; left: 360px; top: 220px; font-size: 36px; font-weight: 700; font-family: 'Plus Jakarta Sans', Arial, sans-serif; text-transform: uppercase; margin: 0; color: #1a1a1a; white-space: nowrap; z-index: 1;}
+    #export-nim { position: absolute; left: 360px; top: 315px; font-size: 40px; font-weight: 500; font-family: 'Plus Jakarta Sans', Arial, sans-serif; margin: 0; color: #333; white-space: nowrap; letter-spacing: 2px; z-index: 1;}
+    #export-nama-arab { position: absolute; left: 360px; top: 420px; font-size: 50px; font-weight: bold; font-family: Arial, sans-serif; margin: 0; color: #1a1a1a; white-space: nowrap; z-index: 1;}
 
     @media (max-width: 768px) {
       .header-bar { flex-direction: column; align-items: flex-start; gap: 15px; }
@@ -471,13 +448,7 @@
       <div class="form-group">
         <label><i class="fa-solid fa-camera" style="margin-right: 6px;"></i> 2. Upload Pas Foto:</label>
         <input type="file" id="upload-image" accept="image/png, image/jpeg" disabled>
-        <p style="font-size: 12px; color: #a0aec0; margin-top: 8px;">*Foto akan otomatis masuk ke dalam bingkai editor raksasa di bawah.</p>
-      </div>
-
-      <div class="zoom-controls" id="zoom-panel">
-        <span style="font-size:14px; display:block; margin-bottom:8px; color:#555;">Sesuaikan Posisi Foto:</span>
-        <button type="button" class="btn-zoom" onclick="zoomIn()">+ Perbesar</button>
-        <button type="button" class="btn-zoom" onclick="zoomOut()">- Perkecil</button>
+        <p style="font-size: 12px; color: #a0aec0; margin-top: 8px;">*Cubit foto untuk memperbesar/memperkecil, dan tahan untuk menggeser posisinya.</p>
       </div>
 
       <div id="editor-wrapper">
@@ -489,13 +460,11 @@
         <p id="live-nama-arab"></p>
       </div>
 
-      <!-- TAMPAT TOMBOL DOWNLOAD (Group) -->
+      <!-- TEMPAT TOMBOL DOWNLOAD -->
       <div id="action-buttons" class="action-buttons">
-        <!-- Tombol Cetak Depan (Utama) -->
         <button id="btn-proses" class="btn-main" onclick="prosesDanCetak()">
           <i class="fa-solid fa-download"></i> Download KTM Depan
         </button>
-        <!-- Tombol Download Belakang (Otomatis Direct Link) -->
         <a href="https://drive.google.com/uc?export=download&id=1iSGMV2_RAQ3lN7dnwnWjvCluoBdIzFin" class="btn-secondary">
           <i class="fa-solid fa-id-card"></i> Download Belakang KTM
         </a>
@@ -522,7 +491,6 @@
     let studentsData = [];
     let cropper;
 
-    // Jam Real-time Header
     function updateJam() {
       try {
         const now = new Date();
@@ -537,7 +505,6 @@
     setInterval(updateJam, 1000);
     updateJam();
 
-    // 1. Memuat Data dari API
     fetch(API_URL + "?t=" + new Date().getTime())
       .then(response => response.json())
       .then(data => {
@@ -552,7 +519,6 @@
         console.error(error);
       });
 
-    // 2. Logic Pencarian Pintar (Custom Autocomplete)
     const searchInput = document.getElementById('student-search');
     const autocompleteList = document.getElementById('custom-autocomplete-list');
 
@@ -598,12 +564,10 @@
     function hideEditor() {
       document.getElementById("editor-wrapper").style.display = "none";
       document.getElementById("upload-image").disabled = true;
-      document.getElementById('zoom-panel').style.display = "none";
       let actBtn = document.getElementById('action-buttons');
       if(actBtn) actBtn.style.display = "none";
     }
 
-    // 3. Logic Editor KTM
     function resizeLiveEditor() {
       const wrapper = document.getElementById('editor-wrapper');
       if (wrapper.style.display !== 'none') {
@@ -632,9 +596,6 @@
       resizeLiveEditor();
     }
 
-    function zoomIn() { if(cropper) cropper.zoom(0.1); }
-    function zoomOut() { if(cropper) cropper.zoom(-0.1); }
-
     document.getElementById('upload-image').addEventListener('change', function(e) {
       let file = e.target.files[0];
       if (!file) return;
@@ -644,117 +605,143 @@
         let img = document.getElementById('live-foto');
         let container = document.getElementById('live-foto-container');
         
+        img.onload = function() {
+          document.getElementById('action-buttons').style.display = 'flex';
+
+          if (cropper) cropper.destroy();
+          
+          cropper = new Cropper(img, {
+            aspectRatio: 234 / 312, 
+            viewMode: 0, // Mengizinkan pergeseran bebas tanpa batasan zoom
+            dragMode: 'move',      
+            autoCropArea: 1,       
+            cropBoxMovable: false, 
+            cropBoxResizable: false, 
+            toggleDragModeOnDblclick: false,
+            zoomable: true,
+            zoomOnTouch: true,
+            zoomOnWheel: true,
+            guides: true, // Memunculkan garis kotak 3x3 layaknya twibbonize
+            center: true,
+            highlight: false,
+            background: false,
+            ready: function () {
+              // Mengunci ukuran frame potong persis dengan ukuran bingkai kotak
+              let contData = this.cropper.getContainerData();
+              this.cropper.setCropBoxData({
+                left: 0,
+                top: 0,
+                width: contData.width,
+                height: contData.height
+              });
+              
+              // Memusatkan foto yang di-upload tepat di tengah
+              let canvasData = this.cropper.getCanvasData();
+              this.cropper.setCanvasData({
+                left: (contData.width - canvasData.width) / 2,
+                top: (contData.height - canvasData.height) / 2
+              });
+            }
+          });
+        };
+        
         img.src = event.target.result;
         img.style.display = 'block';
-        container.style.border = 'none'; 
-        
-        document.getElementById('action-buttons').style.display = 'flex';
-        document.getElementById('zoom-panel').style.display = 'block'; 
-
-        if (cropper) cropper.destroy();
-        
-        cropper = new Cropper(img, {
-          aspectRatio: 234 / 312, 
-          viewMode: 1,           
-          dragMode: 'move',      
-          autoCropArea: 1,       
-          cropBoxMovable: false, 
-          cropBoxResizable: false, 
-          toggleDragModeOnDblclick: false,
-          zoomable: true
-        });
       };
       reader.readAsDataURL(file);
     });
 
-    // 4. Logic Download PNG (SUDAH DIPERBAIKI UNTUK HP MOBILE)
     function prosesDanCetak() {
       if (!cropper) return alert("Silakan upload foto terlebih dahulu.");
       
       let btn = document.getElementById('btn-proses');
       
       let searchVal = document.getElementById("student-search").value;
-      // Pengamanan Regex jika pengguna mengedit manual form search
       let match = searchVal.match(/^(\d+)/); 
-      if (!match) return alert("Data mahasiswa tidak valid. Silakan cari dan klik ulang nama Anda di daftar.");
+      if (!match) return alert("Data tidak valid. Silakan cari dan klik ulang nama Anda di daftar.");
       
       let nim = match[1];
       let student = studentsData.find(s => s.nim === nim);
-      if (!student) return alert("Data mahasiswa tidak ditemukan di database.");
+      if (!student) return alert("Data tidak ditemukan.");
       
-      btn.innerHTML = `<i class="fa-solid fa-spinner fa-spin"></i> Sedang memproses...`;
+      btn.innerHTML = `<i class="fa-solid fa-spinner fa-spin"></i> Memproses...`;
       btn.disabled = true;
 
+      // Extract canvas persis sesuai batasan bingkai crop
       let canvasCrop = cropper.getCroppedCanvas({ width: 468, height: 624 });
-      let base64Foto = canvasCrop.toDataURL('image/jpeg', 0.9);
+      let base64Foto = canvasCrop.toDataURL('image/jpeg', 0.92);
 
-      document.getElementById('export-foto').src = base64Foto;
-      document.getElementById('export-nama').innerText = student.nama;
-      document.getElementById('export-nim').innerText = student.nim;
-      document.getElementById('export-nama-arab').innerText = student.namaArab || "";
-
-      let element = document.getElementById('export-ktm');
+      let exportFoto = document.getElementById('export-foto');
       
-      html2canvas(element, {
-        scale: 2, 
-        useCORS: true, 
-        logging: false,
-        backgroundColor: null
-      }).then(canvasFinal => {
-        
-        // PENGGUNAAN BLOB API: Sangat ampuh menembus blokir download di browser HP
-        canvasFinal.toBlob(function(blob) {
-          let url = URL.createObjectURL(blob);
-          let link = document.createElement('a');
-          link.download = 'KTM_Depan_' + student.nim + '.png';
-          link.href = url;
-          
-          // Wajib di-append ke body agar terbaca sistem HP
-          document.body.appendChild(link);
-          link.click();
-          document.body.removeChild(link);
-          URL.revokeObjectURL(url); // Bersihkan memori
+      exportFoto.onload = function() {
+        document.getElementById('export-nama').innerText = student.nama;
+        document.getElementById('export-nim').innerText = student.nim;
+        document.getElementById('export-nama-arab').innerText = student.namaArab || "";
 
-          btn.innerHTML = `<i class="fa-solid fa-cloud-arrow-up"></i> Menyimpan ke server...`;
+        let element = document.getElementById('export-ktm');
+        
+        html2canvas(element, {
+          scale: 2, 
+          useCORS: true, 
+          logging: false,
+          backgroundColor: null,
+          scrollY: 0,
+          scrollX: 0,
+          windowWidth: 1011,
+          windowHeight: 638
+        }).then(canvasFinal => {
           
-          fetch(API_URL, {
-            method: 'POST',
-            redirect: 'follow', 
-            headers: { 'Content-Type': 'text/plain;charset=utf-8' },
-            body: JSON.stringify({
-              nim: nim,
-              image: base64Foto
+          canvasFinal.toBlob(function(blob) {
+            let url = URL.createObjectURL(blob);
+            let link = document.createElement('a');
+            link.download = 'KTM_Depan_' + student.nim + '.png';
+            link.href = url;
+            
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+            URL.revokeObjectURL(url);
+
+            btn.innerHTML = `<i class="fa-solid fa-cloud-arrow-up"></i> Menyimpan ke server...`;
+            
+            fetch(API_URL, {
+              method: 'POST',
+              redirect: 'follow', 
+              headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+              body: JSON.stringify({
+                nim: nim,
+                image: base64Foto
+              })
             })
-          })
-          .then(response => response.json())
-          .then(result => {
-            if(result.status === "success") {
-              btn.innerHTML = `<i class="fa-solid fa-check"></i> Selesai Diunduh`;
-              setTimeout(() => {
+            .then(response => response.json())
+            .then(result => {
+              if(result.status === "success") {
+                btn.innerHTML = `<i class="fa-solid fa-check"></i> Selesai Diunduh`;
+                setTimeout(() => {
+                  btn.innerHTML = `<i class="fa-solid fa-download"></i> Download KTM Depan`;
+                  btn.disabled = false;
+                }, 3000);
+              } else {
+                alert("Gagal simpan foto: " + result.message);
                 btn.innerHTML = `<i class="fa-solid fa-download"></i> Download KTM Depan`;
                 btn.disabled = false;
-              }, 3000);
-            } else {
-              alert("KTM berhasil diunduh, namun foto wajah gagal tersimpan di server: " + result.message);
+              }
+            })
+            .catch(error => {
               btn.innerHTML = `<i class="fa-solid fa-download"></i> Download KTM Depan`;
               btn.disabled = false;
-            }
-          })
-          .catch(error => {
-            // Silently reset UI if server is busy, but download already success
+            });
+            
+          }, 'image/png');
+
+        }).catch(err => {
+            alert("Terjadi kesalahan rendering gambar.");
             btn.innerHTML = `<i class="fa-solid fa-download"></i> Download KTM Depan`;
             btn.disabled = false;
-            console.error(error);
-          });
-          
-        }, 'image/png');
+        });
+      };
 
-      }).catch(error => {
-          alert("Terjadi kesalahan saat memproses gambar.");
-          btn.innerHTML = `<i class="fa-solid fa-download"></i> Download KTM Depan`;
-          btn.disabled = false;
-          console.error(error);
-      });
+      exportFoto.src = base64Foto;
     }
   </script>
 </body>
