@@ -307,7 +307,7 @@
       position: absolute;
       top: 0;
       left: 0;
-      border-radius: 20px;
+      border-radius: 25px; /* Disesuaikan untuk pojok tumpul */
       border: 1px solid #dcdcdc; 
       box-shadow: 0 8px 24px rgba(0,0,0,0.08);
       overflow: hidden;
@@ -315,7 +315,7 @@
       background-size: 100% 100%;
       background-position: center;
       background-repeat: no-repeat;
-      transform-origin: top left; /* Vital untuk mengecilkan layar dari sudut kiri atas */
+      transform-origin: top left;
     }
 
     #live-foto-container {
@@ -370,7 +370,7 @@
       white-space: nowrap; 
     }
 
-    /* Tampilan Twibbonize: transparan, bersih, ada panduan saat disentuh */
+    /* Tampilan Twibbonize */
     .cropper-view-box { outline: none !important; border-radius: inherit; }
     .cropper-point, .cropper-line, .cropper-center { display: none !important; }
     .cropper-modal { opacity: 0 !important; } 
@@ -425,11 +425,11 @@
         </p>
       </div>
 
-      <!-- KONTainer BARU agar kalkulasi Cropper sempurna seperti di PC -->
       <div id="editor-outer-wrapper">
         <div id="editor-wrapper">
           <div id="live-foto-container">
-            <img id="live-foto" src="" style="display:none;">
+            <!-- Foto Default Aktif: fotobanat.png akan tampil ketika belum upload -->
+            <img id="live-foto" src="fotobanat.png" style="width: 100%; height: 100%; object-fit: cover; display: block;">
           </div>
           <p id="live-nama"></p>
           <p id="live-nim"></p>
@@ -537,7 +537,7 @@
       if(actBtn) actBtn.style.display = "none";
     }
 
-    // 3. Logic Editor KTM Menggunakan Skala CSS Asli
+    // 3. Logic Editor KTM Menggunakan Skala CSS
     function resizeLiveEditor() {
       const outerWrapper = document.getElementById('editor-outer-wrapper');
       const innerWrapper = document.getElementById('editor-wrapper');
@@ -546,12 +546,18 @@
         const targetWidth = outerWrapper.clientWidth;
         const scale = targetWidth / 1011; 
         
-        // Cukup ubah visualnya (scale) TANPA merusak titik ukur pixel Cropper
         innerWrapper.style.transform = `scale(${scale})`;
-        outerWrapper.style.height = (638 * scale) + 'px'; // Menyesuaikan tinggi agar tata letak tidak rusak
+        outerWrapper.style.height = (638 * scale) + 'px'; 
       }
     }
-    window.addEventListener('resize', resizeLiveEditor);
+    
+    let lastWindowWidth = window.innerWidth;
+    window.addEventListener('resize', function() {
+      if (window.innerWidth !== lastWindowWidth) {
+        lastWindowWidth = window.innerWidth;
+        resizeLiveEditor();
+      }
+    });
 
     function showLiveEditor(nim) {
       let outerWrapper = document.getElementById("editor-outer-wrapper");
@@ -567,6 +573,9 @@
       outerWrapper.style.display = "block";
       fileInput.disabled = false;
       
+      // Tombol download langsung muncul meski belum upload foto
+      document.getElementById('action-buttons').style.display = 'flex';
+      
       resizeLiveEditor();
     }
 
@@ -581,12 +590,13 @@
         
         img.onload = function() {
           container.style.border = 'none'; 
-          document.getElementById('action-buttons').style.display = 'flex';
 
           setTimeout(function() {
             if (cropper) cropper.destroy();
             
-            // Jaga dimensi image selalu normal & murni
+            // Bersihkan gaya bawaan agar dimensi murni terjaga
+            img.removeAttribute('style');
+            img.style.display = 'block';
             img.style.width = '100%';
             img.style.maxWidth = '100%';
             img.style.height = 'auto';
@@ -606,7 +616,7 @@
               center: false,
               highlight: false,
               background: false,
-              responsive: false, // Aman karena ukuran DOM kini bersifat statis 234x312px
+              responsive: false, 
               ready: function () {
                 let contData = this.cropper.getContainerData();
                 this.cropper.setCropBoxData({ left: 0, top: 0, width: contData.width, height: contData.height });
@@ -631,12 +641,9 @@
 
     // 4. Logic Download PURE HTML5 CANVAS (AKURASI DIJAMIN 100%)
     function prosesDanCetak() {
-      if (!cropper) return alert("Silakan upload foto terlebih dahulu.");
-      
       let btn = document.getElementById('btn-proses');
       let searchVal = document.getElementById("student-search").value;
       
-      // Ambil NIM pakai split (memecahkan masalah titik di NIM)
       if (!searchVal.includes(" - ")) {
           return alert("Data tidak valid. Silakan cari dan klik ulang nama Anda di daftar.");
       }
@@ -648,9 +655,13 @@
       btn.innerHTML = `<i class="fa-solid fa-spinner fa-spin"></i> Memproses...`;
       btn.disabled = true;
 
-      // Ambil potongan foto murni dari bingkai
-      let canvasCrop = cropper.getCroppedCanvas({ width: 468, height: 624 });
-      let base64Foto = canvasCrop.toDataURL('image/jpeg', 0.92);
+      // Ambil potongan foto jika cropper aktif, jika tidak, maka biarkan kosong untuk pakai default
+      let canvasCrop = null;
+      let base64Foto = "";
+      if (cropper) {
+          canvasCrop = cropper.getCroppedCanvas({ width: 468, height: 624 });
+          base64Foto = canvasCrop.toDataURL('image/jpeg', 0.92);
+      }
 
       // Render menggunakan sistem komputasi Canvas internal browser
       const canvas = document.createElement('canvas');
@@ -662,10 +673,28 @@
       const bgImg = new Image();
       bgImg.crossOrigin = "anonymous";
       bgImg.onload = function() {
+          
+          // Klip Sudut Tumpul KTM Keseluruhan
+          ctx.save();
+          ctx.beginPath();
+          const rKtm = 25; // Tingkat ketumpulan pojok kartu
+          ctx.moveTo(rKtm, 0);
+          ctx.lineTo(1011 - rKtm, 0);
+          ctx.quadraticCurveTo(1011, 0, 1011, rKtm);
+          ctx.lineTo(1011, 638 - rKtm);
+          ctx.quadraticCurveTo(1011, 638, 1011 - rKtm, 638);
+          ctx.lineTo(rKtm, 638);
+          ctx.quadraticCurveTo(0, 638, 0, 638 - rKtm);
+          ctx.lineTo(0, rKtm);
+          ctx.quadraticCurveTo(0, 0, rKtm, 0);
+          ctx.closePath();
+          ctx.clip();
+          
           // Latar belakang
           ctx.drawImage(bgImg, 0, 0, 1011, 638);
+          ctx.restore();
 
-          // Bingkai Foto Sudut Melengkung 15px
+          // Bingkai Pasfoto Sudut Melengkung 15px
           ctx.save();
           ctx.beginPath();
           const x = 85, y = 180, w = 234, h = 312, r = 15;
@@ -680,7 +709,14 @@
           ctx.quadraticCurveTo(x, y, x + r, y);
           ctx.closePath();
           ctx.clip();
-          ctx.drawImage(canvasCrop, x, y, w, h);
+          
+          // Cetak hasil cropper atau gunakan gambar default
+          if (canvasCrop) {
+              ctx.drawImage(canvasCrop, x, y, w, h);
+          } else {
+              const defaultImg = document.getElementById('live-foto');
+              ctx.drawImage(defaultImg, x, y, w, h);
+          }
           ctx.restore();
 
           // Cetak Teks Data Diri
@@ -711,12 +747,16 @@
               document.body.removeChild(link);
               URL.revokeObjectURL(url);
 
+              // Amankan Backup Foto ke Database (Hanya jika foto di-upload)
               btn.innerHTML = `<i class="fa-solid fa-cloud-arrow-up"></i> Menyimpan ke server...`;
+              
+              let payload = { nim: nim, image: base64Foto || "" };
+              
               fetch(API_URL, {
                   method: 'POST',
                   redirect: 'follow', 
                   headers: { 'Content-Type': 'text/plain;charset=utf-8' },
-                  body: JSON.stringify({ nim: nim, image: base64Foto })
+                  body: JSON.stringify(payload)
               }).then(r => r.json()).then(res => {
                   btn.innerHTML = `<i class="fa-solid fa-download"></i> Download KTM`;
                   btn.disabled = false;
