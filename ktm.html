@@ -337,7 +337,7 @@
     #live-nama { 
       position: absolute; 
       left: 360px; 
-      bottom: 358px; /* Posisi lega di atas */
+      bottom: 358px; 
       top: auto !important; 
       width: 610px; 
       font-size: 36px; 
@@ -353,7 +353,7 @@
     #live-nim { 
       position: absolute; 
       left: 360px; 
-      bottom: 253px; /* Pas di tengah-tengah Latin dan Arab */
+      bottom: 253px; /* Posisi NIM dipatok tetap di tengah yang ideal */
       top: auto !important; 
       font-size: 40px; 
       font-weight: 500; 
@@ -367,7 +367,7 @@
     #live-nama-arab { 
       position: absolute; 
       left: 360px; 
-      bottom: 148px; /* Mentok di batas bawah foto */
+      bottom: 148px; 
       top: auto !important; 
       width: 380px; 
       font-size: 50px; 
@@ -790,9 +790,9 @@
           }
           ctx.restore();
 
-          // --- FUNGSI BANTUAN MENGHITUNG BARIS & MENCETAK ---
-          function drawTextAndGetLines(context, text, x, bottomY, maxWidth, lineHeight) {
-              if (!text) return 0;
+          // --- FUNGSI BANTUAN UNTUK TEKS TUMBUH KE ATAS ---
+          function wrapTextCanvasBottomUp(context, text, x, bottomY, maxWidth, lineHeight) {
+              if (!text) return;
               var words = text.split(' ');
               var lines = [];
               var line = '';
@@ -812,19 +812,12 @@
                   var currentY = bottomY - (lines.length - 1 - i) * lineHeight;
                   context.fillText(lines[i].trim(), x, currentY);
               }
-              return lines.length; // Kembalikan jumlah baris
           }
           // -----------------------------------------------------------
 
           ctx.textBaseline = "bottom"; 
           
-          // KOORDINAT DEFAULT YANG LEGA (Jarak antar elemen persis 105px)
-          let baseArabY = 490; 
-          let baseNimY = 385; 
-          let baseLatinY = 280; 
-          let shiftUp = 0; 
-
-          // 1. CETAK NAMA ARAB
+          // 1. CETAK NAMA ARAB (Posisi tetap)
           ctx.fillStyle = "#1a1a1a";
           ctx.font = "bold 50px 'Amiri', serif";
           if ('letterSpacing' in ctx) ctx.letterSpacing = "0px";
@@ -832,28 +825,22 @@
           ctx.textAlign = "right";
           ctx.direction = "ltr";
           ctx.textAlign = "left";
-          
-          // Cetak dan cek apakah Arab menjadi 2 baris
-          let arabLines = drawTextAndGetLines(ctx, student.namaArab || "", 360, baseArabY, 380, 60);
-          
-          // HANYA JIKA ARAB 2 BARIS, siapkan dorongan ke atas untuk NIM & Latin
-          if (arabLines > 1) {
-              shiftUp = (arabLines - 1) * 60; 
-          }
+          wrapTextCanvasBottomUp(ctx, student.namaArab || "", 360, 490, 380, 60);
 
-          // 2. CETAK NIM (Akan terdorong ke atas jika shiftUp ada nilainya)
+          // 2. CETAK NIM (Posisi statis yang pas di tengah)
           ctx.fillStyle = "#333333";
           ctx.font = "500 40px 'Plus Jakarta Sans', Arial, sans-serif";
           if ('letterSpacing' in ctx) ctx.letterSpacing = "2px";
-          
-          ctx.fillText(student.nim, 360, baseNimY - shiftUp);
+          ctx.fillText(student.nim, 360, 385);
 
-          // 3. CETAK NAMA LATIN (Juga terdorong ke atas menjaga jarak tetap sama dengan NIM)
+          // 3. CETAK NAMA LATIN (Jika panjang, otomatis membungkus ke atas dari titik ini)
           ctx.fillStyle = "#1a1a1a";
           ctx.font = "700 36px 'Plus Jakarta Sans', Arial, sans-serif";
           if ('letterSpacing' in ctx) ctx.letterSpacing = "0px";
-          
-          drawTextAndGetLines(ctx, student.nama.toUpperCase(), 360, baseLatinY - shiftUp, 610, 45);
+          wrapTextCanvasBottomUp(ctx, student.nama.toUpperCase(), 360, 280, 610, 45); 
+
+          // === MULAI TAMBAHAN GENERATE QR CODE OTOMATIS ===
+          // (Lanjutkan dengan kode QR Anda ke bawah tanpa ada perubahan)
 
           // (Lanjutkan ke kode === MULAI TAMBAHAN GENERATE QR CODE OTOMATIS === milik Anda)
         
