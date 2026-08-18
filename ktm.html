@@ -750,36 +750,61 @@
           
           ctx.fillText(student.namaArab || "", 360, 420 + 5);
 
-          canvas.toBlob(function(blob) {
-              let url = URL.createObjectURL(blob);
-              let link = document.createElement('a');
-              link.download = 'KTM_' + student.nim + '.png';
-              link.href = url;
+          // === MULAI TAMBAHAN GENERATE QR CODE OTOMATIS ===
+          // URL ini mengarah ke Vercel Anda, sisipkan NIM mahasiswa ke dalam link
+          const verifikasiUrl = `https://administrasiakademik.vercel.app/index.html?nim=${student.nim}`;
+          const qrApiUrl = `https://api.qrserver.com/v1/create-qr-code/?size=150x150&margin=0&data=${encodeURIComponent(verifikasiUrl)}`;
 
-              document.body.appendChild(link);
-              link.click();
-              document.body.removeChild(link);
-              URL.revokeObjectURL(url);
+          const qrImg = new Image();
+          qrImg.crossOrigin = "anonymous";
+          qrImg.onload = function() {
+              // Simpan QR Code di kanvas
+              // Sesuaikan nilai koordinat X dan Y (misal: x=800, y=450) agar posisinya pas di desain KTM
+              const qrX = 820; 
+              const qrY = 430;
+              const qrSize = 140; 
+              ctx.drawImage(qrImg, qrX, qrY, qrSize, qrSize);
 
-              btn.innerHTML = `<i class="fa-solid fa-cloud-arrow-up"></i> Menyimpan ke server...`;
-              
-              let payload = { nim: nim, image: base64Foto || "" };
-              
-              fetch(API_URL, {
-                  method: 'POST',
-                  redirect: 'follow', 
-                  headers: { 'Content-Type': 'text/plain;charset=utf-8' },
-                  body: JSON.stringify(payload)
-              }).then(r => r.json()).then(res => {
-                  btn.innerHTML = `<i class="fa-solid fa-download"></i> Download KTM`;
-                  btn.disabled = false;
-              }).catch(e => {
-                  btn.innerHTML = `<i class="fa-solid fa-download"></i> Download KTM`;
-                  btn.disabled = false;
-              });
-              
-          }, 'image/png');
-      };
+              // Eksekusi download HANYA dilakukan di sini (setelah QR digambar)
+              canvas.toBlob(function(blob) {
+                  let url = URL.createObjectURL(blob);
+                  let link = document.createElement('a');
+                  link.download = 'KTM_' + student.nim + '.png';
+                  link.href = url;
+                  
+                  document.body.appendChild(link);
+                  link.click();
+                  document.body.removeChild(link);
+                  URL.revokeObjectURL(url);
+
+                  btn.innerHTML = `<i class="fa-solid fa-cloud-arrow-up"></i> Menyimpan ke server...`;
+                  let payload = { nim: nim, image: base64Foto || "" };
+                  
+                  fetch(API_URL, {
+                      method: 'POST',
+                      redirect: 'follow', 
+                      headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+                      body: JSON.stringify(payload)
+                  }).then(r => r.json()).then(res => {
+                      btn.innerHTML = `<i class="fa-solid fa-download"></i> Download KTM`;
+                      btn.disabled = false;
+                  }).catch(e => {
+                      btn.innerHTML = `<i class="fa-solid fa-download"></i> Download KTM`;
+                      btn.disabled = false;
+                  });
+              }, 'image/png');
+          };
+          
+          qrImg.onerror = function() {
+              alert("Gagal memuat QR Code.");
+              btn.innerHTML = `<i class="fa-solid fa-download"></i> Download KTM`;
+              btn.disabled = false;
+          };
+          
+          qrImg.src = qrApiUrl; // Mulai memuat QR
+          // === AKHIR TAMBAHAN GENERATE QR CODE ===
+          
+      }; // <-- Tutup kurung kurawal dari bgImg.onload
       
       bgImg.onerror = function() {
           alert("Gagal memuat template background KTM.");
