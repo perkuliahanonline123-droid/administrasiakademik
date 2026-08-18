@@ -24,12 +24,20 @@
 <body class="min-h-screen flex flex-col">
 
     <!-- Navbar Top (Header) -->
-    <header class="bg-white border-b border-gray-200 py-4 px-6 md:px-12 flex justify-between items-center hidden md:flex">
+    <header class="bg-white border-b border-gray-200 py-3 px-4 md:py-4 md:px-12 flex justify-between items-center">
+        <!-- Logo dan Nama Kampus -->
         <div class="flex items-center gap-3 group cursor-pointer">
-            <img src="https://i.ibb.co.com/fGv3qQ11/logo-staiis.webp" alt="Logo STAIIS" class="w-14 h-14 relative object-contain drop-shadow-[0_0_10px_rgba(255,255,255,0.4)] transform transition-all duration-300 group-hover:scale-110 group-hover:-rotate-3">
-            <h1 class="font-bold text-gray-800 leading-tight">Akademik<br>STAI Imam Syafi`i</h1>
+            <img src="https://i.ibb.co.com/fGv3qQ11/logo-staiis.webp" alt="Logo STAIIS" class="w-10 h-10 md:w-14 md:h-14 relative object-contain drop-shadow-[0_0_10px_rgba(255,255,255,0.4)] transform transition-all duration-300 group-hover:scale-110 group-hover:-rotate-3">
+            <h1 class="font-bold text-gray-800 leading-tight text-sm md:text-base">Akademik<br>STAI Imam Syafi`i</h1>
         </div>
-        <nav class="flex gap-6 text-sm text-gray-600 font-medium">
+        
+        <!-- Ikon Hamburger Menu untuk tampilan HP -->
+        <button class="md:hidden text-green-700 focus:outline-none">
+            <i data-lucide="menu" class="w-7 h-7"></i>
+        </button>
+
+        <!-- Menu Navigasi Desktop -->
+        <nav class="hidden md:flex gap-6 text-sm text-gray-600 font-medium">
             <a href="#" class="hover:text-green-700">Tentang Kampus</a>
             <a href="#" class="hover:text-green-700">Kebijakan Privasi</a>
         </nav>
@@ -71,16 +79,16 @@
                             <p id="val-nim" class="font-bold text-gray-900">-</p>
                         </div>
                         <div>
-                            <p class="text-[12px] text-gray-500 font-medium mb-0.5">Jenjang - Program Studi</p>
-                            <p id="val-prodi" class="font-semibold text-gray-800">-</p>
+                            <p class="text-[12px] text-gray-500 font-medium mb-0.5">Perguruan Tinggi</p>
+                            <p class="font-semibold text-staiis">STAI Imam Syafi`i Cianjur</p>
                         </div>
                     </div>
 
                     <!-- Kanan / Bawah (Mobile): Urutan 5 s.d 7 -->
                     <div class="space-y-5">
                         <div>
-                            <p class="text-[12px] text-gray-500 font-medium mb-0.5">Perguruan Tinggi</p>
-                            <p class="font-semibold text-staiis">STAI Imam Syafi`i Cianjur</p>
+                            <p class="text-[12px] text-gray-500 font-medium mb-0.5">Jenjang - Program Studi</p>
+                            <p id="val-prodi" class="font-semibold text-gray-800">-</p>
                         </div>
                         <div>
                             <p class="text-[12px] text-gray-500 font-medium mb-0.5">Tanggal Masuk</p>
@@ -112,7 +120,7 @@
         const urlParams = new URLSearchParams(window.location.search);
         const nimParam = urlParams.get('nim');
         
-        // PASTIKAN URL APPS SCRIPT ANDA SUDAH BENAR DI SINI
+        // URL APPS SCRIPT
         const scriptUrl = 'https://script.google.com/macros/s/AKfycbw7pgDjQaj0hpuOXYCc1JJ5KWjd8er1_rfm9yK0_WOSv51Jvdqo54mGz0WSqGT5NCh3MA/exec';
 
         async function fetchData() {
