@@ -803,14 +803,14 @@
           qrImg.crossOrigin = "anonymous";
           qrImg.onload = function() {
               
-              // --- ANGKA BARU UNTUK KANVAS DOWNLOAD ---
-              const qrX = 710;    // <--- UBAH DARI 750 MENJADI 710 (Geser ke kiri)
-              const qrY = 330;    
-              const qrSize = 220; 
-              // ----------------------------------------
+              // --- SAMAKAN ANGKA DENGAN SETTINGAN PRATINJAU LAYAR ---
+              const qrX = 740;    // Sesuaikan dengan left
+              const qrY = 345;    // Sesuaikan dengan top
+              const qrSize = 220; // Sesuaikan dengan width/height
+              // ------------------------------------------------------
               
               ctx.save();
-              ctx.globalCompositeOperation = "multiply"; // Menghilangkan background putih QR
+              ctx.globalCompositeOperation = "multiply";
               ctx.drawImage(qrImg, qrX, qrY, qrSize, qrSize);
               ctx.restore();
 
