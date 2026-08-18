@@ -337,8 +337,9 @@
     #live-nama { 
       position: absolute; 
       left: 360px; 
-      bottom: 358px; /* Teks Latin di atas */
-      width: 610px; 
+      bottom: 388px; /* Teks Latin aman di atas */
+      top: auto !important; 
+      width: 610px; /* Lebar penuh aman karena di atas QR */
       font-size: 36px; 
       font-weight: 700; 
       font-family: 'Plus Jakarta Sans', Arial, sans-serif;
@@ -346,13 +347,14 @@
       margin: 0; 
       color: #1a1a1a; 
       white-space: normal; 
-      line-height: 1.2; 
+      line-height: 45px; 
     }
     
     #live-nim { 
       position: absolute; 
       left: 360px; 
-      bottom: 258px; /* NIM tepat di tengah */
+      bottom: 288px; /* NIM tepat di tengah, di atas QR */
+      top: auto !important; 
       font-size: 40px; 
       font-weight: 500; 
       font-family: 'Plus Jakarta Sans', Arial, sans-serif;
@@ -365,15 +367,16 @@
     #live-nama-arab { 
       position: absolute; 
       left: 360px; 
-      bottom: 148px; /* Nama Arab dengan jarak yang pas dari foto */
-      width: 380px; 
+      bottom: 148px; /* Sejajar dengan bingkai bawah foto */
+      top: auto !important; 
+      width: 360px; /* Dibatasi agar tidak menabrak QR di kanannya */
       font-size: 50px; 
       font-weight: bold; 
       font-family: 'Amiri', serif;
       margin: 0; 
       color: #1a1a1a; 
       white-space: normal; 
-      line-height: 1.2; 
+      line-height: 60px; 
     }
     
     /* Tampilan Twibbonize */
@@ -767,7 +770,7 @@
           }
           ctx.restore();
 
-          // --- FUNGSI BANTUAN UNTUK MENGHITUNG JUMLAH BARIS & MENCETAK ---
+          // --- FUNGSI BANTUAN MENGHITUNG BARIS & MENCETAK ---
           function drawTextAndGetLines(context, text, x, bottomY, maxWidth, lineHeight) {
               if (!text) return 0;
               var words = text.split(' ');
@@ -795,13 +798,13 @@
 
           ctx.textBaseline = "bottom"; 
           
-          // --- KOORDINAT DEFAULT YANG LEGA ---
-          let baseArabY = 480; 
-          let baseNimY = 370;
-          let baseLatinY = 270;
-          let shiftUp = 0; // Jarak dorong tambahan jika teks panjang
+          // KOORDINAT DEFAULT YANG LEGA & PROPORSIONAL
+          let baseArabY = 490; 
+          let baseNimY = 350;
+          let baseLatinY = 250;
+          let shiftUp = 0; 
 
-          // 1. CETAK NAMA ARAB
+          // 1. CETAK NAMA ARAB (Paling Bawah)
           ctx.fillStyle = "#1a1a1a";
           ctx.font = "bold 50px 'Amiri', serif";
           if ('letterSpacing' in ctx) ctx.letterSpacing = "0px";
@@ -810,12 +813,13 @@
           ctx.direction = "ltr";
           ctx.textAlign = "left";
           
-          // Cetak dan hitung baris Arab
-          let arabLines = drawTextAndGetLines(ctx, student.namaArab || "", 360, baseArabY, 380, 60);
+          // Cetak dan hitung berapa baris Arab yang terpakai
+          let arabLines = drawTextAndGetLines(ctx, student.namaArab || "", 360, baseArabY, 360, 60);
           
-          // Jika Arab 2 baris, siapkan dorongan 60px ke atas untuk elemen berikutnya
-          if (arabLines > 1) {
-              shiftUp += 60; 
+          // Logika pendorong: Jika teks Arab tumbuh ke atas dan hampir menyentuh NIM (jarak < 10px), dorong NIM ke atas!
+          let arabTop = baseArabY - (arabLines * 60);
+          if (arabTop < baseNimY + 10) {
+              shiftUp = (baseNimY + 10) - arabTop; 
           }
 
           // 2. CETAK NIM
@@ -832,9 +836,8 @@
           if ('letterSpacing' in ctx) ctx.letterSpacing = "0px";
           
           let currentLatinY = baseLatinY - shiftUp;
-          drawTextAndGetLines(ctx, student.nama.toUpperCase(), 360, currentLatinY, 610, 45); 
-
-          // === MULAI TAMBAHAN GENERATE QR CODE OTOMATIS ===
+          drawTextAndGetLines(ctx, student.nama.toUpperCase(), 360, currentLatinY, 610, 45);
+        
           // === MULAI TAMBAHAN GENERATE QR CODE OTOMATIS ===
           // URL DIPERBAIKI mengarah ke verifikasiktm.html (bukan index.html)
           const verifikasiUrl = `https://administrasiakademik.vercel.app/verifikasiktm.html?nim=${student.nim}`;
