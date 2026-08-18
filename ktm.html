@@ -625,42 +625,39 @@
       }, 50); 
       // ====================================================================
       
-      // --- LOGIKA MENDORONG TEKS PRATINJAU HANYA SAAT ARAB 2 BARIS ---
-      setTimeout(function() {
-          let arabEl = document.getElementById("live-nama-arab");
-          let nimEl = document.getElementById("live-nim");
-
-          let shiftUp = 0;
-          // Jika teks Arab lebih tinggi dari 1 baris (karena nama panjang)
-          if (arabEl.offsetHeight > 70) {
-              shiftUp = arabEl.offsetHeight - 60; // Hitung kelebihannya untuk mendorong
-          }
-
-          // Geser NIM ke atas secara bersamaan (Nama Latin dibiarkan statis di atas)
-          nimEl.style.bottom = (253 + shiftUp) + "px";
-      }, 50);
-      // -------------------------------------------------------------
-      // ... (kode penampil liveQr tetap sama) ...
-      document.getElementById('action-buttons').style.display = 'flex';
-
-      // --- LOGIKA MENDORONG TEKS PRATINJAU HANYA SAAT ARAB 2 BARIS ---
+      // --- LOGIKA CERDAS PENGATUR POSISI PREVIEW ---
       setTimeout(function() {
           let arabEl = document.getElementById("live-nama-arab");
           let nimEl = document.getElementById("live-nim");
           let namaEl = document.getElementById("live-nama");
 
-          let shiftUp = 0;
-          // Jika teks Arab lebih tinggi dari 1 baris (karena nama panjang)
-          if (arabEl.offsetHeight > 70) {
-              shiftUp = arabEl.offsetHeight - 60; // Hitung kelebihannya untuk mendorong
+          // Reset CSS Nama Latin untuk mengukur jumlah baris murni
+          namaEl.style.top = "auto";
+          namaEl.style.bottom = "358px"; 
+          
+          // 1. Logika Nama Latin (1 Baris Statis, 2 Baris Sejajar Foto)
+          if (namaEl.offsetHeight > 50) { 
+              // Jika terdeteksi menjadi 2 baris
+              namaEl.style.bottom = "auto";
+              namaEl.style.top = "180px"; // Kunci tepat sejajar bingkai atas foto
+          } else {
+              // Jika tetap 1 baris
+              namaEl.style.bottom = "358px"; // Posisikan kembali seperti Gambar 2
+              namaEl.style.top = "auto";
           }
 
-          // Geser NIM dan Latin ke atas secara bersamaan
+          // 2. Logika NIM & Nama Arab (Tetap Aman)
+          arabEl.style.bottom = "148px"; 
+          
+          let shiftUp = 0;
+          if (arabEl.offsetHeight > 70) { 
+              shiftUp = arabEl.offsetHeight - 60; 
+          }
+          // NIM menyesuaikan teks Arab (Nama Latin di atasnya dibiarkan aman)
           nimEl.style.bottom = (253 + shiftUp) + "px";
-          namaEl.style.bottom = (358 + shiftUp) + "px";
-      }, 50);
-      // -------------------------------------------------------------
 
+      }, 50);
+      // -----------------------------------------------------------
       resizeLiveEditor();
     }
     
@@ -807,28 +804,68 @@
           }
           ctx.restore();
 
-          // --- FUNGSI BANTUAN UNTUK TEKS TUMBUH KE BAWAH ---
-          function wrapTextCanvas(context, text, x, y, maxWidth, lineHeight) {
+          // --- FUNGSI BANTUAN NAMA LATIN (1 Baris = Statis, 2 Baris = Rata Atas) ---
+          function cetakNamaLatin(context, text, x, maxWidth, lineHeight) {
               if (!text) return;
               var words = text.split(' ');
-              var line = '';
+              var lines = [];
+              var currentLine = '';
               for(var n = 0; n < words.length; n++) {
-                  var testLine = line + words[n] + ' ';
+                  var testLine = currentLine + words[n] + ' ';
                   var metrics = context.measureText(testLine);
                   if (metrics.width > maxWidth && n > 0) {
-                      context.fillText(line.trim(), x, y);
-                      line = words[n] + ' ';
-                      y += lineHeight;
+                      lines.push(currentLine.trim());
+                      currentLine = words[n] + ' ';
                   } else {
-                      line = testLine;
+                      currentLine = testLine;
                   }
               }
-              context.fillText(line.trim(), x, y);
+              lines.push(currentLine.trim());
+
+              context.textBaseline = "top"; 
+              if (lines.length > 1) {
+                  // 2 Baris: Mulai di koordinat Y=180 (Sejajar presisi batas atas bingkai foto)
+                  var currentY = 180;
+                  for(var i=0; i<lines.length; i++) {
+                      context.fillText(lines[i], x, currentY);
+                      currentY += lineHeight;
+                  }
+              } else {
+                  // 1 Baris: Jatuh di koordinat Y=235 (Kalkulasi persis sejajar bottom: 358px)
+                  context.fillText(lines[0], x, 235);
+              }
+          }
+
+          // --- FUNGSI BANTUAN TEKS ARAB (Dari Bawah ke Atas) ---
+          function cetakArabBottomUp(context, text, x, bottomY, maxWidth, lineHeight) {
+              if (!text) return 0;
+              var words = text.split(' ');
+              var lines = [];
+              var currentLine = '';
+              for(var n = 0; n < words.length; n++) {
+                  var testLine = currentLine + words[n] + ' ';
+                  var metrics = context.measureText(testLine);
+                  if (metrics.width > maxWidth && n > 0) {
+                      lines.push(currentLine.trim());
+                      currentLine = words[n] + ' ';
+                  } else {
+                      currentLine = testLine;
+                  }
+              }
+              lines.push(currentLine.trim());
+              
+              var currentY = bottomY;
+              context.textBaseline = "bottom";
+              for(var i = lines.length - 1; i >= 0; i--) {
+                  context.fillText(lines[i], x, currentY);
+                  currentY -= lineHeight;
+              }
+              // Mengembalikan tinggi ekstra jika terjadi penambahan baris
+              return (lines.length > 1) ? (lines.length - 1) * lineHeight : 0;
           }
           // -----------------------------------------------------------
-          ctx.textBaseline = "bottom"; 
           
-          // 1. CETAK NAMA ARAB (Posisi tetap)
+          // 1. CETAK NAMA ARAB 
           ctx.fillStyle = "#1a1a1a";
           ctx.font = "bold 50px 'Amiri', serif";
           if ('letterSpacing' in ctx) ctx.letterSpacing = "0px";
@@ -836,22 +873,23 @@
           ctx.textAlign = "right";
           ctx.direction = "ltr";
           ctx.textAlign = "left";
-          wrapTextCanvasBottomUp(ctx, student.namaArab || "", 360, 490, 380, 60);
+          // Cetak sekalian ambil nilai shift-nya jika nama arab 2 baris
+          let shiftNimUp = cetakArabBottomUp(ctx, student.namaArab || "", 360, 490, 380, 60);
 
-          // 2. CETAK NIM (Posisi statis yang pas di tengah)
+          // 2. CETAK NIM
           ctx.fillStyle = "#333333";
           ctx.font = "500 40px 'Plus Jakarta Sans', Arial, sans-serif";
+          ctx.textBaseline = "bottom";
           if ('letterSpacing' in ctx) ctx.letterSpacing = "2px";
-          ctx.fillText(student.nim, 360, 385);
+          // Posisikan NIM secara otomatis naik hanya jika Nama Arab 2 baris
+          ctx.fillText(student.nim, 360, 385 - shiftNimUp);
 
-          // 3. CETAK NAMA LATIN (Posisi statis, jika 2 baris otomatis membungkus ke atas)
-          ctx.textBaseline = "bottom"; 
+          // 3. CETAK NAMA LATIN 
           ctx.fillStyle = "#1a1a1a";
           ctx.font = "700 36px 'Plus Jakarta Sans', Arial, sans-serif";
           if ('letterSpacing' in ctx) ctx.letterSpacing = "0px";
-          
-          // Menggunakan wrapTextCanvasBottomUp agar teks tumbuh ke atas
-          wrapTextCanvasBottomUp(ctx, student.nama.toUpperCase(), 360, 280, 610, 45); 
+          // Gunakan fungsi pintar: 1 baris diam layaknya Gambar 2, jika 2 baris kunci ke atas bingkai foto
+          cetakNamaLatin(ctx, student.nama.toUpperCase(), 360, 610, 45); 
 
           // === MULAI TAMBAHAN GENERATE QR CODE OTOMATIS ===
           // (Lanjutkan dengan kode QR Anda ke bawah tanpa ada perubahan)
