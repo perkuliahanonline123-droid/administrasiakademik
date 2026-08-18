@@ -28,13 +28,8 @@
         <!-- Logo dan Nama Kampus -->
         <div class="flex items-center gap-3 group cursor-pointer">
             <img src="https://i.ibb.co.com/fGv3qQ11/logo-staiis.webp" alt="Logo STAIIS" class="w-10 h-10 md:w-14 md:h-14 relative object-contain drop-shadow-[0_0_10px_rgba(255,255,255,0.4)] transform transition-all duration-300 group-hover:scale-110 group-hover:-rotate-3">
-            <h1 class="font-bold text-gray-800 leading-tight text-sm md:text-base">Akademik<br>STAI Imam Syafi`i</h1>
+            <h1 class="font-bold text-gray-800 leading-tight text-sm md:text-base">STAI Imam Syafi'i Cianjur</h1>
         </div>
-        
-        <!-- Ikon Hamburger Menu untuk tampilan HP -->
-        <button class="md:hidden text-green-700 focus:outline-none">
-            <i data-lucide="menu" class="w-7 h-7"></i>
-        </button>
 
         <!-- Menu Navigasi Desktop -->
         <nav class="hidden md:flex gap-6 text-sm text-gray-600 font-medium">
@@ -94,10 +89,6 @@
                             <p class="text-[12px] text-gray-500 font-medium mb-0.5">Tanggal Masuk</p>
                             <p id="val-tgl-masuk" class="font-semibold text-gray-800">-</p>
                         </div>
-                        <div>
-                            <p class="text-[12px] text-gray-500 font-medium mb-0.5">Angkatan</p>
-                            <p id="val-angkatan" class="font-semibold text-gray-800">-</p>
-                        </div>
                     </div>
 
                 </div>
@@ -139,7 +130,6 @@
                     const nama = student.nama || "-";
                     const jenisKelamin = student.jenisKelamin || "-";
                     const nim = student.nim || "-";
-                    const angkatan = student.angkatan || "-";
                     const tglMasuk = student.tanggalMasuk || "-";
                     
                     const prodiUtuh = student.jenjangProgramStudi || "-";
@@ -157,7 +147,6 @@
                     document.getElementById('val-nim').innerText = nim;
                     document.getElementById('val-prodi').innerHTML = prodiFormatted;
                     document.getElementById('val-tgl-masuk').innerText = tglMasuk;
-                    document.getElementById('val-angkatan').innerText = angkatan;
 
                     document.getElementById('status-message').classList.add('hidden');
                     document.getElementById('card-container').classList.remove('hidden');
