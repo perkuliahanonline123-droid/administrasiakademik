@@ -585,8 +585,8 @@
       liveQr.src = qrApiUrl;
       
       // Sesuaikan left, top, width, dan height agar sama dengan settingan Canvas
-      liveQr.style.left = "750px"; 
-      liveQr.style.top = "330px";  // <--- UBAH ANGKA INI (Sebelumnya 380px)
+      liveQr.style.left = "710px";  // <--- UBAH DARI 750px MENJADI 710px
+      liveQr.style.top = "330px";
       liveQr.style.width = "220px";
       liveQr.style.height = "220px";
       
@@ -804,9 +804,9 @@
           qrImg.onload = function() {
               
               // --- ANGKA BARU UNTUK KANVAS DOWNLOAD ---
-              const qrX = 750;    // Jarak kiri-kanan
-              const qrY = 330;    // POSISI NAIK agar jarak bawah sama dengan desain
-              const qrSize = 220; // Ukuran QR
+              const qrX = 710;    // <--- UBAH DARI 750 MENJADI 710 (Geser ke kiri)
+              const qrY = 330;    
+              const qrSize = 220; 
               // ----------------------------------------
               
               ctx.save();
