@@ -337,7 +337,8 @@
     #live-nama { 
       position: absolute; 
       left: 360px; 
-      top: 235px; /* Menjangkar posisi atas, agar saat 2 baris meluas ke bawah */
+      bottom: 358px; /* Pastikan kembali menggunakan bottom agar teks tumbuh ke atas */
+      top: auto !important; 
       width: 610px; 
       font-size: 36px; 
       font-weight: 700; 
@@ -600,23 +601,28 @@
       fileInput.disabled = false;
       document.getElementById('action-buttons').style.display = 'flex';
       
-      // === TAMBAHAN: MENDORONG NIM & NAMA LATIN KE ATAS SECARA OTOMATIS ===
+      // === LOGIKA PRATINJAU: NIM DIGESER JIKA ARAB 2 BARIS, NAMA LATIN DIAM DI TEMPAT ===
       setTimeout(() => {
           let arabEl = document.getElementById("live-nama-arab");
           let nimEl = document.getElementById("live-nim");
+          let namaEl = document.getElementById("live-nama");
 
-          // Ukur tinggi teks Arab (apakah 1 baris atau 2 baris)
-          let arabHeight = arabEl.offsetHeight;
-
-          // Arab tetap di bawah
+          // Arab tetap di posisinya
           arabEl.style.bottom = "148px";
+          
+          // Posisi Nama Latin dikunci statis di bottom 358px agar tidak nabrak logo
+          namaEl.style.bottom = "358px";
 
-          // NIM didorong ke atas sejauh tinggi teks Arab
-          let nimBottom = 148 + arabHeight + 5; 
-          nimEl.style.bottom = nimBottom + "px";
+          let shiftUp = 0;
+          if (arabEl.offsetHeight > 70) {
+              shiftUp = arabEl.offsetHeight - 60; 
+          }
+
+          // Hanya NIM yang bergeser menyesuaikan teks Arab
+          nimEl.style.bottom = (253 + shiftUp) + "px";
       }, 50); 
       // ====================================================================
-
+      
       // --- LOGIKA MENDORONG TEKS PRATINJAU HANYA SAAT ARAB 2 BARIS ---
       setTimeout(function() {
           let arabEl = document.getElementById("live-nama-arab");
@@ -836,13 +842,14 @@
           if ('letterSpacing' in ctx) ctx.letterSpacing = "2px";
           ctx.fillText(student.nim, 360, 385);
 
-          // 3. CETAK NAMA LATIN (Jika panjang, otomatis membungkus ke bawah)
-          ctx.textBaseline = "top"; // Ubah sementara ke top untuk nama
+          // 3. CETAK NAMA LATIN (Posisi statis, jika 2 baris otomatis membungkus ke atas)
+          ctx.textBaseline = "bottom"; 
           ctx.fillStyle = "#1a1a1a";
           ctx.font = "700 36px 'Plus Jakarta Sans', Arial, sans-serif";
           if ('letterSpacing' in ctx) ctx.letterSpacing = "0px";
-          wrapTextCanvas(ctx, student.nama.toUpperCase(), 360, 235, 610, 45); 
-          ctx.textBaseline = "bottom"; // Kembalikan default untuk elemen lain jika ada 
+          
+          // Menggunakan wrapTextCanvasBottomUp agar teks tumbuh ke atas
+          wrapTextCanvasBottomUp(ctx, student.nama.toUpperCase(), 360, 280, 610, 45); 
 
           // === MULAI TAMBAHAN GENERATE QR CODE OTOMATIS ===
           // (Lanjutkan dengan kode QR Anda ke bawah tanpa ada perubahan)
