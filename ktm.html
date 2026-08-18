@@ -337,13 +337,6 @@
     #live-nama { 
       position: absolute; 
       left: 360px; 
-    
-      /* --- PERUBAHAN UTAMA --- */
-      bottom: 313px !important; /* Didapat dari: 358px (bottom awal) dikurangi 45px (tinggi 1 baris) */
-      height: 90px;             /* Kunci tinggi maksimal untuk 2 baris (45px dikali 2) */
-      top: auto !important; 
-      /* ----------------------- */
-    
       width: 610px; 
       font-size: 36px; 
       font-weight: 700; 
@@ -353,6 +346,10 @@
       color: #1a1a1a; 
       white-space: normal; 
       line-height: 45px; 
+      
+      /* Biarkan properti tumpuan ini dikontrol sepenuhnya oleh JavaScript nanti */
+      bottom: 358px; 
+      top: auto;
     }
     
     #live-nim { 
