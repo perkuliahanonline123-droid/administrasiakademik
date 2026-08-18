@@ -337,20 +337,22 @@
     #live-nama { 
       position: absolute; 
       left: 360px; 
-      top: 220px; 
+      top: 180px; /* Posisinya dinaikkan */
+      width: 610px; /* Batas lebar sebelum teks turun ke bawah */
       font-size: 36px; 
       font-weight: 700; 
       font-family: 'Plus Jakarta Sans', Arial, sans-serif;
       text-transform: uppercase; 
       margin: 0; 
       color: #1a1a1a; 
-      white-space: nowrap; 
+      white-space: normal; /* Mengizinkan teks turun jadi 2 baris */
+      line-height: 1.2; 
     }
     
     #live-nim { 
       position: absolute; 
       left: 360px; 
-      top: 315px; 
+      top: 275px; /* Posisinya dinaikkan dan disesuaikan jaraknya */
       font-size: 40px; 
       font-weight: 500; 
       font-family: 'Plus Jakarta Sans', Arial, sans-serif;
@@ -363,15 +365,17 @@
     #live-nama-arab { 
       position: absolute; 
       left: 360px; 
-      top: 420px; /* Angka diperkecil dari 420px agar teks naik ke atas */
+      top: 365px; /* Posisinya dinaikkan */
+      width: 380px; /* Diberi batas lebar agar tidak menabrak QR Code */
       font-size: 50px; 
       font-weight: bold; 
       font-family: 'Amiri', serif;
       margin: 0; 
       color: #1a1a1a; 
-      white-space: nowrap; 
-      line-height: 1; /* Ditambahkan untuk membuang jarak kosong bawaan font */
+      white-space: normal; /* Mengizinkan teks Arab turun jika panjang */
+      line-height: 1.2; 
     }
+    
     /* Tampilan Twibbonize */
     .cropper-view-box { outline: none !important; border-radius: inherit; }
     .cropper-point, .cropper-line, .cropper-center { display: none !important; }
@@ -582,7 +586,7 @@
       
       // Sesuaikan left, top, width, dan height agar sama dengan settingan Canvas
       liveQr.style.left = "750px"; 
-      liveQr.style.top = "380px";
+      liveQr.style.top = "330px";  // <--- UBAH ANGKA INI (Sebelumnya 380px)
       liveQr.style.width = "220px";
       liveQr.style.height = "220px";
       
@@ -742,65 +746,80 @@
 
           // Cetak Teks Data Diri
           ctx.textBaseline = "top";
+
+          // --- FUNGSI BANTUAN AGAR TEKS TURUN OTOMATIS (WORD WRAP) ---
+          function wrapTextCanvas(context, text, x, y, maxWidth, lineHeight) {
+              var words = text.split(' ');
+              var line = '';
+              for(var n = 0; n < words.length; n++) {
+                  var testLine = line + words[n] + ' ';
+                  var metrics = context.measureText(testLine);
+                  var testWidth = metrics.width;
+                  if (testWidth > maxWidth && n > 0) {
+                      context.fillText(line, x, y);
+                      line = words[n] + ' ';
+                      y += lineHeight;
+                  } else {
+                      line = testLine;
+                  }
+              }
+              context.fillText(line, x, y);
+          }
+          // -----------------------------------------------------------
           
-          // 1. CETAK NAMA LATIN
+          // 1. CETAK NAMA LATIN (Posisi Naik ke 180 & Teks Turun Otomatis)
           ctx.fillStyle = "#1a1a1a";
           ctx.font = "700 36px 'Plus Jakarta Sans', Arial, sans-serif";
           if ('letterSpacing' in ctx) ctx.letterSpacing = "0px"; // Kunci jarak normal
-          ctx.fillText(student.nama.toUpperCase(), 360, 220 + 5); 
+          wrapTextCanvas(ctx, student.nama.toUpperCase(), 360, 180, 610, 45); 
 
-          // 2. CETAK NIM
+          // 2. CETAK NIM (Posisi Naik ke 275)
           ctx.fillStyle = "#333333";
           ctx.font = "500 40px 'Plus Jakarta Sans', Arial, sans-serif";
           if ('letterSpacing' in ctx) ctx.letterSpacing = "2px"; // Beri jarak 2px khusus NIM
-          ctx.fillText(student.nim, 360, 315 + 5);
+          ctx.fillText(student.nim, 360, 275);
 
-          // 3. CETAK NAMA ARAB (FONT AMIRI)
+          // 3. CETAK NAMA ARAB (FONT AMIRI) (Posisi Naik ke 365 & Teks Turun Otomatis)
           ctx.fillStyle = "#1a1a1a";
           ctx.font = "bold 50px 'Amiri', serif";
-          if ('letterSpacing' in ctx) ctx.letterSpacing = "0px"; // WAJIB DI-RESET ke 0 agar huruf Arab menyambung dengan sempurna
+          if ('letterSpacing' in ctx) ctx.letterSpacing = "0px"; // WAJIB DI-RESET
           
-          // Tambahkan pengaturan RTL (Right-to-Left) sebagai pengaman ekstra untuk format Arab di Kanvas HTML5
           ctx.direction = "rtl"; 
           ctx.textAlign = "right";
-          
-          // Karena textAlign "right", koordinat x disesuaikan (misal 360 + panjang area yang diperkirakan, kita set kira-kira di 920 agar rata kiri dengan teks lainnya)
-          // Menggunakan metode default left lebih aman jika sistem Canvas sudah RTL otomatis.
           ctx.direction = "ltr";
           ctx.textAlign = "left";
           
-          ctx.fillText(student.namaArab || "", 360, 420 + 5);
+          // Lebar maksimal 380px agar tidak menabrak QR Code
+          wrapTextCanvas(ctx, student.namaArab || "", 360, 365, 380, 60);
 
           // === MULAI TAMBAHAN GENERATE QR CODE OTOMATIS ===
-          // URL ini mengarah ke Vercel Anda, sisipkan NIM mahasiswa ke dalam link
-          const verifikasiUrl = `https://administrasiakademik.vercel.app/index.html?nim=${student.nim}`;
-          const qrApiUrl = `https://api.qrserver.com/v1/create-qr-code/?size=150x150&margin=0&data=${encodeURIComponent(verifikasiUrl)}`;
+          // URL DIPERBAIKI mengarah ke verifikasiktm.html (bukan index.html)
+          const verifikasiUrl = `https://administrasiakademik.vercel.app/verifikasiktm.html?nim=${student.nim}`;
+          
+          // Size URL QR disamakan dengan ukuran Canvas yaitu 220x220
+          const qrApiUrl = `https://api.qrserver.com/v1/create-qr-code/?size=220x220&margin=0&data=${encodeURIComponent(verifikasiUrl)}`;
 
           const qrImg = new Image();
           qrImg.crossOrigin = "anonymous";
           qrImg.onload = function() {
               
               // --- ANGKA BARU UNTUK KANVAS DOWNLOAD ---
-              const qrX = 750;    // Geser ke kanan (sebelumnya 790, diturunkan karena size lebih besar)
-              const qrY = 370;    // Geser ke bawah (tetap atau sesuaikan sedikit)
-              const qrSize = 220; // PERBESAR UKURAN QR (sebelumnya 170)
+              const qrX = 750;    // Jarak kiri-kanan
+              const qrY = 330;    // POSISI NAIK agar jarak bawah sama dengan desain
+              const qrSize = 220; // Ukuran QR
               // ----------------------------------------
               
               ctx.save();
-              ctx.globalCompositeOperation = "multiply";
+              ctx.globalCompositeOperation = "multiply"; // Menghilangkan background putih QR
               ctx.drawImage(qrImg, qrX, qrY, qrSize, qrSize);
               ctx.restore();
-              
-              // ... (kode toBlob Anda tetap sama) ...
-              // =============================================
 
-              // Eksekusi download 
+              // Eksekusi download (Pindahkan canvas.toBlob ke DALAM onload QR ini)
               canvas.toBlob(function(blob) {
                   let url = URL.createObjectURL(blob);
                   let link = document.createElement('a');
                   link.download = 'KTM_' + student.nim + '.png';
                   link.href = url;
-                  
                   document.body.appendChild(link);
                   link.click();
                   document.body.removeChild(link);
@@ -829,11 +848,9 @@
               btn.innerHTML = `<i class="fa-solid fa-download"></i> Download KTM`;
               btn.disabled = false;
           };
-          
           qrImg.src = qrApiUrl; // Mulai memuat QR
-          // === AKHIR TAMBAHAN GENERATE QR CODE ===
           
-      }; // <-- Tutup kurung kurawal dari bgImg.onload
+      }; // Tutup fungsi bgImg.onload
       
       bgImg.onerror = function() {
           alert("Gagal memuat template background KTM.");
