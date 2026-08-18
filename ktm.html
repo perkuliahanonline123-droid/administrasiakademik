@@ -759,10 +759,12 @@
           qrImg.crossOrigin = "anonymous";
           qrImg.onload = function() {
               // Simpan QR Code di kanvas
-              // Sesuaikan nilai koordinat X dan Y (misal: x=800, y=450) agar posisinya pas di desain KTM
-              const qrX = 820; 
-              const qrY = 430;
-              const qrSize = 140; 
+              // --- UBAH ANGKA INI UNTUK POSISI KANAN BAWAH ---
+              const qrX = 790;    // Jarak dari kiri (semakin besar semakin ke kanan)
+              const qrY = 380;    // Jarak dari atas (semakin besar semakin ke bawah)
+              const qrSize = 170; // Ukuran kotak QR Code (px)
+              // ----------------------------------------------
+              
               ctx.drawImage(qrImg, qrX, qrY, qrSize, qrSize);
 
               // Eksekusi download HANYA dilakukan di sini (setelah QR digambar)
