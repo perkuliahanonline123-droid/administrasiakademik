@@ -337,8 +337,12 @@
     #live-nama { 
       position: absolute; 
       left: 360px; 
-      bottom: 358px; /* Pastikan kembali menggunakan bottom agar teks tumbuh ke atas */
-      top: auto !important; 
+    
+      /* PERUBAHAN: Kunci posisi baris pertama persis seperti posisi awal 1 baris.
+         Kalkulasi: 100% tinggi kartu - (bottom 358px + line-height 45px) */
+      top: calc(100% - 403px); 
+      bottom: auto !important; 
+    
       width: 610px; 
       font-size: 36px; 
       font-weight: 700; 
