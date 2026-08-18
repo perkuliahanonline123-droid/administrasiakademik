@@ -593,11 +593,34 @@
       liveQr.style.display = "block"; 
       // ===============================================
 
+      // ... (kode di atasnya tetap) ...
       outerWrapper.style.display = "block";
       fileInput.disabled = false;
-      
       document.getElementById('action-buttons').style.display = 'flex';
       
+      // === TAMBAHAN: MENDORONG NIM & NAMA LATIN KE ATAS SECARA OTOMATIS ===
+      setTimeout(() => {
+          let arabEl = document.getElementById("live-nama-arab");
+          let nimEl = document.getElementById("live-nim");
+          let namaEl = document.getElementById("live-nama");
+
+          // Ukur tinggi teks Arab (apakah 1 baris atau 2 baris)
+          let arabHeight = arabEl.offsetHeight;
+          let nimHeight = nimEl.offsetHeight;
+
+          // Arab tetap di bawah
+          arabEl.style.bottom = "148px";
+
+          // NIM didorong ke atas sejauh tinggi teks Arab
+          let nimBottom = 148 + arabHeight + 5; 
+          nimEl.style.bottom = nimBottom + "px";
+
+          // Nama Latin didorong ke atas sejauh tinggi NIM
+          let namaBottom = nimBottom + nimHeight + 15; 
+          namaEl.style.bottom = namaBottom + "px";
+      }, 50); // Jeda kecil agar browser selesai mengukur teks
+      // ====================================================================
+
       resizeLiveEditor();
     }
     
