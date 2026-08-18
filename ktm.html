@@ -570,6 +570,15 @@
       document.getElementById("live-nim").innerText = student.nim;
       document.getElementById("live-nama-arab").innerText = student.namaArab || "";
       
+      // === TAMBAHAN UNTUK MUNCULKAN QR DI PRATINJAU ===
+      const verifikasiUrl = `https://administrasiakademik.vercel.app/index.html?nim=${student.nim}`;
+      const qrApiUrl = `https://api.qrserver.com/v1/create-qr-code/?size=170x170&margin=0&data=${encodeURIComponent(verifikasiUrl)}`;
+      
+      let liveQr = document.getElementById("live-qr");
+      liveQr.src = qrApiUrl;
+      liveQr.style.display = "block"; 
+      // ===============================================
+
       outerWrapper.style.display = "block";
       fileInput.disabled = false;
       
@@ -577,7 +586,7 @@
       
       resizeLiveEditor();
     }
-
+    
     document.getElementById('upload-image').addEventListener('change', function(e) {
       let file = e.target.files[0];
       if (!file) return;
