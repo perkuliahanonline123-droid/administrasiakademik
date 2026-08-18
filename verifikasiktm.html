@@ -3,22 +3,22 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <!-- Meta theme color untuk menyesuaikan warna header browser di HP -->
-    <meta name="theme-color" content="#9333ea">
-    <title>Biodata Mahasiswa - PDDikti</title>
+    <!-- Meta theme color menyesuaikan warna hijau logo STAIIS -->
+    <meta name="theme-color" content="#15803d">
+    <title>Biodata Mahasiswa - STAIIS</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://unpkg.com/lucide@latest"></script>
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
         body {
             font-family: 'Inter', sans-serif;
-            background-color: #f8fafc; /* Light gray background */
+            background-color: #f8fafc;
         }
-        .pddikti-gradient {
-            background: linear-gradient(90deg, #b026ff 0%, #7000df 100%);
+        .staiis-gradient {
+            background: linear-gradient(90deg, #16a34a 0%, #15803d 100%);
         }
-        .text-pddikti {
-            color: #7000df;
+        .text-staiis {
+            color: #15803d;
         }
     </style>
 </head>
@@ -27,16 +27,14 @@
     <!-- Navbar Top (Header) -->
     <header class="bg-white border-b border-gray-200 py-4 px-6 md:px-12 flex justify-between items-center hidden md:flex">
         <div class="flex items-center gap-3">
-            <!-- Icon placeholder for PDDikti Logo -->
-            <div class="w-8 h-8 rounded bg-purple-700 flex items-center justify-center">
-                <i data-lucide="line-chart" class="text-white w-5 h-5"></i>
+            <div class="w-8 h-8 rounded bg-green-700 flex items-center justify-center">
+                <i data-lucide="graduation-cap" class="text-white w-5 h-5"></i>
             </div>
-            <h1 class="font-bold text-gray-800 leading-tight">Pangkalan Data<br>Pendidikan Tinggi</h1>
+            <h1 class="font-bold text-gray-800 leading-tight">Akademik<br>STAI Imam Syafi`i</h1>
         </div>
         <nav class="flex gap-6 text-sm text-gray-600 font-medium">
-            <a href="#" class="hover:text-purple-700">Tentang PDDikti</a>
-            <a href="#" class="hover:text-purple-700">Kebijakan Privasi</a>
-            <a href="#" class="hover:text-purple-700">Kebijakan Keamanan Informasi</a>
+            <a href="#" class="hover:text-green-700">Tentang Kampus</a>
+            <a href="#" class="hover:text-green-700">Kebijakan Privasi</a>
         </nav>
     </header>
 
@@ -50,7 +48,7 @@
 
         <!-- Tampilan Loading -->
         <div id="status-message" class="bg-white p-10 rounded-2xl shadow-sm border border-gray-100 text-center">
-            <i data-lucide="loader-2" id="loading-icon" class="animate-spin text-purple-600 w-10 h-10 mx-auto mb-4"></i>
+            <i data-lucide="loader-2" id="loading-icon" class="animate-spin text-green-700 w-10 h-10 mx-auto mb-4"></i>
             <h2 id="status-text" class="text-lg font-semibold text-gray-800">Mencari Data Mahasiswa...</h2>
         </div>
 
@@ -58,7 +56,7 @@
         <div id="card-container" class="hidden space-y-6">
             
             <!-- Banner Biodata -->
-            <div class="pddikti-gradient rounded-xl p-5 md:p-6 shadow-md">
+            <div class="staiis-gradient rounded-xl p-5 md:p-6 shadow-md">
                 <h2 class="text-2xl md:text-3xl font-bold text-white">Biodata Mahasiswa</h2>
             </div>
 
@@ -69,7 +67,7 @@
                     <!-- Kiri / Atas (Mobile) -->
                     <div class="space-y-5">
                         <div>
-                            <p class="text-[12px] text-gray-500 font-medium mb-0.5">Nama</p>
+                            <p class="text-[12px] text-gray-500 font-medium mb-0.5">Nama Lengkap</p>
                             <p id="val-nama" class="font-bold text-gray-900 uppercase">MEMUAT...</p>
                         </div>
                         <div>
@@ -81,8 +79,8 @@
                             <p id="val-nim" class="font-bold text-gray-900">-</p>
                         </div>
                         <div>
-                            <p class="text-[12px] text-gray-500 font-medium mb-0.5">Status Awal Mahasiswa</p>
-                            <p class="font-semibold text-gray-800">Peserta didik baru</p>
+                            <p class="text-[12px] text-gray-500 font-medium mb-0.5">Angkatan</p>
+                            <p id="val-angkatan" class="font-semibold text-gray-800">-</p>
                         </div>
                     </div>
 
@@ -90,7 +88,7 @@
                     <div class="space-y-5">
                         <div>
                             <p class="text-[12px] text-gray-500 font-medium mb-0.5">Perguruan Tinggi</p>
-                            <p class="font-semibold text-pddikti">STAI Imam Syafi`i Cianjur</p>
+                            <p class="font-semibold text-staiis">STAI Imam Syafi`i Cianjur</p>
                         </div>
                         <div>
                             <p class="text-[12px] text-gray-500 font-medium mb-0.5">Tanggal Masuk</p>
@@ -100,20 +98,16 @@
                             <p class="text-[12px] text-gray-500 font-medium mb-0.5">Jenjang - Program Studi</p>
                             <p id="val-prodi" class="font-semibold text-gray-800">-</p>
                         </div>
-                        <div>
-                            <p class="text-[12px] text-gray-500 font-medium mb-0.5">Status Terakhir Mahasiswa</p>
-                            <p class="font-semibold text-gray-800">Aktif-2024/2025 Genap</p>
-                        </div>
                     </div>
 
                 </div>
             </div>
 
             <!-- Disclaimer Card -->
-            <div class="bg-[#e9d5ff] rounded-xl p-5 flex items-start gap-4">
-                <i data-lucide="info" class="text-gray-800 w-6 h-6 flex-shrink-0 mt-0.5"></i>
-                <p class="text-sm text-gray-800 leading-relaxed">
-                    Semua data yang ditampilkan pada laman ini bersumber dari pelaporan Perguruan Tinggi di Indonesia dan diperbarui secara berkala. Jika Anda menemukan ketidaksesuaian data, silakan periksa kondisi terkini melalui <a href="#" class="font-bold underline">menu pencarian spesifik</a>. Informasi terkait perubahan data dapat diakses <a href="#" class="font-bold underline">di sini</a>.
+            <div class="bg-green-50 border border-green-100 rounded-xl p-5 flex items-start gap-4">
+                <i data-lucide="info" class="text-green-800 w-6 h-6 flex-shrink-0 mt-0.5"></i>
+                <p class="text-sm text-green-900 leading-relaxed">
+                    Semua data yang ditampilkan pada laman ini bersumber dari basis data akademik <b>STAI Imam Syafi'i Cianjur</b>. Jika Anda menemukan ketidaksesuaian data, silakan periksa kondisi terkini melalui Bagian Administrasi Akademik.
                 </p>
             </div>
 
@@ -121,14 +115,12 @@
     </main>
 
     <script>
-        // Initialize Icons
         lucide.createIcons();
 
-        // Ambil NIM dari Parameter URL (Contoh: webanda.com/?nim=25110455)
         const urlParams = new URLSearchParams(window.location.search);
         const nimParam = urlParams.get('nim');
         
-        // GANTI URL INI DENGAN URL GOOGLE APPS SCRIPT WEB APP ANDA
+        // PASTIKAN URL INI ADALAH URL GOOGLE APPS SCRIPT ANDA
         const scriptUrl = 'https://script.google.com/macros/s/AKfycbw7pgDjQaj0hpuOXYCc1JJ5KWjd8er1_rfm9yK0_WOSv51Jvdqo54mGz0WSqGT5NCh3MA/exec';
 
         async function fetchData() {
@@ -138,40 +130,41 @@
             }
 
             try {
-                const response = await fetch(scriptUrl);
+                // Fetch data json dari Apps Script (t=new Date().getTime() agar tidak ter-cache di browser)
+                const response = await fetch(`${scriptUrl}?t=${new Date().getTime()}`);
                 const data = await response.json();
                 
-                // Pencarian data (case insensitive) berdasarkan parameter NIM
-                const student = data.find(s => 
-                    String(s.nim || s.NIM || s['NIM']).trim() === String(nimParam).trim()
-                );
+                // Cari mahasiswa berdasarkan NIM
+                const student = data.find(s => String(s.nim).trim() === String(nimParam).trim());
 
                 if (student) {
-                    // Mapping Data dari JSON Google Apps Script ke HTML
-                    // Disesuaikan dengan toleransi penamaan kunci (key) JSON dari header kolom
-                    const nama = student.namaLengkap || student['Nama Lengkap'] || student.nama || "-";
-                    const jenisKelamin = student.jenisKelamin || student['Jenis Kelamin'] || "-";
-                    const nim = student.nim || student.NIM || student['NIM'] || "-";
-                    const tglMasuk = student.tanggalMasuk || student['Tanggal Masuk'] || "-";
+                    // Mapping Data
+                    const nama = student.nama || "-";
+                    const jenisKelamin = student.jenisKelamin || "-";
+                    const nim = student.nim || "-";
+                    const angkatan = student.angkatan || "-";
+                    const tglMasuk = student.tanggalMasuk || "-";
                     
-                    // Format khusus untuk Jenjang - Program Studi agar nama prodi berwarna ungu
-                    const prodiUtuh = student.jenjangProgramStudi || student['Jenjang - Program Studi'] || student.programStudi || "-";
+                    const prodiUtuh = student.jenjangProgramStudi || "-";
                     let prodiFormatted = prodiUtuh;
+                    
+                    // Membuat teks Program Studi menjadi warna hijau (text-staiis)
                     if(prodiUtuh.includes("-")) {
                         const parts = prodiUtuh.split("-");
-                        prodiFormatted = `${parts[0].trim()} - <span class="text-pddikti font-bold">${parts.slice(1).join("-").trim()}</span>`;
+                        prodiFormatted = `${parts[0].trim()} - <span class="text-staiis font-bold">${parts.slice(1).join("-").trim()}</span>`;
                     } else {
-                        prodiFormatted = `<span class="text-pddikti font-bold">${prodiUtuh}</span>`;
+                        prodiFormatted = `<span class="text-staiis font-bold">${prodiUtuh}</span>`;
                     }
 
-                    // Terapkan ke DOM
+                    // Menuliskan data ke dalam HTML
                     document.getElementById('val-nama').innerText = nama;
                     document.getElementById('val-jk').innerText = jenisKelamin;
                     document.getElementById('val-nim').innerText = nim;
+                    document.getElementById('val-angkatan').innerText = angkatan;
                     document.getElementById('val-tgl-masuk').innerText = tglMasuk;
                     document.getElementById('val-prodi').innerHTML = prodiFormatted;
 
-                    // Hilangkan Loading, Munculkan Konten
+                    // Hilangkan Tampilan Loading, Munculkan Kartu Data
                     document.getElementById('status-message').classList.add('hidden');
                     document.getElementById('card-container').classList.remove('hidden');
                 } else {
@@ -179,20 +172,20 @@
                 }
             } catch (error) {
                 console.error(error);
-                showError("Terjadi kesalahan saat mengambil data dari server. Pastikan URL Apps Script benar.");
+                showError("Terjadi kesalahan saat mengambil data dari server.");
             }
         }
 
         function showError(msg) {
             document.getElementById('loading-icon').classList.replace('animate-spin', 'hidden');
             document.getElementById('loading-icon').setAttribute('data-lucide', 'x-circle');
-            lucide.createIcons(); // Re-render icon
+            document.getElementById('loading-icon').classList.replace('text-green-700', 'text-red-600');
+            lucide.createIcons();
             
             document.getElementById('status-text').innerText = msg;
             document.getElementById('status-text').classList.add('text-red-600');
         }
 
-        // Jalankan saat halaman dimuat
         window.addEventListener('DOMContentLoaded', fetchData);
     </script>
 </body>
