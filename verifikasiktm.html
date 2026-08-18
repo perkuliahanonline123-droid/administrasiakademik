@@ -3,198 +3,134 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Kartu Mahasiswa - STAIIS</title>
-    
-    <!-- Tailwind CSS via CDN -->
+    <title>Verifikasi KTM Mahasiswa - STAIIS</title>
     <script src="https://cdn.tailwindcss.com"></script>
-    
-    <!-- Icon dari Lucide -->
     <script src="https://unpkg.com/lucide@latest"></script>
-
     <style>
-        /* Konfigurasi warna khusus sesuai gambar */
         .bg-stai-green { background-color: #125b39; }
         .text-stai-green { color: #125b39; }
         .bg-stai-green-light { background-color: #eef5f1; }
-        .badge-green { background-color: #2bd47e; }
     </style>
 </head>
 <body class="bg-gray-100 min-h-screen flex items-center justify-center font-sans sm:p-4">
 
     <!-- Container Utama -->
-    <div class="w-full max-w-sm bg-white sm:rounded-3xl shadow-xl overflow-hidden border border-gray-200 min-h-screen sm:min-h-0 relative">
+    <div id="card-container" class="w-full max-w-sm bg-white sm:rounded-3xl shadow-xl overflow-hidden border border-gray-200 hidden">
         
-        <!-- Loading Overlay (Opsional) -->
-        <div id="loading" class="absolute inset-0 bg-white/80 z-10 flex flex-col items-center justify-center hidden">
-            <i data-lucide="loader-2" class="animate-spin text-stai-green w-8 h-8 mb-2"></i>
-            <p class="text-sm text-gray-600 font-medium">Memuat Data...</p>
-        </div>
-
         <!-- Header - Bagian Hijau -->
         <div class="bg-stai-green p-8 flex flex-col items-center sm:rounded-t-3xl">
-            <!-- Foto Profil -->
             <div class="w-28 h-28 bg-white rounded-xl p-1 mb-4 shadow-sm relative">
                 <img id="photoUrl" src="https://via.placeholder.com/150" alt="Foto Mahasiswa" class="w-full h-full object-cover rounded-lg bg-gray-200">
             </div>
             
-            <!-- Nama & NIM -->
             <h1 id="name" class="text-white text-xl font-bold text-center">Memuat...</h1>
-            <p id="nim" class="text-green-100 text-sm mt-1">-</p>
+            <p id="angkatan" class="text-green-100 text-sm mt-1">-</p>
             
-            <!-- Badge Status -->
             <div class="mt-4 bg-[#19754b] text-white px-4 py-1.5 rounded-full text-xs font-semibold flex items-center gap-2">
-                <span class="w-2 h-2 rounded-full badge-green"></span>
-                <span id="status">Aktif</span>
+                <span class="w-2 h-2 rounded-full bg-[#2bd47e]"></span>
+                <span>Aktif</span>
             </div>
         </div>
 
         <!-- Body - Informasi Akademik -->
         <div class="p-6">
-            <!-- Logo Universitas -->
             <div class="flex justify-center mb-6">
-                <!-- Ganti src dengan link URL logo asli STAIIS yang di-host online -->
-                <img src="https://via.placeholder.com/300x80?text=Logo+STAI+Imam+Syafii" alt="Logo STAIIS" class="h-14 object-contain">
+                <!-- Ganti dengan URL Logo Asli -->
+                <img src="https://via.placeholder.com/300x80?text=Logo+STAIIS" alt="Logo STAIIS" class="h-14 object-contain">
             </div>
 
-            <!-- List Informasi -->
             <div class="flex flex-col gap-3">
-                
-                <!-- Program Studi -->
                 <div class="bg-gray-50 p-4 rounded-2xl flex items-center gap-4">
-                    <div class="bg-stai-green-light p-2.5 rounded-full text-stai-green">
-                        <i data-lucide="book" class="w-5 h-5"></i>
-                    </div>
+                    <div class="bg-stai-green-light p-2.5 rounded-full text-stai-green"><i data-lucide="book" class="w-5 h-5"></i></div>
                     <div>
                         <p class="text-[11px] text-gray-500 font-medium">Program Studi</p>
                         <p id="programStudi" class="text-sm font-bold text-gray-800">-</p>
                     </div>
                 </div>
 
-                <!-- Masa Studi -->
                 <div class="bg-gray-50 p-4 rounded-2xl flex items-center gap-4">
-                    <div class="bg-stai-green-light p-2.5 rounded-full text-stai-green">
-                        <i data-lucide="calendar" class="w-5 h-5"></i>
-                    </div>
+                    <div class="bg-stai-green-light p-2.5 rounded-full text-stai-green"><i data-lucide="calendar" class="w-5 h-5"></i></div>
                     <div>
-                        <p class="text-[11px] text-gray-500 font-medium">Masa Studi</p>
-                        <p id="masaStudi" class="text-sm font-bold text-gray-800">-</p>
+                        <p class="text-[11px] text-gray-500 font-medium">Angkatan</p>
+                        <p id="tahunAngkatan" class="text-sm font-bold text-gray-800">-</p>
                     </div>
                 </div>
 
-                <!-- Keterangan -->
                 <div class="bg-gray-50 p-4 rounded-2xl flex items-center gap-4">
-                    <div class="bg-stai-green-light p-2.5 rounded-full text-stai-green">
-                        <i data-lucide="info" class="w-5 h-5"></i>
-                    </div>
+                    <div class="bg-stai-green-light p-2.5 rounded-full text-stai-green"><i data-lucide="info" class="w-5 h-5"></i></div>
                     <div>
                         <p class="text-[11px] text-gray-500 font-medium">Keterangan</p>
-                        <p id="keterangan" class="text-sm font-bold text-gray-800 leading-tight">-</p>
+                        <p class="text-sm font-bold text-gray-800 leading-tight">Mahasiswa aktif STAI Imam Syafi'i Cianjur.</p>
                     </div>
                 </div>
-
             </div>
         </div>
 
-        <!-- Footer - Validasi & Tanda Tangan -->
+        <!-- Footer -->
         <div class="px-6 pb-6 text-center">
-            <p class="text-[11px] text-gray-500 mb-1">
-                Validasi terakhir: <span id="validationDate" class="font-bold text-gray-700">-</span>
-            </p>
             <p class="text-[10px] text-blue-500/80 mb-4 font-medium">www.staiimamsyafii.ac.id</p>
-            
-            <div class="flex flex-col items-center justify-center">
-                <p class="text-xs text-gray-800">Ketua STAIIS,</p>
-                <!-- Tanda Tangan & Stempel -->
-                <img src="https://via.placeholder.com/150x60?text=Tanda+Tangan" alt="Tanda Tangan" class="h-16 object-contain my-1">
-                <p class="text-xs font-bold text-gray-800 underline underline-offset-2">
-                    Abd. Rachman Naim, Lc., M.M
-                </p>
-            </div>
         </div>
-
-        <!-- Copyright -->
-        <div class="bg-gray-50 py-3 text-center">
-            <p class="text-[10px] text-gray-400">© 2025 STAI Imam Syafi'i Cianjur.</p>
-        </div>
-        
     </div>
 
-    <!-- Script Logika Fetch & Cache -->
+    <!-- Tampilan Error/Loading -->
+    <div id="status-message" class="text-center p-8 bg-white rounded-xl shadow-md max-w-sm w-full mx-4">
+        <i data-lucide="loader-2" id="loading-icon" class="animate-spin text-stai-green w-10 h-10 mx-auto mb-4"></i>
+        <h2 id="status-text" class="text-lg font-bold text-gray-800">Mencari Data Mahasiswa...</h2>
+    </div>
+
     <script>
-        // Render ikon Lucide
         lucide.createIcons();
-
-        // Konfigurasi Cache (simpan data selama 1 jam di browser)
-        const CACHE_KEY = 'student_data_cache';
-        const CACHE_TIME_KEY = 'student_data_time';
-        const CACHE_DURATION = 60 * 60 * 1000; // 1 jam dalam milidetik
-
+        
+        // 1. Ambil NIM dari URL (Contoh: web.com/?nim=25110455)
+        const urlParams = new URLSearchParams(window.location.search);
+        const nimParam = urlParams.get('nim');
         const scriptUrl = 'https://script.google.com/macros/s/AKfycbw7pgDjQaj0hpuOXYCc1JJ5KWjd8er1_rfm9yK0_WOSv51Jvdqo54mGz0WSqGT5NCh3MA/exec';
 
-        // Fungsi untuk memperbarui tampilan HTML
-        function updateUI(data) {
-            // Sesuaikan "data.nama", "data.nim" dll dengan KEY (kolom) asli dari JSON Google Sheets Anda
-            document.getElementById('name').innerText = data.nama || "Mustafa Arbash";
-            document.getElementById('nim').innerText = data.nim || "23210256";
-            document.getElementById('status').innerText = data.status || "Aktif";
-            document.getElementById('programStudi').innerText = data.programStudi || "Hukum Keluarga Islam";
-            document.getElementById('masaStudi').innerText = data.masaStudi || "09/2023 - 08/2030";
-            document.getElementById('keterangan').innerText = data.keterangan || "Mahasiswa aktif STAI Imam Syafi'i Cianjur.";
-            document.getElementById('validationDate').innerText = data.tanggalValidasi || "12 November 2025";
-            
-            if(data.foto) {
-                document.getElementById('photoUrl').src = data.foto;
-            }
-        }
-
-        // Fungsi Utama untuk mengambil data
-        async function loadStudentData() {
-            const cachedData = localStorage.getItem(CACHE_KEY);
-            const cachedTime = localStorage.getItem(CACHE_TIME_KEY);
-            const now = Date.now();
-
-            // 1. Cek Cache (Jika ada cache & belum expired, langsung tampilkan agar instan)
-            if (cachedData && cachedTime && (now - parseInt(cachedTime) < CACHE_DURATION)) {
-                updateUI(JSON.parse(cachedData));
-                console.log("Data dimuat dari cache lokal.");
-                return; // Berhenti di sini, tidak perlu fetch ke server
+        async function initVerification() {
+            if (!nimParam) {
+                showError("Gagal: Barcode tidak valid atau NIM tidak ditemukan pada link.");
+                return;
             }
 
-            // 2. Fetch ke Google Apps Script jika tidak ada cache / sudah expired
-            document.getElementById('loading').classList.remove('hidden');
-            
             try {
+                // Fetch seluruh data mahasiswa
                 const response = await fetch(scriptUrl);
-                const result = await response.json();
+                const students = await response.json();
                 
-                // Asumsi data JSON adalah object tunggal atau array index ke-0
-                // Modifikasi sesuai respon asli GAS Anda
-                const studentData = Array.isArray(result) ? result[0] : result; 
+                // Cari mahasiswa berdasarkan NIM
+                // Asumsi key JSON dari Google Apps Script: "nim", "namaLengkap", "programStudi", dll.
+                // Jika key berbeda, sesuaikan dengan hasil output GAS Anda.
+                const student = students.find(s => String(s.nim) === String(nimParam));
 
-                // Simpan ke Cache Browser
-                localStorage.setItem(CACHE_KEY, JSON.stringify(studentData));
-                localStorage.setItem(CACHE_TIME_KEY, now.toString());
+                if (student) {
+                    // Tampilkan Data
+                    document.getElementById('name').innerText = student.nama || student.namaLengkap || "Nama Kosong";
+                    document.getElementById('angkatan').innerText = nimParam; // Tampilkan NIM di bawah nama
+                    document.getElementById('programStudi').innerText = student.programStudi || "-";
+                    document.getElementById('tahunAngkatan').innerText = student.angkatan || "-";
+                    
+                    if(student.foto) {
+                        document.getElementById('photoUrl').src = student.foto;
+                    }
 
-                // Perbarui tampilan
-                updateUI(studentData);
-            } catch (error) {
-                console.error("Gagal mengambil data:", error);
-                
-                // Jika gagal fetch (misal offline), tapi ada cache lama, tampilkan cache lama
-                if (cachedData) {
-                    updateUI(JSON.parse(cachedData));
-                    console.log("Offline: Menampilkan data cache lama.");
+                    // Sembunyikan loading, munculkan kartu
+                    document.getElementById('status-message').classList.add('hidden');
+                    document.getElementById('card-container').classList.remove('hidden');
                 } else {
-                    // Fallback Dummy Data jika benar-benar kosong
-                    updateUI({}); 
+                    showError(`Data mahasiswa dengan NIM ${nimParam} tidak ditemukan.`);
                 }
-            } finally {
-                document.getElementById('loading').classList.add('hidden');
+            } catch (error) {
+                showError("Gagal terhubung ke database server.");
             }
         }
 
-        // Jalankan saat halaman dimuat
-        window.addEventListener('DOMContentLoaded', loadStudentData);
+        function showError(msg) {
+            document.getElementById('loading-icon').classList.replace('animate-spin', 'hidden');
+            document.getElementById('status-text').innerText = msg;
+            document.getElementById('status-text').classList.add('text-red-500');
+        }
+
+        window.addEventListener('DOMContentLoaded', initVerification);
     </script>
 </body>
 </html>
