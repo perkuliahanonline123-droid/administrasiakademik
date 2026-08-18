@@ -573,10 +573,19 @@
       
       // === TAMBAHAN UNTUK MUNCULKAN QR DI PRATINJAU ===
       const verifikasiUrl = `https://administrasiakademik.vercel.app/verifikasiktm.html?nim=${student.nim}`;
-      const qrApiUrl = `https://api.qrserver.com/v1/create-qr-code/?size=170x170&margin=0&data=${encodeURIComponent(verifikasiUrl)}`;
+      
+      // Ubah size di URL menjadi 220x220
+      const qrApiUrl = `https://api.qrserver.com/v1/create-qr-code/?size=220x220&margin=0&data=${encodeURIComponent(verifikasiUrl)}`;
       
       let liveQr = document.getElementById("live-qr");
       liveQr.src = qrApiUrl;
+      
+      // Sesuaikan left, top, width, dan height agar sama dengan settingan Canvas
+      liveQr.style.left = "750px"; 
+      liveQr.style.top = "380px";
+      liveQr.style.width = "220px";
+      liveQr.style.height = "220px";
+      
       liveQr.style.display = "block"; 
       // ===============================================
 
@@ -770,16 +779,19 @@
           const qrImg = new Image();
           qrImg.crossOrigin = "anonymous";
           qrImg.onload = function() {
-              // Simpan QR Code di kanvas
-              const qrX = 790;    
-              const qrY = 380;    
-              const qrSize = 170; 
               
-              // === TAMBAHAN BLEND MODE AGAR PUTIH HILANG ===
+              // --- ANGKA BARU UNTUK KANVAS DOWNLOAD ---
+              const qrX = 750;    // Geser ke kanan (sebelumnya 790, diturunkan karena size lebih besar)
+              const qrY = 380;    // Geser ke bawah (tetap atau sesuaikan sedikit)
+              const qrSize = 220; // PERBESAR UKURAN QR (sebelumnya 170)
+              // ----------------------------------------
+              
               ctx.save();
               ctx.globalCompositeOperation = "multiply";
               ctx.drawImage(qrImg, qrX, qrY, qrSize, qrSize);
               ctx.restore();
+              
+              // ... (kode toBlob Anda tetap sama) ...
               // =============================================
 
               // Eksekusi download 
