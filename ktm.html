@@ -334,25 +334,26 @@
       overflow: hidden;
     }
 
-    #live-nama { 
-      position: absolute; 
-      left: 360px; 
-    
-      /* PERUBAHAN: Kunci posisi baris pertama persis seperti posisi awal 1 baris.
-         Kalkulasi: 100% tinggi kartu - (bottom 358px + line-height 45px) */
-      top: calc(100% - 403px); 
-      bottom: auto !important; 
-    
-      width: 610px; 
-      font-size: 36px; 
-      font-weight: 700; 
-      font-family: 'Plus Jakarta Sans', Arial, sans-serif;
-      text-transform: uppercase; 
-      margin: 0; 
-      color: #1a1a1a; 
-      white-space: normal; 
-      line-height: 45px; 
-    }
+      #live-nama { 
+        position: absolute; 
+        left: 360px; 
+      
+        /* --- PERUBAHAN UTAMA --- */
+        bottom: 313px !important; /* Didapat dari: 358px (bottom awal) dikurangi 45px (tinggi 1 baris) */
+        height: 90px;             /* Kunci tinggi maksimal untuk 2 baris (45px dikali 2) */
+        top: auto !important; 
+        /* ----------------------- */
+      
+        width: 610px; 
+        font-size: 36px; 
+        font-weight: 700; 
+        font-family: 'Plus Jakarta Sans', Arial, sans-serif;
+        text-transform: uppercase; 
+        margin: 0; 
+        color: #1a1a1a; 
+        white-space: normal; 
+        line-height: 45px; 
+      }
     
     #live-nim { 
       position: absolute; 
