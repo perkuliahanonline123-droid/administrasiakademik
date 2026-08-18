@@ -337,22 +337,22 @@
     #live-nama { 
       position: absolute; 
       left: 360px; 
-      top: 180px; /* Posisinya dinaikkan */
-      width: 610px; /* Batas lebar sebelum teks turun ke bawah */
+      bottom: 308px; /* Titik tumpu bawah, teks akan naik ke atas jika 2 baris */
+      width: 610px; 
       font-size: 36px; 
       font-weight: 700; 
       font-family: 'Plus Jakarta Sans', Arial, sans-serif;
       text-transform: uppercase; 
       margin: 0; 
       color: #1a1a1a; 
-      white-space: normal; /* Mengizinkan teks turun jadi 2 baris */
+      white-space: normal; 
       line-height: 1.2; 
     }
     
     #live-nim { 
       position: absolute; 
       left: 360px; 
-      top: 275px; /* Posisinya dinaikkan dan disesuaikan jaraknya */
+      bottom: 238px; 
       font-size: 40px; 
       font-weight: 500; 
       font-family: 'Plus Jakarta Sans', Arial, sans-serif;
@@ -365,14 +365,14 @@
     #live-nama-arab { 
       position: absolute; 
       left: 360px; 
-      top: 365px; /* Posisinya dinaikkan */
-      width: 380px; /* Diberi batas lebar agar tidak menabrak QR Code */
+      bottom: 148px; /* Posisinya dibuat rata (sejajar) dengan garis bawah foto */
+      width: 380px; 
       font-size: 50px; 
       font-weight: bold; 
       font-family: 'Amiri', serif;
       margin: 0; 
       color: #1a1a1a; 
-      white-space: normal; /* Mengizinkan teks Arab turun jika panjang */
+      white-space: normal; 
       line-height: 1.2; 
     }
     
@@ -747,31 +747,58 @@
           // Cetak Teks Data Diri
           ctx.textBaseline = "top";
 
-          // --- FUNGSI BANTUAN AGAR TEKS TURUN OTOMATIS (WORD WRAP) ---
-          function wrapTextCanvas(context, text, x, y, maxWidth, lineHeight) {
+          // --- FUNGSI BANTUAN UNTUK TEKS TUMBUH KE ATAS (BOTTOM-UP WORD WRAP) ---
+          function wrapTextCanvasBottomUp(context, text, x, bottomY, maxWidth, lineHeight) {
               var words = text.split(' ');
+              var lines = [];
               var line = '';
               for(var n = 0; n < words.length; n++) {
                   var testLine = line + words[n] + ' ';
                   var metrics = context.measureText(testLine);
-                  var testWidth = metrics.width;
-                  if (testWidth > maxWidth && n > 0) {
-                      context.fillText(line, x, y);
+                  if (metrics.width > maxWidth && n > 0) {
+                      lines.push(line);
                       line = words[n] + ' ';
-                      y += lineHeight;
                   } else {
                       line = testLine;
                   }
               }
-              context.fillText(line, x, y);
+              lines.push(line);
+              
+              // Cetak teks dari bawah ke atas
+              for (var i = 0; i < lines.length; i++) {
+                  // Baris terakhir akan persis menyentuh bottomY, baris di atasnya akan naik
+                  var currentY = bottomY - (lines.length - 1 - i) * lineHeight;
+                  context.fillText(lines[i].trim(), x, currentY);
+              }
           }
-          // -----------------------------------------------------------
+          // ----------------------------------------------------------------------
+
+          // Cetak Teks Data Diri (KUNCI: textBaseline = bottom)
+          ctx.textBaseline = "bottom"; 
           
-          // 1. CETAK NAMA LATIN (Posisi Naik ke 180 & Teks Turun Otomatis)
+          // 1. CETAK NAMA ARAB (Paling Bawah, Y = 490 sejajar dengan bawah bingkai foto)
+          ctx.fillStyle = "#1a1a1a";
+          ctx.font = "bold 50px 'Amiri', serif";
+          if ('letterSpacing' in ctx) ctx.letterSpacing = "0px";
+          ctx.direction = "rtl"; 
+          ctx.textAlign = "right";
+          ctx.direction = "ltr";
+          ctx.textAlign = "left";
+          wrapTextCanvasBottomUp(ctx, student.namaArab || "", 360, 490, 380, 60);
+
+          // 2. CETAK NIM (Di atas Nama Arab)
+          ctx.fillStyle = "#333333";
+          ctx.font = "500 40px 'Plus Jakarta Sans', Arial, sans-serif";
+          if ('letterSpacing' in ctx) ctx.letterSpacing = "2px";
+          ctx.fillText(student.nim, 360, 400);
+
+          // 3. CETAK NAMA LATIN (Paling atas, akan otomatis dorong ke atas jika 2 baris)
           ctx.fillStyle = "#1a1a1a";
           ctx.font = "700 36px 'Plus Jakarta Sans', Arial, sans-serif";
-          if ('letterSpacing' in ctx) ctx.letterSpacing = "0px"; // Kunci jarak normal
-          wrapTextCanvas(ctx, student.nama.toUpperCase(), 360, 180, 610, 45); 
+          if ('letterSpacing' in ctx) ctx.letterSpacing = "0px";
+          wrapTextCanvasBottomUp(ctx, student.nama.toUpperCase(), 360, 330, 610, 45); 
+
+          // (Lanjutkan dengan kode === MULAI TAMBAHAN GENERATE QR CODE OTOMATIS ===) 
 
           // 2. CETAK NIM (Posisi Naik ke 275)
           ctx.fillStyle = "#333333";
