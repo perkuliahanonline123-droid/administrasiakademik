@@ -320,46 +320,60 @@
       transform-origin: top left; 
     }
 
-    /* Wadah baru untuk menampung teks */
-    #live-text-container {
+    #live-foto-container {
       position: absolute;
-      left: 360px;
-      bottom: 148px; /* Mentok sejajar dengan batas bawah foto */
-      width: 610px;
-      display: flex;
-      flex-direction: column;
-      justify-content: flex-end; /* Memaksa isi menumpuk dari bawah ke atas */
-      gap: 12px; /* Jarak antar elemen (Latin, NIM, Arab) */
+      left: 85px; 
+      top: 180px; 
+      width: 234px; 
+      height: 312px; 
+      border-radius: 15px; 
+      background-color: rgba(255, 255, 255, 0.8); 
+      border: 2px dashed #045844;
+      box-sizing: border-box;
+      z-index: 10;
+      overflow: hidden;
     }
-    
+
     #live-nama { 
+      position: absolute; 
+      left: 360px; 
+      bottom: 358px; /* Teks Latin di atas */
+      width: 610px; 
       font-size: 36px; 
       font-weight: 700; 
       font-family: 'Plus Jakarta Sans', Arial, sans-serif;
       text-transform: uppercase; 
       margin: 0; 
       color: #1a1a1a; 
+      white-space: normal; 
       line-height: 1.2; 
     }
     
     #live-nim { 
+      position: absolute; 
+      left: 360px; 
+      bottom: 258px; /* NIM tepat di antara Latin dan Arab */
       font-size: 40px; 
       font-weight: 500; 
       font-family: 'Plus Jakarta Sans', Arial, sans-serif;
       margin: 0; 
       color: #333; 
+      white-space: nowrap; 
       letter-spacing: 2px;
-      line-height: 1;
     }
     
     #live-nama-arab { 
+      position: absolute; 
+      left: 360px; 
+      bottom: 148px; /* Nama Arab menempel di batas bawah foto */
+      width: 380px; 
       font-size: 50px; 
       font-weight: bold; 
       font-family: 'Amiri', serif;
       margin: 0; 
       color: #1a1a1a; 
+      white-space: normal; 
       line-height: 1.2; 
-      width: 380px; /* Lebar dibatasi agar tidak menabrak QR */
     }
     
     /* Tampilan Twibbonize */
@@ -423,11 +437,9 @@
             <!-- MURNI object-position: bottom TANPA RUMUS ZOOM EKSTREM AGAR PAS DI DOWNLOAD -->
             <img id="live-foto" src="fotobanat.png?v=2" style="width: 100%; height: 100%; object-fit: cover; object-position: bottom; display: block;">
           </div>
-          <div id="live-text-container">
-            <p id="live-nama"></p>
-            <p id="live-nim"></p>
-            <p id="live-nama-arab"></p>
-          </div>
+          <p id="live-nama"></p>
+          <p id="live-nim"></p>
+          <p id="live-nama-arab"></p>
           
           <!-- Tambahan Elemen Live QR Code -->
           <img id="live-qr" src="" alt="QR Code" style="display: none; position: absolute; left: 790px; top: 380px; width: 170px; height: 170px; z-index: 10; mix-blend-mode: multiply;">
@@ -732,9 +744,9 @@
           }
           ctx.restore();
 
-          // --- FUNGSI BANTUAN UNTUK TEKS TUMBUH KE ATAS DINAMIS ---
-          function wrapTextCanvasBottomUp(context, text, x, bottomY, maxWidth, lineHeight, gapAbove) {
-              if (!text) return bottomY;
+          // --- FUNGSI BANTUAN UNTUK TEKS TUMBUH KE ATAS ---
+          function wrapTextCanvasBottomUp(context, text, x, bottomY, maxWidth, lineHeight) {
+              if (!text) return;
               var words = text.split(' ');
               var lines = [];
               var line = '';
@@ -751,18 +763,17 @@
               lines.push(line);
               
               for (var i = 0; i < lines.length; i++) {
+                  // Jika 2 baris, baris teratas akan dicetak lebih tinggi, baris terakhir mentok di bawah (bottomY)
                   var currentY = bottomY - (lines.length - 1 - i) * lineHeight;
                   context.fillText(lines[i].trim(), x, currentY);
               }
-              
-              // Memberikan Kordinat Y baru untuk elemen selanjutnya di atas
-              return bottomY - ((lines.length - 1) * lineHeight) - gapAbove;
           }
           // -----------------------------------------------------------
 
+          // Cetak Teks Data Diri (KUNCI: textBaseline = bottom)
           ctx.textBaseline = "bottom"; 
           
-          // 1. CETAK NAMA ARAB (Paling Bawah, Patokan Awal)
+          // 1. CETAK NAMA ARAB (Paling Bawah)
           ctx.fillStyle = "#1a1a1a";
           ctx.font = "bold 50px 'Amiri', serif";
           if ('letterSpacing' in ctx) ctx.letterSpacing = "0px";
@@ -770,25 +781,24 @@
           ctx.textAlign = "right";
           ctx.direction = "ltr";
           ctx.textAlign = "left";
-          
-          // Gambar Arab di Y=490, dan kembalikan Y baru (dikurangi gap 70px) untuk NIM
-          let nextY = wrapTextCanvasBottomUp(ctx, student.namaArab || "", 360, 490, 380, 60, 70);
+          // Kordinat Y = 490 (sejajar batas foto bawah)
+          wrapTextCanvasBottomUp(ctx, student.namaArab || "", 360, 490, 380, 60);
 
-          // 2. CETAK NIM (Otomatis menyesuaikan posisi Arab)
+          // 2. CETAK NIM (Tengah)
           ctx.fillStyle = "#333333";
           ctx.font = "500 40px 'Plus Jakarta Sans', Arial, sans-serif";
           if ('letterSpacing' in ctx) ctx.letterSpacing = "2px";
-          ctx.fillText(student.nim, 360, nextY);
-          
-          // Kurangi Y lagi untuk menyiapkan ruang Nama Latin (dikurangi gap 50px)
-          nextY = nextY - 50;
+          // Kordinat Y = 380 (Pas di antara Latin dan Arab)
+          ctx.fillText(student.nim, 360, 380);
 
-          // 3. CETAK NAMA LATIN (Paling Atas, Otomatis menyesuaikan posisi NIM)
+          // 3. CETAK NAMA LATIN (Atas)
           ctx.fillStyle = "#1a1a1a";
           ctx.font = "700 36px 'Plus Jakarta Sans', Arial, sans-serif";
           if ('letterSpacing' in ctx) ctx.letterSpacing = "0px";
-          wrapTextCanvasBottomUp(ctx, student.nama.toUpperCase(), 360, nextY, 610, 45, 0);
-          
+          // Kordinat Y = 280 (Akan tumbuh ke atas menjauhi NIM jika panjang)
+          wrapTextCanvasBottomUp(ctx, student.nama.toUpperCase(), 360, 280, 610, 45); 
+
+          // === MULAI TAMBAHAN GENERATE QR CODE OTOMATIS ===
           // === MULAI TAMBAHAN GENERATE QR CODE OTOMATIS ===
           // URL DIPERBAIKI mengarah ke verifikasiktm.html (bukan index.html)
           const verifikasiUrl = `https://administrasiakademik.vercel.app/verifikasiktm.html?nim=${student.nim}`;
