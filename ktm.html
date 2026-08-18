@@ -337,7 +337,7 @@
     #live-nama { 
       position: absolute; 
       left: 360px; 
-      bottom: 308px; /* Titik tumpu bawah, teks akan naik ke atas jika 2 baris */
+      bottom: 368px; /* Jarak diperlebar ke atas */
       width: 610px; 
       font-size: 36px; 
       font-weight: 700; 
@@ -352,7 +352,7 @@
     #live-nim { 
       position: absolute; 
       left: 360px; 
-      bottom: 238px; 
+      bottom: 268px; /* Jarak diperlebar ke atas */
       font-size: 40px; 
       font-weight: 500; 
       font-family: 'Plus Jakarta Sans', Arial, sans-serif;
@@ -365,7 +365,7 @@
     #live-nama-arab { 
       position: absolute; 
       left: 360px; 
-      bottom: 148px; /* Posisinya dibuat rata (sejajar) dengan garis bawah foto */
+      bottom: 158px; /* Sedikit diangkat agar seimbang dengan bingkai bawah */
       width: 380px; 
       font-size: 50px; 
       font-weight: bold; 
@@ -744,39 +744,10 @@
           }
           ctx.restore();
 
-          // Cetak Teks Data Diri
-          ctx.textBaseline = "top";
-
-          // --- FUNGSI BANTUAN UNTUK TEKS TUMBUH KE ATAS (BOTTOM-UP WORD WRAP) ---
-          function wrapTextCanvasBottomUp(context, text, x, bottomY, maxWidth, lineHeight) {
-              var words = text.split(' ');
-              var lines = [];
-              var line = '';
-              for(var n = 0; n < words.length; n++) {
-                  var testLine = line + words[n] + ' ';
-                  var metrics = context.measureText(testLine);
-                  if (metrics.width > maxWidth && n > 0) {
-                      lines.push(line);
-                      line = words[n] + ' ';
-                  } else {
-                      line = testLine;
-                  }
-              }
-              lines.push(line);
-              
-              // Cetak teks dari bawah ke atas
-              for (var i = 0; i < lines.length; i++) {
-                  // Baris terakhir akan persis menyentuh bottomY, baris di atasnya akan naik
-                  var currentY = bottomY - (lines.length - 1 - i) * lineHeight;
-                  context.fillText(lines[i].trim(), x, currentY);
-              }
-          }
-          // ----------------------------------------------------------------------
-
           // Cetak Teks Data Diri (KUNCI: textBaseline = bottom)
           ctx.textBaseline = "bottom"; 
           
-          // 1. CETAK NAMA ARAB (Paling Bawah, Y = 490 sejajar dengan bawah bingkai foto)
+          // 1. CETAK NAMA ARAB
           ctx.fillStyle = "#1a1a1a";
           ctx.font = "bold 50px 'Amiri', serif";
           if ('letterSpacing' in ctx) ctx.letterSpacing = "0px";
@@ -784,19 +755,22 @@
           ctx.textAlign = "right";
           ctx.direction = "ltr";
           ctx.textAlign = "left";
-          wrapTextCanvasBottomUp(ctx, student.namaArab || "", 360, 490, 380, 60);
+          // UBAH Y MENJADI 480
+          wrapTextCanvasBottomUp(ctx, student.namaArab || "", 360, 480, 380, 60);
 
-          // 2. CETAK NIM (Di atas Nama Arab)
+          // 2. CETAK NIM
           ctx.fillStyle = "#333333";
           ctx.font = "500 40px 'Plus Jakarta Sans', Arial, sans-serif";
           if ('letterSpacing' in ctx) ctx.letterSpacing = "2px";
-          ctx.fillText(student.nim, 360, 400);
+          // UBAH Y MENJADI 370
+          ctx.fillText(student.nim, 360, 370);
 
-          // 3. CETAK NAMA LATIN (Paling atas, akan otomatis dorong ke atas jika 2 baris)
+          // 3. CETAK NAMA LATIN
           ctx.fillStyle = "#1a1a1a";
           ctx.font = "700 36px 'Plus Jakarta Sans', Arial, sans-serif";
           if ('letterSpacing' in ctx) ctx.letterSpacing = "0px";
-          wrapTextCanvasBottomUp(ctx, student.nama.toUpperCase(), 360, 330, 610, 45); 
+          // UBAH Y MENJADI 270
+          wrapTextCanvasBottomUp(ctx, student.nama.toUpperCase(), 360, 270, 610, 45); 
 
           // (Lanjutkan dengan kode === MULAI TAMBAHAN GENERATE QR CODE OTOMATIS ===) 
 
