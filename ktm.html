@@ -337,9 +337,9 @@
     #live-nama { 
       position: absolute; 
       left: 360px; 
-      bottom: 388px; /* Teks Latin aman di atas */
+      bottom: 358px; /* Posisi lega di atas */
       top: auto !important; 
-      width: 610px; /* Lebar penuh aman karena di atas QR */
+      width: 610px; 
       font-size: 36px; 
       font-weight: 700; 
       font-family: 'Plus Jakarta Sans', Arial, sans-serif;
@@ -353,7 +353,7 @@
     #live-nim { 
       position: absolute; 
       left: 360px; 
-      bottom: 288px; /* NIM tepat di tengah, di atas QR */
+      bottom: 253px; /* Pas di tengah-tengah Latin dan Arab */
       top: auto !important; 
       font-size: 40px; 
       font-weight: 500; 
@@ -367,9 +367,9 @@
     #live-nama-arab { 
       position: absolute; 
       left: 360px; 
-      bottom: 148px; /* Sejajar dengan bingkai bawah foto */
+      bottom: 148px; /* Mentok di batas bawah foto */
       top: auto !important; 
-      width: 360px; /* Dibatasi agar tidak menabrak QR di kanannya */
+      width: 380px; 
       font-size: 50px; 
       font-weight: bold; 
       font-family: 'Amiri', serif;
@@ -623,6 +623,26 @@
           namaEl.style.bottom = namaBottom + "px";
       }, 50); // Jeda kecil agar browser selesai mengukur teks
       // ====================================================================
+      // ... (kode penampil liveQr tetap sama) ...
+      document.getElementById('action-buttons').style.display = 'flex';
+
+      // --- LOGIKA MENDORONG TEKS PRATINJAU HANYA SAAT ARAB 2 BARIS ---
+      setTimeout(function() {
+          let arabEl = document.getElementById("live-nama-arab");
+          let nimEl = document.getElementById("live-nim");
+          let namaEl = document.getElementById("live-nama");
+
+          let shiftUp = 0;
+          // Jika teks Arab lebih tinggi dari 1 baris (karena nama panjang)
+          if (arabEl.offsetHeight > 70) {
+              shiftUp = arabEl.offsetHeight - 60; // Hitung kelebihannya untuk mendorong
+          }
+
+          // Geser NIM dan Latin ke atas secara bersamaan
+          nimEl.style.bottom = (253 + shiftUp) + "px";
+          namaEl.style.bottom = (358 + shiftUp) + "px";
+      }, 50);
+      // -------------------------------------------------------------
 
       resizeLiveEditor();
     }
@@ -792,19 +812,19 @@
                   var currentY = bottomY - (lines.length - 1 - i) * lineHeight;
                   context.fillText(lines[i].trim(), x, currentY);
               }
-              return lines.length;
+              return lines.length; // Kembalikan jumlah baris
           }
           // -----------------------------------------------------------
 
           ctx.textBaseline = "bottom"; 
           
-          // KOORDINAT DEFAULT YANG LEGA & PROPORSIONAL
+          // KOORDINAT DEFAULT YANG LEGA (Jarak antar elemen persis 105px)
           let baseArabY = 490; 
-          let baseNimY = 350;
-          let baseLatinY = 250;
+          let baseNimY = 385; 
+          let baseLatinY = 280; 
           let shiftUp = 0; 
 
-          // 1. CETAK NAMA ARAB (Paling Bawah)
+          // 1. CETAK NAMA ARAB
           ctx.fillStyle = "#1a1a1a";
           ctx.font = "bold 50px 'Amiri', serif";
           if ('letterSpacing' in ctx) ctx.letterSpacing = "0px";
@@ -813,30 +833,29 @@
           ctx.direction = "ltr";
           ctx.textAlign = "left";
           
-          // Cetak dan hitung berapa baris Arab yang terpakai
-          let arabLines = drawTextAndGetLines(ctx, student.namaArab || "", 360, baseArabY, 360, 60);
+          // Cetak dan cek apakah Arab menjadi 2 baris
+          let arabLines = drawTextAndGetLines(ctx, student.namaArab || "", 360, baseArabY, 380, 60);
           
-          // Logika pendorong: Jika teks Arab tumbuh ke atas dan hampir menyentuh NIM (jarak < 10px), dorong NIM ke atas!
-          let arabTop = baseArabY - (arabLines * 60);
-          if (arabTop < baseNimY + 10) {
-              shiftUp = (baseNimY + 10) - arabTop; 
+          // HANYA JIKA ARAB 2 BARIS, siapkan dorongan ke atas untuk NIM & Latin
+          if (arabLines > 1) {
+              shiftUp = (arabLines - 1) * 60; 
           }
 
-          // 2. CETAK NIM
+          // 2. CETAK NIM (Akan terdorong ke atas jika shiftUp ada nilainya)
           ctx.fillStyle = "#333333";
           ctx.font = "500 40px 'Plus Jakarta Sans', Arial, sans-serif";
           if ('letterSpacing' in ctx) ctx.letterSpacing = "2px";
           
-          let currentNimY = baseNimY - shiftUp;
-          ctx.fillText(student.nim, 360, currentNimY);
+          ctx.fillText(student.nim, 360, baseNimY - shiftUp);
 
-          // 3. CETAK NAMA LATIN
+          // 3. CETAK NAMA LATIN (Juga terdorong ke atas menjaga jarak tetap sama dengan NIM)
           ctx.fillStyle = "#1a1a1a";
           ctx.font = "700 36px 'Plus Jakarta Sans', Arial, sans-serif";
           if ('letterSpacing' in ctx) ctx.letterSpacing = "0px";
           
-          let currentLatinY = baseLatinY - shiftUp;
-          drawTextAndGetLines(ctx, student.nama.toUpperCase(), 360, currentLatinY, 610, 45);
+          drawTextAndGetLines(ctx, student.nama.toUpperCase(), 360, baseLatinY - shiftUp, 610, 45);
+
+          // (Lanjutkan ke kode === MULAI TAMBAHAN GENERATE QR CODE OTOMATIS === milik Anda)
         
           // === MULAI TAMBAHAN GENERATE QR CODE OTOMATIS ===
           // URL DIPERBAIKI mengarah ke verifikasiktm.html (bukan index.html)
