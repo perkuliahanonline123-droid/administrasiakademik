@@ -494,7 +494,13 @@
     updateJam();
 
     fetch(API_URL + "?t=" + new Date().getTime())
-      .then(response => response.json())
+      .then(response => {
+        // Cek apakah status HTTP-nya sukses (200-299)
+        if (!response.ok) {
+          throw new Error(`HTTP error! Status: ${response.status}`);
+        }
+        return response.json();
+      })
       .then(data => {
         studentsData = data;
         let searchInput = document.getElementById("student-search");
@@ -503,8 +509,8 @@
         searchInput.placeholder = "Ketik NIM atau Nama Anda...";
       })
       .catch(error => {
-        alert("Gagal memuat data dari server.");
-        console.error(error);
+        alert("Gagal memuat data dari server. Silakan cek URL atau koneksi.");
+        console.error("Detail error:", error);
       });
 
     const searchInput = document.getElementById('student-search');
