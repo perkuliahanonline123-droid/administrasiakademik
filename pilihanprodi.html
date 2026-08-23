@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Formulir Pemilihan Prodi - STAIIS</title>
     <script src="https://cdn.tailwindcss.com"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
         * { box-sizing: border-box; font-family: 'Plus Jakarta Sans', Arial, sans-serif; -webkit-font-smoothing: antialiased; }
@@ -31,7 +31,7 @@
 
     <div id="overlay-loading">
         <div class="loader mb-4"></div>
-        <p id="loading-text" class="text-gray-800 font-bold text-lg">Mohon tunggu sebentar...</p>
+        <p id="loading-text" class="text-gray-800 font-bold text-lg">Mengecek Sistem Pendaftaran...</p>
     </div>
 
     <!-- Header -->
@@ -39,16 +39,14 @@
         <div class="max-w-4xl w-full flex items-center gap-4">
             <img src="https://i.ibb.co.com/fGv3qQ11/logo-staiis.webp" alt="Logo STAIIS" class="w-10 h-10 object-contain drop-shadow-sm">
             <div>
-                <h1 class="font-extrabold text-[#045844] text-lg leading-tight tracking-tight">FORMULIR PEMILIHAN PRODI</h1>
+                <h1 class="font-extrabold text-[#045844] text-lg leading-tight tracking-tight">FORMULIR PMB</h1>
                 <p class="text-[10px] font-bold text-emerald-600 uppercase tracking-[0.2em]">STAI Imam Syafi'i Cianjur</p>
             </div>
         </div>
     </header>
 
     <main id="mainContent" class="max-w-4xl mx-auto px-4 mt-8 hidden">
-        
         <div id="alertBox" class="hidden p-4 rounded-xl text-sm font-bold transition-all mb-6 flex items-center gap-3"></div>
-
         <form id="pmbForm" class="space-y-6">
             <!-- KARTU 1: Pilihan Prodi & Berkas -->
             <div class="card border-t-4 border-t-[#0ba97b]">
@@ -76,10 +74,7 @@
             <div class="card">
                 <h2 class="section-title"><i class="fa-solid fa-id-card"></i> Data Diri Mahasiswa</h2>
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
-                    <div class="form-group">
-                        <label>Nama Lengkap (Sesuai Ijazah) <span class="text-red-500">*</span></label>
-                        <input type="text" id="namaLengkap" class="custom-input" required>
-                    </div>
+                    <div class="form-group"><label>Nama Lengkap (Sesuai Ijazah) <span class="text-red-500">*</span></label><input type="text" id="namaLengkap" class="custom-input" required></div>
                     <div class="form-group">
                         <label>Jenis Kelamin <span class="text-red-500">*</span></label>
                         <select id="jenisKelamin" class="custom-input" required>
@@ -88,45 +83,20 @@
                             <option value="Perempuan">Perempuan</option>
                         </select>
                     </div>
-                    <div class="form-group">
-                        <label>Tempat Lahir <span class="text-red-500">*</span></label>
-                        <input type="text" id="tempatLahir" class="custom-input" required>
-                    </div>
-                    <div class="form-group">
-                        <label>Tanggal Lahir <span class="text-red-500">*</span></label>
-                        <input type="date" id="tglLahir" class="custom-input" required>
-                    </div>
-                    <div class="form-group">
-                        <label>NIK (Nomor Induk Kependudukan) <span class="text-red-500">*</span></label>
-                        <input type="number" id="nik" class="custom-input" required>
-                    </div>
-                    <div class="form-group">
-                        <label>NISN <span class="text-red-500">*</span></label>
-                        <input type="number" id="nisn" class="custom-input" required>
-                    </div>
-                    <div class="form-group">
-                        <label>Kewarganegaraan <span class="text-red-500">*</span></label>
-                        <input type="text" id="kewarganegaraan" class="custom-input" placeholder="WNI / WNA (Tulis nama negara)" required>
-                    </div>
-                    <div class="form-group">
-                        <label>Nomor WhatsApp / Telepon <span class="text-red-500">*</span></label>
-                        <input type="number" id="noTelepon" class="custom-input" placeholder="08..." required>
-                    </div>
-                    <div class="form-group md:col-span-2">
-                        <label>Alamat Email Aktif <span class="text-red-500">*</span></label>
-                        <input type="email" id="email" class="custom-input" required>
-                    </div>
-                    <div class="form-group md:col-span-2">
-                        <label>Alamat Lengkap (Sesuai KTP) <span class="text-red-500">*</span></label>
-                        <textarea id="alamatLengkap" rows="3" class="custom-input" required></textarea>
-                    </div>
+                    <div class="form-group"><label>Tempat Lahir <span class="text-red-500">*</span></label><input type="text" id="tempatLahir" class="custom-input" required></div>
+                    <div class="form-group"><label>Tanggal Lahir <span class="text-red-500">*</span></label><input type="date" id="tglLahir" class="custom-input" required></div>
+                    <div class="form-group"><label>NIK <span class="text-red-500">*</span></label><input type="number" id="nik" class="custom-input" required></div>
+                    <div class="form-group"><label>NISN <span class="text-red-500">*</span></label><input type="number" id="nisn" class="custom-input" required></div>
+                    <div class="form-group"><label>Kewarganegaraan <span class="text-red-500">*</span></label><input type="text" id="kewarganegaraan" class="custom-input" placeholder="WNI / WNA (Tulis nama negara)" required></div>
+                    <div class="form-group"><label>Nomor WhatsApp / Telepon <span class="text-red-500">*</span></label><input type="number" id="noTelepon" class="custom-input" placeholder="08..." required></div>
+                    <div class="form-group md:col-span-2"><label>Alamat Email Aktif <span class="text-red-500">*</span></label><input type="email" id="email" class="custom-input" required></div>
+                    <div class="form-group md:col-span-2"><label>Alamat Lengkap (Sesuai KTP) <span class="text-red-500">*</span></label><textarea id="alamatLengkap" rows="3" class="custom-input" required></textarea></div>
                 </div>
             </div>
 
             <!-- KARTU 3: Data Orang Tua -->
             <div class="card">
                 <h2 class="section-title"><i class="fa-solid fa-users"></i> Data Orang Tua (Ayah & Ibu)</h2>
-                
                 <div class="bg-slate-50 p-5 rounded-xl border border-slate-200 mb-6">
                     <h3 class="font-bold text-slate-700 mb-4 border-b border-slate-200 pb-2">DATA AYAH</h3>
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -138,20 +108,12 @@
                             <label>Pendidikan Ayah <span class="text-red-500">*</span></label>
                             <select id="pendidikanAyah" class="custom-input" required>
                                 <option value="" disabled selected>-- Pilih Pendidikan --</option>
-                                <option value="Tidak/Belum Sekolah">Tidak/Belum Sekolah</option>
-                                <option value="SD/Sederajat">SD/Sederajat</option>
-                                <option value="SMP/Sederajat">SMP/Sederajat</option>
-                                <option value="SMA/Sederajat">SMA/Sederajat</option>
-                                <option value="D1/D2/D3">D1/D2/D3</option>
-                                <option value="S1">S1</option>
-                                <option value="S2">S2</option>
-                                <option value="S3">S3</option>
+                                <option value="Tidak/Belum Sekolah">Tidak/Belum Sekolah</option><option value="SD/Sederajat">SD/Sederajat</option>
+                                <option value="SMP/Sederajat">SMP/Sederajat</option><option value="SMA/Sederajat">SMA/Sederajat</option>
+                                <option value="D1/D2/D3">D1/D2/D3</option><option value="S1">S1</option><option value="S2">S2</option><option value="S3">S3</option>
                             </select>
                         </div>
-                        <div class="form-group">
-                            <label>Penghasilan Ayah <span class="text-red-500">*</span></label>
-                            <select id="penghasilanAyah" class="custom-input" required></select> 
-                        </div>
+                        <div class="form-group"><label>Penghasilan Ayah <span class="text-red-500">*</span></label><select id="penghasilanAyah" class="custom-input" required></select></div>
                     </div>
                 </div>
 
@@ -166,41 +128,33 @@
                             <label>Pendidikan Ibu <span class="text-red-500">*</span></label>
                             <select id="pendidikanIbu" class="custom-input" required>
                                 <option value="" disabled selected>-- Pilih Pendidikan --</option>
-                                <option value="Tidak/Belum Sekolah">Tidak/Belum Sekolah</option>
-                                <option value="SD/Sederajat">SD/Sederajat</option>
-                                <option value="SMP/Sederajat">SMP/Sederajat</option>
-                                <option value="SMA/Sederajat">SMA/Sederajat</option>
-                                <option value="D1/D2/D3">D1/D2/D3</option>
-                                <option value="S1">S1</option>
-                                <option value="S2">S2</option>
-                                <option value="S3">S3</option>
+                                <option value="Tidak/Belum Sekolah">Tidak/Belum Sekolah</option><option value="SD/Sederajat">SD/Sederajat</option>
+                                <option value="SMP/Sederajat">SMP/Sederajat</option><option value="SMA/Sederajat">SMA/Sederajat</option>
+                                <option value="D1/D2/D3">D1/D2/D3</option><option value="S1">S1</option><option value="S2">S2</option><option value="S3">S3</option>
                             </select>
                         </div>
-                        <div class="form-group">
-                            <label>Penghasilan Ibu <span class="text-red-500">*</span></label>
-                            <select id="penghasilanIbu" class="custom-input" required></select>
-                        </div>
+                        <div class="form-group"><label>Penghasilan Ibu <span class="text-red-500">*</span></label><select id="penghasilanIbu" class="custom-input" required></select></div>
                     </div>
                 </div>
             </div>
 
             <button type="submit" id="btnSubmit" class="btn-main">
-                <i class="fa-solid fa-paper-plane"></i> Kirim Formulir
+                <i class="fa-solid fa-paper-plane"></i> Kirim Pendaftaran
             </button>
         </form>
     </main>
 
-    <!-- UI PESAN FORM TUTUP -->
+    <!-- UI PESAN FORM TUTUP & HITUNG MUNDUR -->
     <div id="closedMessage" class="hidden flex-col items-center justify-center min-h-[70vh] px-4 text-center mt-8">
-        <div class="bg-white p-8 md:p-12 rounded-3xl shadow-xl max-w-lg border border-slate-100">
+        <div class="bg-white p-8 md:p-12 rounded-3xl shadow-xl max-w-lg border border-slate-100 w-full">
             <div class="w-20 h-20 bg-red-100 text-red-500 rounded-full flex items-center justify-center text-4xl mx-auto mb-6">
                 <i class="fa-solid fa-lock"></i>
             </div>
             <h2 class="text-2xl font-black text-slate-800 mb-3 tracking-tight">Status Formulir</h2>
-            <p id="closedMessageText" class="text-slate-600 font-medium leading-relaxed"></p>
-            <a href="https://layanan-akademik.vercel.app" class="inline-block mt-8 text-emerald-600 font-bold hover:text-emerald-700 transition-colors">
-                <i class="fa-solid fa-arrow-left mr-2"></i> Kembali ke Portal
-            </a>
+            <p id="closedMessageText" class="text-slate-600 font-medium leading-relaxed mb-2"></p>
+            
+            <!-- Area Countdown -->
+            <div id="countdownContainer"></div>
         </div>
     </div>
 
@@ -217,6 +171,62 @@
             "13. Rp15.000.001 - Rp20.000.000", "14. Rp20.000.001 - Rp25.000.000", "15. > Rp25.000.000"
         ];
 
+        // FUNGSI HITUNG MUNDUR
+        function startCountdown(targetTime) {
+            const container = document.getElementById('countdownContainer');
+            
+            // Render elemen kotak-kotak UI ke dalam HTML
+            container.innerHTML = `
+                <div class="flex items-center justify-center gap-2 md:gap-4 mt-6">
+                    <div class="flex flex-col items-center">
+                        <div class="w-14 h-14 md:w-16 md:h-16 bg-red-50 text-red-600 flex items-center justify-center rounded-xl md:rounded-2xl text-2xl font-black shadow-sm border border-red-100" id="cdDays">00</div>
+                        <span class="text-[10px] font-bold text-slate-400 mt-2 uppercase tracking-widest">Hari</span>
+                    </div>
+                    <div class="text-2xl font-black text-slate-300 -mt-6 md:-mt-8">:</div>
+                    <div class="flex flex-col items-center">
+                        <div class="w-14 h-14 md:w-16 md:h-16 bg-red-50 text-red-600 flex items-center justify-center rounded-xl md:rounded-2xl text-2xl font-black shadow-sm border border-red-100" id="cdHours">00</div>
+                        <span class="text-[10px] font-bold text-slate-400 mt-2 uppercase tracking-widest">Jam</span>
+                    </div>
+                    <div class="text-2xl font-black text-slate-300 -mt-6 md:-mt-8">:</div>
+                    <div class="flex flex-col items-center">
+                        <div class="w-14 h-14 md:w-16 md:h-16 bg-red-50 text-red-600 flex items-center justify-center rounded-xl md:rounded-2xl text-2xl font-black shadow-sm border border-red-100" id="cdMins">00</div>
+                        <span class="text-[10px] font-bold text-slate-400 mt-2 uppercase tracking-widest">Menit</span>
+                    </div>
+                    <div class="text-2xl font-black text-slate-300 -mt-6 md:-mt-8">:</div>
+                    <div class="flex flex-col items-center">
+                        <div class="w-14 h-14 md:w-16 md:h-16 bg-red-50 text-red-600 flex items-center justify-center rounded-xl md:rounded-2xl text-2xl font-black shadow-sm border border-red-100" id="cdSecs">00</div>
+                        <span class="text-[10px] font-bold text-slate-400 mt-2 uppercase tracking-widest">Detik</span>
+                    </div>
+                </div>
+            `;
+            
+            const timer = setInterval(() => {
+                const now = new Date().getTime();
+                const distance = targetTime - now;
+                
+                // Jika waktu sudah habis, ubah otomatis jadi tombol refresh/daftar
+                if (distance < 0) {
+                    clearInterval(timer);
+                    container.innerHTML = `
+                        <button onclick="location.reload()" class="mt-8 bg-[#045844] hover:bg-[#034233] text-white px-8 py-3.5 rounded-xl font-bold transition-all shadow-md w-full md:w-auto">
+                            <i class="fa-solid fa-rotate-right mr-2"></i> Pendaftaran Telah Dibuka!
+                        </button>
+                    `;
+                    return;
+                }
+                
+                const d = Math.floor(distance / (1000 * 60 * 60 * 24));
+                const h = Math.floor((distance % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+                const m = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60));
+                const s = Math.floor((distance % (1000 * 60)) / 1000);
+                
+                document.getElementById('cdDays').innerText = d.toString().padStart(2, '0');
+                document.getElementById('cdHours').innerText = h.toString().padStart(2, '0');
+                document.getElementById('cdMins').innerText = m.toString().padStart(2, '0');
+                document.getElementById('cdSecs').innerText = s.toString().padStart(2, '0');
+            }, 1000);
+        }
+
         document.addEventListener('DOMContentLoaded', async () => {
             const selectAyah = document.getElementById('penghasilanAyah');
             const selectIbu = document.getElementById('penghasilanIbu');
@@ -225,32 +235,41 @@
                 const el1 = new Option(opt, idx===0 ? "" : opt);
                 if (idx===0) el1.disabled = true;
                 selectAyah.add(el1);
-                
                 const el2 = new Option(opt, idx===0 ? "" : opt);
                 if (idx===0) el2.disabled = true;
                 selectIbu.add(el2);
             });
 
             try {
-                // CEK STATUS BUKA/TUTUP FORM & KUOTA PBA SEKALIGUS
                 const response = await fetch(`${API_URL}?action=checkQuota`);
                 const result = await response.json();
                 
                 document.getElementById('overlay-loading').style.display = 'none';
 
                 if (result.status === 'success') {
-                    // JIKA FORM DITUTUP
+                    // CEK JIKA FORM DITUTUP
                     if (result.isOpen === false) {
                         document.getElementById('closedMessageText').innerHTML = result.statusMessage;
                         document.getElementById('closedMessage').style.display = 'flex';
                         document.getElementById('mainContent').style.display = 'none';
-                        return; // Hentikan proses selanjutnya
+                        
+                        // JIKA STATUS SEBELUM TANGGAL BUKA -> Jalankan Countdown
+                        if (result.statusType === 'before' && result.targetTime) {
+                            startCountdown(result.targetTime);
+                        } else {
+                            // JIKA STATUS SUDAH LEWAT TANGGAL TUTUP
+                            document.getElementById('countdownContainer').innerHTML = `
+                                <a href="https://layanan-akademik.vercel.app" class="inline-block mt-8 text-emerald-600 font-bold hover:text-emerald-700 transition-colors">
+                                    <i class="fa-solid fa-arrow-left mr-2"></i> Kembali ke Portal Utama
+                                </a>
+                            `;
+                        }
+                        return; 
                     }
 
-                    // JIKA FORM DIBUKA -> Tampilkan form utama
+                    // JIKA FORM DIBUKA
                     document.getElementById('mainContent').style.display = 'block';
 
-                    // Pengaturan Sisa Kuota PBA
                     const terisi = result.count;
                     const sisa = 20 - terisi;
                     const optPBA = document.getElementById('optPBA');
@@ -279,18 +298,14 @@
 
         document.getElementById('pmbForm').addEventListener('submit', async function(e) {
             e.preventDefault();
-
             const file = document.getElementById('fileIjazah').files[0];
             if(file.size > 5242880) return showAlert('Ukuran Ijazah maksimal 5MB!', 'error');
-
             const btnSubmit = document.getElementById('btnSubmit');
             btnSubmit.disabled = true; 
             btnSubmit.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Mengirim Data...';
             document.getElementById('alertBox').classList.add('hidden');
-
             try {
                 const base64Data = await getBase64(file);
-                
                 const payloadJSON = {
                     namaLengkap: document.getElementById('namaLengkap').value.trim(),
                     jenisKelamin: document.getElementById('jenisKelamin').value,
@@ -303,36 +318,30 @@
                     email: document.getElementById('email').value.trim(),
                     noTelepon: document.getElementById('noTelepon').value,
                     prodiPilihan: document.getElementById('prodiPilihan').value,
-                    
                     namaAyah: document.getElementById('namaAyah').value.trim(),
                     nikAyah: document.getElementById('nikAyah').value,
                     tglLahirAyah: document.getElementById('tglLahirAyah').value,
                     pendidikanAyah: document.getElementById('pendidikanAyah').value,
                     pekerjaanAyah: document.getElementById('pekerjaanAyah').value.trim(),
                     penghasilanAyah: document.getElementById('penghasilanAyah').value,
-                    
                     namaIbu: document.getElementById('namaIbu').value.trim(),
                     nikIbu: document.getElementById('nikIbu').value,
                     tglLahirIbu: document.getElementById('tglLahirIbu').value,
                     pendidikanIbu: document.getElementById('pendidikanIbu').value,
                     pekerjaanIbu: document.getElementById('pekerjaanIbu').value.trim(),
                     penghasilanIbu: document.getElementById('penghasilanIbu').value,
-
                     fileName: file.name,
                     mimeType: file.type || "application/octet-stream",
                     fileData: base64Data
                 };
-
                 const response = await fetch(API_URL, {
                     method: 'POST', 
                     headers: { 'Content-Type': 'text/plain;charset=utf-8' },
                     body: JSON.stringify(payloadJSON)
                 });
-                
                 const result = await response.json();
-
                 if (result.status === 'success') {
-                    showAlert('Formulir Berhasil Dikirim! Terima Kasih.', 'success');
+                    showAlert('Pendaftaran Berhasil Dikirim! Terima Kasih.', 'success');
                     setTimeout(() => location.reload(), 3000); 
                 } else {
                     showAlert('Gagal: ' + result.message, 'error');
@@ -341,7 +350,7 @@
                 showAlert('Gagal terhubung ke Database. Periksa koneksi internet Anda.', 'error');
             } finally {
                 btnSubmit.disabled = false; 
-                btnSubmit.innerHTML = '<i class="fa-solid fa-paper-plane"></i> Kirim Formulir';
+                btnSubmit.innerHTML = '<i class="fa-solid fa-paper-plane"></i> Kirim Pendaftaran';
             }
         });
 
