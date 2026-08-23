@@ -48,37 +48,16 @@
     <main id="mainContent" class="max-w-4xl mx-auto px-4 mt-8 hidden">
         <div id="alertBox" class="hidden p-4 rounded-xl text-sm font-bold transition-all mb-6 flex items-center gap-3"></div>
         <form id="pmbForm" class="space-y-6">
-            <!-- KARTU 1: Pilihan Prodi & Berkas -->
+            
+            <!-- KARTU 1: Data Diri (Pindah Ke Atas Untuk Filter Prodi) -->
             <div class="card border-t-4 border-t-[#0ba97b]">
-                <h2 class="section-title text-[#0ba97b] border-b-[#bceadd]"><i class="fa-solid fa-graduation-cap"></i> Pemilihan Program Studi & Berkas</h2>
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                    <div class="form-group md:col-span-2 bg-[#f0fdf4] p-4 rounded-xl border border-[#bceadd]">
-                        <label>Program Studi Pilihan <span class="text-red-500">*</span></label>
-                        <select id="prodiPilihan" class="custom-input bg-white" required>
-                            <option value="" disabled selected>-- Pilih Program Studi --</option>
-                            <option value="Ahwal Al-Syakhshiyyah">Ahwal Al-Syakhshiyyah (Hukum Keluarga Islam)</option>
-                            <option value="Pendidikan Bahasa Arab" id="optPBA">Pendidikan Bahasa Arab (Kuota Tersisa: Sedang memuat...)</option>
-                        </select>
-                    </div>
-                    <div class="form-group md:col-span-2">
-                        <label>Upload Ijazah SMA/Sederajat (PDF/JPG/PNG) <span class="text-red-500">*</span></label>
-                        <div class="border-2 border-dashed border-slate-300 rounded-xl p-4 text-center bg-slate-50 hover:bg-slate-100 transition">
-                            <input type="file" id="fileIjazah" accept=".pdf,.jpg,.jpeg,.png" required class="w-full text-sm font-semibold text-slate-600 outline-none cursor-pointer">
-                            <p class="text-[11px] text-slate-400 mt-2">Maksimal ukuran file 5 MB.</p>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            <!-- KARTU 2: Data Diri -->
-            <div class="card">
-                <h2 class="section-title"><i class="fa-solid fa-id-card"></i> Data Diri Mahasiswa</h2>
+                <h2 class="section-title text-[#0ba97b] border-b-[#bceadd]"><i class="fa-solid fa-id-card"></i> Data Diri Mahasiswa</h2>
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
                     <div class="form-group"><label>Nama Lengkap (Sesuai Ijazah) <span class="text-red-500">*</span></label><input type="text" id="namaLengkap" class="custom-input" required></div>
                     <div class="form-group">
                         <label>Jenis Kelamin <span class="text-red-500">*</span></label>
-                        <select id="jenisKelamin" class="custom-input" required>
-                            <option value="" disabled selected>-- Pilih --</option>
+                        <select id="jenisKelamin" class="custom-input bg-[#f0fdf4]" required>
+                            <option value="" disabled selected>-- Pilih Gender Dahulu --</option>
                             <option value="Laki-laki">Laki-laki</option>
                             <option value="Perempuan">Perempuan</option>
                         </select>
@@ -91,6 +70,29 @@
                     <div class="form-group"><label>Nomor WhatsApp / Telepon <span class="text-red-500">*</span></label><input type="number" id="noTelepon" class="custom-input" placeholder="08..." required></div>
                     <div class="form-group md:col-span-2"><label>Alamat Email Aktif <span class="text-red-500">*</span></label><input type="email" id="email" class="custom-input" required></div>
                     <div class="form-group md:col-span-2"><label>Alamat Lengkap (Sesuai KTP) <span class="text-red-500">*</span></label><textarea id="alamatLengkap" rows="3" class="custom-input" required></textarea></div>
+                </div>
+            </div>
+
+            <!-- KARTU 2: Pilihan Prodi & Berkas -->
+            <div class="card">
+                <h2 class="section-title"><i class="fa-solid fa-graduation-cap"></i> Pemilihan Program Studi & Berkas</h2>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div class="form-group md:col-span-2 bg-[#f8fafc] p-4 rounded-xl border border-slate-200">
+                        <label>Program Studi Pilihan <span class="text-red-500">*</span></label>
+                        <select id="prodiPilihan" class="custom-input bg-white" required>
+                            <option value="" disabled selected>-- Pilih Gender pada kolom Data Diri terlebih dahulu --</option>
+                            <option value="Ahwal Al-Syakhshiyyah" id="optAhwal" disabled>Ahwal Al-Syakhshiyyah (Hukum Keluarga Islam)</option>
+                            <option value="Pendidikan Bahasa Arab" id="optPBA" disabled>Pendidikan Bahasa Arab (Silakan Pilih Gender)</option>
+                        </select>
+                        <p class="text-[11px] font-semibold text-slate-500 mt-2"><i class="fa-solid fa-circle-info mr-1 text-emerald-600"></i> Pilihan prodi akan otomatis menyesuaikan jenis kelamin Anda.</p>
+                    </div>
+                    <div class="form-group md:col-span-2">
+                        <label>Upload Ijazah SMA/Sederajat (PDF/JPG/PNG) <span class="text-red-500">*</span></label>
+                        <div class="border-2 border-dashed border-slate-300 rounded-xl p-4 text-center bg-slate-50 hover:bg-slate-100 transition">
+                            <input type="file" id="fileIjazah" accept=".pdf,.jpg,.jpeg,.png" required class="w-full text-sm font-semibold text-slate-600 outline-none cursor-pointer">
+                            <p class="text-[11px] text-slate-400 mt-2">Maksimal ukuran file 5 MB.</p>
+                        </div>
+                    </div>
                 </div>
             </div>
 
@@ -151,16 +153,17 @@
                 <i class="fa-solid fa-lock"></i>
             </div>
             <h2 class="text-2xl font-black text-slate-800 mb-3 tracking-tight">Status Formulir</h2>
-            <p id="closedMessageText" class="text-slate-600 font-medium leading-relaxed mb-2"></p>
+            <p id="closedMessageText" class="text-slate-600 font-medium leading-relaxed mb-4"></p>
             
-            <!-- Area Countdown -->
             <div id="countdownContainer"></div>
         </div>
     </div>
 
     <script>
         // ⚠️ PASTE URL WEB APP BARU BAPAK DI SINI ⚠️
-        const API_URL = 'https://script.google.com/macros/s/AKfycbx-05Hxhfk5QdtQbDQfCpUISTcZwiubpludYX2pHcCVowL6JHtCEgbzCILvJ2uAbJ-V/exec'; 
+        const API_URL = 'PASTE_URL_WEB_APP_DISINI'; 
+
+        let globalSisaLaki = 20;
 
         const penghasilanOptions = [
             "-- Pilih Rentang Penghasilan --",
@@ -171,11 +174,35 @@
             "13. Rp15.000.001 - Rp20.000.000", "14. Rp20.000.001 - Rp25.000.000", "15. > Rp25.000.000"
         ];
 
-        // FUNGSI HITUNG MUNDUR
+        // LOGIKA KONTROL PRODI BERDASARKAN GENDER
+        document.getElementById('jenisKelamin').addEventListener('change', function(e) {
+            const jk = e.target.value;
+            const prodiSelect = document.getElementById('prodiPilihan');
+            const optAhwal = document.getElementById('optAhwal');
+            const optPBA = document.getElementById('optPBA');
+            
+            if (jk === 'Perempuan') {
+                optAhwal.disabled = true;
+                optPBA.disabled = false;
+                optPBA.text = "Pendidikan Bahasa Arab (Otomatis khusus Perempuan & Tanpa Kuota)";
+                prodiSelect.value = 'Pendidikan Bahasa Arab'; // Paksa Pilih
+            } else if (jk === 'Laki-laki') {
+                optAhwal.disabled = false;
+                if (globalSisaLaki <= 0) {
+                    optPBA.disabled = true;
+                    optPBA.text = "Pendidikan Bahasa Arab (KUOTA LAKI-LAKI PENUH)";
+                    prodiSelect.value = ""; 
+                } else {
+                    optPBA.disabled = false;
+                    optPBA.text = `Pendidikan Bahasa Arab (Sisa Kuota Laki-laki: ${globalSisaLaki})`;
+                    prodiSelect.value = ""; // Harus milih manual
+                }
+            }
+        });
+
+        // FUNGSI HITUNG MUNDUR (Countdown)
         function startCountdown(targetTime) {
             const container = document.getElementById('countdownContainer');
-            
-            // Render elemen kotak-kotak UI ke dalam HTML
             container.innerHTML = `
                 <div class="flex items-center justify-center gap-2 md:gap-4 mt-6">
                     <div class="flex flex-col items-center">
@@ -204,7 +231,6 @@
                 const now = new Date().getTime();
                 const distance = targetTime - now;
                 
-                // Jika waktu sudah habis, ubah otomatis jadi tombol refresh/daftar
                 if (distance < 0) {
                     clearInterval(timer);
                     container.innerHTML = `
@@ -241,45 +267,34 @@
             });
 
             try {
-                const response = await fetch(`${API_URL}?action=checkQuota`);
+                const response = await fetch(`${API_URL}?action=checkQuota&t=${new Date().getTime()}`);
                 const result = await response.json();
                 
                 document.getElementById('overlay-loading').style.display = 'none';
 
                 if (result.status === 'success') {
-                    // CEK JIKA FORM DITUTUP
                     if (result.isOpen === false) {
                         document.getElementById('closedMessageText').innerHTML = result.statusMessage;
                         document.getElementById('closedMessage').style.display = 'flex';
                         document.getElementById('mainContent').style.display = 'none';
                         
-                        // JIKA STATUS SEBELUM TANGGAL BUKA -> Jalankan Countdown
                         if (result.statusType === 'before' && result.targetTime) {
                             startCountdown(result.targetTime);
                         } else {
-                            // JIKA STATUS SUDAH LEWAT TANGGAL TUTUP
                             document.getElementById('countdownContainer').innerHTML = `
-                                <a href="https://layanan-akademik.vercel.app" class="inline-block mt-8 text-emerald-600 font-bold hover:text-emerald-700 transition-colors">
-                                    <i class="fa-solid fa-arrow-left mr-2"></i> Kembali ke Portal Utama
-                                </a>
+                                <div class="mt-6 inline-flex bg-slate-100 text-slate-500 font-bold px-6 py-2 rounded-full text-sm">
+                                    <i class="fa-solid fa-ban mr-2 mt-0.5"></i> Gelombang Pendaftaran Ditutup
+                                </div>
                             `;
                         }
                         return; 
                     }
 
-                    // JIKA FORM DIBUKA
                     document.getElementById('mainContent').style.display = 'block';
 
                     const terisi = result.count;
-                    const sisa = 20 - terisi;
-                    const optPBA = document.getElementById('optPBA');
+                    globalSisaLaki = 20 - terisi;
                     
-                    if (sisa <= 0) {
-                        optPBA.text = `Pendidikan Bahasa Arab (KUOTA PENUH)`;
-                        optPBA.disabled = true;
-                    } else {
-                        optPBA.text = `Pendidikan Bahasa Arab (Sisa Kuota: ${sisa})`;
-                    }
                 } else {
                     throw new Error("Respon server gagal");
                 }
@@ -300,10 +315,12 @@
             e.preventDefault();
             const file = document.getElementById('fileIjazah').files[0];
             if(file.size > 5242880) return showAlert('Ukuran Ijazah maksimal 5MB!', 'error');
+            
             const btnSubmit = document.getElementById('btnSubmit');
             btnSubmit.disabled = true; 
             btnSubmit.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Mengirim Data...';
             document.getElementById('alertBox').classList.add('hidden');
+            
             try {
                 const base64Data = await getBase64(file);
                 const payloadJSON = {
@@ -334,11 +351,13 @@
                     mimeType: file.type || "application/octet-stream",
                     fileData: base64Data
                 };
+                
                 const response = await fetch(API_URL, {
                     method: 'POST', 
                     headers: { 'Content-Type': 'text/plain;charset=utf-8' },
                     body: JSON.stringify(payloadJSON)
                 });
+                
                 const result = await response.json();
                 if (result.status === 'success') {
                     showAlert('Pendaftaran Berhasil Dikirim! Terima Kasih.', 'success');
