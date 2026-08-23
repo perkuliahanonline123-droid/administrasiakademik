@@ -1,0 +1,334 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Formulir Pemilihan Prodi - STAIIS</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        * { box-sizing: border-box; font-family: 'Plus Jakarta Sans', Arial, sans-serif; -webkit-font-smoothing: antialiased; }
+        body { background-color: #f4f7f6; background-image: radial-gradient(#cbd5e1 1px, transparent 1px); background-size: 24px 24px; color: #333; min-height: 100vh; padding-bottom: 40px;}
+        .glass-header { background: rgba(255, 255, 255, 0.9); backdrop-filter: blur(12px); border-bottom: 1px solid rgba(226, 232, 240, 0.8); }
+        .card { background: #ffffff; border-radius: 16px; padding: 28px; margin-bottom: 24px; box-shadow: 0 4px 16px rgba(0, 0, 0, 0.03); border: 1px solid #edf2f7; }
+        .form-group label { display: block; font-weight: 700; font-size: 13px; color: #045844; margin-bottom: 6px; }
+        .custom-input { width: 100%; padding: 10px 14px; border-radius: 10px; border: 2px solid #e2e8f0; background: #f8fafc; font-size: 14px; font-weight: 600; color: #1e293b; outline: none; transition: all 0.3s ease; }
+        .custom-input:focus { border-color: #0ba97b; background: #ffffff; box-shadow: 0 0 0 4px rgba(11, 169, 123, 0.1); }
+        select.custom-input { cursor: pointer; appearance: none; background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e"); background-repeat: no-repeat; background-position: right 12px center; background-size: 16px; padding-right: 40px; }
+        .btn-main { width: 100%; padding: 16px; background-color: #045844; color: white; border: none; border-radius: 12px; cursor: pointer; font-weight: 700; font-size: 16px; transition: all 0.2s; box-shadow: 0 8px 16px rgba(4, 88, 68, 0.2); display: flex; align-items: center; justify-content: center; gap: 8px; }
+        .btn-main:hover { background-color: #034233; transform: translateY(-2px); }
+        .btn-main:disabled { background-color: #94a3b8; box-shadow: none; cursor: not-allowed; transform: none; }
+        input[type="file"]::file-selector-button { background-color: #0ba97b; color: white; border: none; padding: 6px 12px; border-radius: 8px; font-weight: 700; cursor: pointer; margin-right: 12px; transition: all 0.2s; }
+        input[type="file"]::file-selector-button:hover { background-color: #045844; }
+        .section-title { font-size: 18px; font-weight: 800; color: #0f172a; margin-bottom: 20px; display: flex; items-center; gap: 8px; padding-bottom: 12px; border-bottom: 2px dashed #e2e8f0; }
+        #overlay-loading { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(255,255,255,0.95); z-index: 50; display: flex; flex-direction: column; justify-content: center; align-items: center; }
+        .loader { border: 4px solid #f3f3f3; border-top: 4px solid #0ba97b; border-radius: 50%; width: 40px; height: 40px; animation: spin 1s linear infinite; }
+        @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+    </style>
+</head>
+<body>
+
+    <div id="overlay-loading">
+        <div class="loader mb-4"></div>
+        <p id="loading-text" class="text-gray-800 font-bold text-lg">Mengecek Ketersediaan Kuota Prodi...</p>
+    </div>
+
+    <!-- Header -->
+    <header class="glass-header sticky top-0 z-40 w-full px-6 py-4 flex justify-center shadow-sm">
+        <div class="max-w-4xl w-full flex items-center gap-4">
+            <img src="https://i.ibb.co.com/fGv3qQ11/logo-staiis.webp" alt="Logo STAIIS" class="w-10 h-10 object-contain drop-shadow-sm">
+            <div>
+                <h1 class="font-extrabold text-[#045844] text-lg leading-tight tracking-tight">FORMULIR PMB</h1>
+                <p class="text-[10px] font-bold text-emerald-600 uppercase tracking-[0.2em]">STAI Imam Syafi'i Cianjur</p>
+            </div>
+        </div>
+    </header>
+
+    <main class="max-w-4xl mx-auto px-4 mt-8">
+        
+        <div id="alertBox" class="hidden p-4 rounded-xl text-sm font-bold transition-all mb-6 flex items-center gap-3"></div>
+
+        <form id="pmbForm" class="space-y-6">
+            
+            <!-- KARTU 1: Pilihan Prodi & Berkas -->
+            <div class="card border-t-4 border-t-[#0ba97b]">
+                <h2 class="section-title text-[#0ba97b] border-b-[#bceadd]"><i class="fa-solid fa-graduation-cap"></i> Pemilihan Program Studi & Berkas</h2>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div class="form-group md:col-span-2 bg-[#f0fdf4] p-4 rounded-xl border border-[#bceadd]">
+                        <label>Program Studi Pilihan <span class="text-red-500">*</span></label>
+                        <select id="prodiPilihan" class="custom-input bg-white" required>
+                            <option value="" disabled selected>-- Pilih Program Studi --</option>
+                            <option value="Ahwal Al-Syakhshiyyah">Ahwal Al-Syakhshiyyah (Hukum Keluarga Islam)</option>
+                            <option value="Pendidikan Bahasa Arab" id="optPBA">Pendidikan Bahasa Arab (Kuota Tersisa: Sedang memuat...)</option>
+                        </select>
+                    </div>
+                    <div class="form-group md:col-span-2">
+                        <label>Upload Ijazah SMA/Sederajat (PDF/JPG/PNG) <span class="text-red-500">*</span></label>
+                        <div class="border-2 border-dashed border-slate-300 rounded-xl p-4 text-center bg-slate-50 hover:bg-slate-100 transition">
+                            <input type="file" id="fileIjazah" accept=".pdf,.jpg,.jpeg,.png" required class="w-full text-sm font-semibold text-slate-600 outline-none cursor-pointer">
+                            <p class="text-[11px] text-slate-400 mt-2">Maksimal ukuran file 5 MB.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- KARTU 2: Data Diri -->
+            <div class="card">
+                <h2 class="section-title"><i class="fa-solid fa-id-card"></i> Data Diri Mahasiswa</h2>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
+                    <div class="form-group">
+                        <label>Nama Lengkap (Sesuai Ijazah) <span class="text-red-500">*</span></label>
+                        <input type="text" id="namaLengkap" class="custom-input" required>
+                    </div>
+                    <div class="form-group">
+                        <label>Jenis Kelamin <span class="text-red-500">*</span></label>
+                        <select id="jenisKelamin" class="custom-input" required>
+                            <option value="" disabled selected>-- Pilih --</option>
+                            <option value="Laki-laki">Laki-laki</option>
+                            <option value="Perempuan">Perempuan</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>Tempat Lahir <span class="text-red-500">*</span></label>
+                        <input type="text" id="tempatLahir" class="custom-input" required>
+                    </div>
+                    <div class="form-group">
+                        <label>Tanggal Lahir <span class="text-red-500">*</span></label>
+                        <input type="date" id="tglLahir" class="custom-input" required>
+                    </div>
+                    <div class="form-group">
+                        <label>NIK (Nomor Induk Kependudukan) <span class="text-red-500">*</span></label>
+                        <input type="number" id="nik" class="custom-input" required>
+                    </div>
+                    <div class="form-group">
+                        <label>NISN <span class="text-red-500">*</span></label>
+                        <input type="number" id="nisn" class="custom-input" required>
+                    </div>
+                    <div class="form-group">
+                        <label>Kewarganegaraan <span class="text-red-500">*</span></label>
+                        <input type="text" id="kewarganegaraan" class="custom-input" value="WNI" required>
+                    </div>
+                    <div class="form-group">
+                        <label>Nomor WhatsApp / Telepon <span class="text-red-500">*</span></label>
+                        <input type="number" id="noTelepon" class="custom-input" placeholder="08..." required>
+                    </div>
+                    <div class="form-group md:col-span-2">
+                        <label>Alamat Email Aktif <span class="text-red-500">*</span></label>
+                        <input type="email" id="email" class="custom-input" required>
+                    </div>
+                    <div class="form-group md:col-span-2">
+                        <label>Alamat Lengkap Saat Ini <span class="text-red-500">*</span></label>
+                        <textarea id="alamatLengkap" rows="3" class="custom-input" required></textarea>
+                    </div>
+                </div>
+            </div>
+
+            <!-- KARTU 3: Data Orang Tua -->
+            <div class="card">
+                <h2 class="section-title"><i class="fa-solid fa-users"></i> Data Orang Tua (Ayah & Ibu)</h2>
+                
+                <div class="bg-slate-50 p-5 rounded-xl border border-slate-200 mb-6">
+                    <h3 class="font-bold text-slate-700 mb-4 border-b border-slate-200 pb-2">DATA AYAH</h3>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div class="form-group"><label>Nama Ayah <span class="text-red-500">*</span></label><input type="text" id="namaAyah" class="custom-input" required></div>
+                        <div class="form-group"><label>NIK Ayah <span class="text-red-500">*</span></label><input type="number" id="nikAyah" class="custom-input" required></div>
+                        <div class="form-group"><label>Tanggal Lahir Ayah <span class="text-red-500">*</span></label><input type="date" id="tglLahirAyah" class="custom-input" required></div>
+                        <div class="form-group"><label>Pekerjaan Ayah <span class="text-red-500">*</span></label><input type="text" id="pekerjaanAyah" class="custom-input" required></div>
+                        <div class="form-group">
+                            <label>Pendidikan Ayah <span class="text-red-500">*</span></label>
+                            <select id="pendidikanAyah" class="custom-input" required>
+                                <option value="" disabled selected>-- Pilih Pendidikan --</option>
+                                <option value="Tidak/Belum Sekolah">Tidak/Belum Sekolah</option>
+                                <option value="SD/Sederajat">SD/Sederajat</option>
+                                <option value="SMP/Sederajat">SMP/Sederajat</option>
+                                <option value="SMA/Sederajat">SMA/Sederajat</option>
+                                <option value="D1/D2/D3">D1/D2/D3</option>
+                                <option value="S1">S1</option>
+                                <option value="S2">S2</option>
+                                <option value="S3">S3</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label>Penghasilan Ayah <span class="text-red-500">*</span></label>
+                            <select id="penghasilanAyah" class="custom-input" required></select> <!-- Diisi oleh Javascript -->
+                        </div>
+                    </div>
+                </div>
+
+                <div class="bg-slate-50 p-5 rounded-xl border border-slate-200">
+                    <h3 class="font-bold text-slate-700 mb-4 border-b border-slate-200 pb-2">DATA IBU</h3>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div class="form-group"><label>Nama Ibu <span class="text-red-500">*</span></label><input type="text" id="namaIbu" class="custom-input" required></div>
+                        <div class="form-group"><label>NIK Ibu <span class="text-red-500">*</span></label><input type="number" id="nikIbu" class="custom-input" required></div>
+                        <div class="form-group"><label>Tanggal Lahir Ibu <span class="text-red-500">*</span></label><input type="date" id="tglLahirIbu" class="custom-input" required></div>
+                        <div class="form-group"><label>Pekerjaan Ibu <span class="text-red-500">*</span></label><input type="text" id="pekerjaanIbu" class="custom-input" required></div>
+                        <div class="form-group">
+                            <label>Pendidikan Ibu <span class="text-red-500">*</span></label>
+                            <select id="pendidikanIbu" class="custom-input" required>
+                                <option value="" disabled selected>-- Pilih Pendidikan --</option>
+                                <option value="Tidak/Belum Sekolah">Tidak/Belum Sekolah</option>
+                                <option value="SD/Sederajat">SD/Sederajat</option>
+                                <option value="SMP/Sederajat">SMP/Sederajat</option>
+                                <option value="SMA/Sederajat">SMA/Sederajat</option>
+                                <option value="D1/D2/D3">D1/D2/D3</option>
+                                <option value="S1">S1</option>
+                                <option value="S2">S2</option>
+                                <option value="S3">S3</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label>Penghasilan Ibu <span class="text-red-500">*</span></label>
+                            <select id="penghasilanIbu" class="custom-input" required></select> <!-- Diisi oleh Javascript -->
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <button type="submit" id="btnSubmit" class="btn-main">
+                <i class="fa-solid fa-paper-plane"></i> Kirim Pendaftaran
+            </button>
+        </form>
+    </main>
+
+    <script>
+        // ⚠️ PASTE URL WEB APP BARU BAPAK DI SINI ⚠️
+        const API_URL = 'https://script.google.com/macros/s/AKfycbx-05Hxhfk5QdtQbDQfCpUISTcZwiubpludYX2pHcCVowL6JHtCEgbzCILvJ2uAbJ-V/exec'; 
+
+        // Daftar Penghasilan Otomatis (sesuai gambar)
+        const penghasilanOptions = [
+            "-- Pilih Rentang Penghasilan --",
+            "1. Tidak punya penghasilan", "2. < Rp500.000", "3. Rp500.000 - Rp1.000.000",
+            "4. Rp1.000.001 - Rp1.500.000", "5. Rp1.500.001 - Rp2.000.000", "6. Rp2.000.001 - Rp2.500.000",
+            "7. Rp2.500.001 - Rp3.000.000", "8. Rp3.000.001 - Rp4.000.000", "9. Rp4.000.001 - Rp5.000.000",
+            "10. Rp5.000.001 - Rp7.500.000", "11. Rp7.500.001 - Rp10.000.000", "12. Rp10.000.001 - Rp15.000.000",
+            "13. Rp15.000.001 - Rp20.000.000", "14. Rp20.000.001 - Rp25.000.000", "15. > Rp25.000.000"
+        ];
+
+        document.addEventListener('DOMContentLoaded', async () => {
+            // Isi dropdown penghasilan
+            const selectAyah = document.getElementById('penghasilanAyah');
+            const selectIbu = document.getElementById('penghasilanIbu');
+            
+            penghasilanOptions.forEach((opt, idx) => {
+                const el1 = new Option(opt, idx===0 ? "" : opt);
+                if (idx===0) el1.disabled = true;
+                selectAyah.add(el1);
+                
+                const el2 = new Option(opt, idx===0 ? "" : opt);
+                if (idx===0) el2.disabled = true;
+                selectIbu.add(el2);
+            });
+
+            // Cek Kuota PBA
+            try {
+                const response = await fetch(`${API_URL}?action=checkQuota`);
+                const result = await response.json();
+                
+                if (result.status === 'success') {
+                    const terisi = result.count;
+                    const sisa = 20 - terisi;
+                    const optPBA = document.getElementById('optPBA');
+                    
+                    if (sisa <= 0) {
+                        optPBA.text = `Pendidikan Bahasa Arab (KUOTA PENUH)`;
+                        optPBA.disabled = true;
+                    } else {
+                        optPBA.text = `Pendidikan Bahasa Arab (Sisa Kuota: ${sisa})`;
+                    }
+                }
+                document.getElementById('overlay-loading').style.display = 'none';
+            } catch (error) {
+                document.getElementById('loading-text').innerText = "Gagal terhubung ke database. Muat ulang halaman.";
+                document.getElementById('loading-text').classList.add('text-red-600');
+            }
+        });
+
+        const getBase64 = (file) => new Promise((resolve, reject) => {
+            const reader = new FileReader();
+            reader.readAsDataURL(file);
+            reader.onload = () => resolve(reader.result.split(',')[1]);
+            reader.onerror = error => reject(error);
+        });
+
+        document.getElementById('pmbForm').addEventListener('submit', async function(e) {
+            e.preventDefault();
+
+            const file = document.getElementById('fileIjazah').files[0];
+            if(file.size > 5242880) return showAlert('Ukuran Ijazah maksimal 5MB!', 'error');
+
+            const btnSubmit = document.getElementById('btnSubmit');
+            btnSubmit.disabled = true; 
+            btnSubmit.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Mengirim Data...';
+            document.getElementById('alertBox').classList.add('hidden');
+
+            try {
+                const base64Data = await getBase64(file);
+                
+                // Ambil semua data input dan gabungkan menjadi JSON (Otomatis fields diset di backend)
+                const payloadJSON = {
+                    namaLengkap: document.getElementById('namaLengkap').value.trim(),
+                    jenisKelamin: document.getElementById('jenisKelamin').value,
+                    tglLahir: document.getElementById('tglLahir').value,
+                    tempatLahir: document.getElementById('tempatLahir').value.trim(),
+                    kewarganegaraan: document.getElementById('kewarganegaraan').value.trim(),
+                    nisn: document.getElementById('nisn').value,
+                    alamatLengkap: document.getElementById('alamatLengkap').value.trim(),
+                    nik: document.getElementById('nik').value,
+                    email: document.getElementById('email').value.trim(),
+                    noTelepon: document.getElementById('noTelepon').value,
+                    prodiPilihan: document.getElementById('prodiPilihan').value,
+                    
+                    // Data Ayah
+                    namaAyah: document.getElementById('namaAyah').value.trim(),
+                    nikAyah: document.getElementById('nikAyah').value,
+                    tglLahirAyah: document.getElementById('tglLahirAyah').value,
+                    pendidikanAyah: document.getElementById('pendidikanAyah').value,
+                    pekerjaanAyah: document.getElementById('pekerjaanAyah').value.trim(),
+                    penghasilanAyah: document.getElementById('penghasilanAyah').value,
+                    
+                    // Data Ibu
+                    namaIbu: document.getElementById('namaIbu').value.trim(),
+                    nikIbu: document.getElementById('nikIbu').value,
+                    tglLahirIbu: document.getElementById('tglLahirIbu').value,
+                    pendidikanIbu: document.getElementById('pendidikanIbu').value,
+                    pekerjaanIbu: document.getElementById('pekerjaanIbu').value.trim(),
+                    penghasilanIbu: document.getElementById('penghasilanIbu').value,
+
+                    // Data File
+                    fileName: file.name,
+                    mimeType: file.type || "application/octet-stream",
+                    fileData: base64Data
+                };
+
+                const response = await fetch(API_URL, {
+                    method: 'POST', 
+                    headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+                    body: JSON.stringify(payloadJSON)
+                });
+                
+                const result = await response.json();
+
+                if (result.status === 'success') {
+                    showAlert('Pendaftaran Berhasil Dikirim! Terima Kasih.', 'success');
+                    setTimeout(() => location.reload(), 3000); 
+                } else {
+                    showAlert('Gagal: ' + result.message, 'error');
+                }
+            } catch (error) {
+                showAlert('Gagal terhubung ke Database. Periksa koneksi internet Anda.', 'error');
+            } finally {
+                btnSubmit.disabled = false; 
+                btnSubmit.innerHTML = '<i class="fa-solid fa-paper-plane"></i> Kirim Pendaftaran';
+            }
+        });
+
+        function showAlert(message, type) {
+            const box = document.getElementById('alertBox');
+            box.className = `p-4 rounded-xl text-sm font-bold transition-all mb-6 flex items-center gap-3 ${type === 'success' ? 'bg-[#f0fdf4] text-[#045844] border border-[#bceadd]' : 'bg-red-50 text-red-700 border border-red-200'}`;
+            box.innerHTML = `<i class="fa-solid ${type === 'success' ? 'fa-circle-check text-xl' : 'fa-triangle-exclamation text-xl'}"></i> ${message}`;
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+    </script>
+</body>
+</html>
