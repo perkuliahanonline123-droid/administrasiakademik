@@ -107,7 +107,8 @@
                     </div>
                     <div class="form-group">
                         <label>Kewarganegaraan <span class="text-red-500">*</span></label>
-                        <input type="text" id="kewarganegaraan" class="custom-input" value="WNI" required>
+                        <!-- Diperbarui sesuai permintaan -->
+                        <input type="text" id="kewarganegaraan" class="custom-input" placeholder="WNI / WNA (Tulis nama negara)" required>
                     </div>
                     <div class="form-group">
                         <label>Nomor WhatsApp / Telepon <span class="text-red-500">*</span></label>
@@ -118,7 +119,8 @@
                         <input type="email" id="email" class="custom-input" required>
                     </div>
                     <div class="form-group md:col-span-2">
-                        <label>Alamat Lengkap Saat Ini <span class="text-red-500">*</span></label>
+                        <!-- Label Diperbarui -->
+                        <label>Alamat Lengkap (Sesuai KTP) <span class="text-red-500">*</span></label>
                         <textarea id="alamatLengkap" rows="3" class="custom-input" required></textarea>
                     </div>
                 </div>
@@ -195,7 +197,7 @@
         // ⚠️ PASTE URL WEB APP BARU BAPAK DI SINI ⚠️
         const API_URL = 'https://script.google.com/macros/s/AKfycbx-05Hxhfk5QdtQbDQfCpUISTcZwiubpludYX2pHcCVowL6JHtCEgbzCILvJ2uAbJ-V/exec'; 
 
-        // Daftar Penghasilan Otomatis (sesuai gambar)
+        // Daftar Penghasilan Otomatis
         const penghasilanOptions = [
             "-- Pilih Rentang Penghasilan --",
             "1. Tidak punya penghasilan", "2. < Rp500.000", "3. Rp500.000 - Rp1.000.000",
@@ -265,7 +267,7 @@
             try {
                 const base64Data = await getBase64(file);
                 
-                // Ambil semua data input dan gabungkan menjadi JSON (Otomatis fields diset di backend)
+                // Ambil semua data input dan gabungkan menjadi JSON
                 const payloadJSON = {
                     namaLengkap: document.getElementById('namaLengkap').value.trim(),
                     jenisKelamin: document.getElementById('jenisKelamin').value,
