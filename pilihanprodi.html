@@ -49,7 +49,7 @@
         <div id="alertBox" class="hidden p-4 rounded-xl text-sm font-bold transition-all mb-6 flex items-center gap-3"></div>
         <form id="pmbForm" class="space-y-6">
             
-            <!-- KARTU 1: Data Diri (Pindah Ke Atas Untuk Filter Prodi) -->
+            <!-- KARTU 1: Data Diri -->
             <div class="card border-t-4 border-t-[#0ba97b]">
                 <h2 class="section-title text-[#0ba97b] border-b-[#bceadd]"><i class="fa-solid fa-id-card"></i> Data Diri Mahasiswa</h2>
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
@@ -57,7 +57,7 @@
                     <div class="form-group">
                         <label>Jenis Kelamin <span class="text-red-500">*</span></label>
                         <select id="jenisKelamin" class="custom-input bg-[#f0fdf4]" required>
-                            <option value="" disabled selected>-- Pilih Gender Dahulu --</option>
+                            <option value="" disabled selected>-- Pilihan Gender --</option>
                             <option value="Laki-laki">Laki-laki</option>
                             <option value="Perempuan">Perempuan</option>
                         </select>
@@ -80,9 +80,9 @@
                     <div class="form-group md:col-span-2 bg-[#f8fafc] p-4 rounded-xl border border-slate-200">
                         <label>Program Studi Pilihan <span class="text-red-500">*</span></label>
                         <select id="prodiPilihan" class="custom-input bg-white" required>
-                            <option value="" disabled selected>-- Pilih Gender pada kolom Data Diri terlebih dahulu --</option>
+                            <option value="" disabled selected>-- Pilihan Program Studi --</option>
                             <option value="Ahwal Al-Syakhshiyyah" id="optAhwal" disabled>Ahwal Al-Syakhshiyyah (Hukum Keluarga Islam)</option>
-                            <option value="Pendidikan Bahasa Arab" id="optPBA" disabled>Pendidikan Bahasa Arab (Silakan Pilih Gender)</option>
+                            <option value="Pendidikan Bahasa Arab" id="optPBA" disabled>Pendidikan Bahasa Arab</option>
                         </select>
                         <p class="text-[11px] font-semibold text-slate-500 mt-2"><i class="fa-solid fa-circle-info mr-1 text-emerald-600"></i> Pilihan prodi akan otomatis menyesuaikan jenis kelamin Anda.</p>
                     </div>
@@ -184,7 +184,7 @@
             if (jk === 'Perempuan') {
                 optAhwal.disabled = true;
                 optPBA.disabled = false;
-                optPBA.text = "Pendidikan Bahasa Arab (Otomatis khusus Perempuan & Tanpa Kuota)";
+                optPBA.text = "Pendidikan Bahasa Arab";
                 prodiSelect.value = 'Pendidikan Bahasa Arab'; // Paksa Pilih
             } else if (jk === 'Laki-laki') {
                 optAhwal.disabled = false;
@@ -259,10 +259,11 @@
             
             penghasilanOptions.forEach((opt, idx) => {
                 const el1 = new Option(opt, idx===0 ? "" : opt);
-                if (idx===0) el1.disabled = true;
+                if (idx===0) { el1.disabled = true; el1.selected = true; } // Perbaikan Selected Default
                 selectAyah.add(el1);
+
                 const el2 = new Option(opt, idx===0 ? "" : opt);
-                if (idx===0) el2.disabled = true;
+                if (idx===0) { el2.disabled = true; el2.selected = true; } // Perbaikan Selected Default
                 selectIbu.add(el2);
             });
 
