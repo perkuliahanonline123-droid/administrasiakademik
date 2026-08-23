@@ -21,7 +21,7 @@
         .btn-main:disabled { background-color: #94a3b8; box-shadow: none; cursor: not-allowed; transform: none; }
         input[type="file"]::file-selector-button { background-color: #0ba97b; color: white; border: none; padding: 6px 12px; border-radius: 8px; font-weight: 700; cursor: pointer; margin-right: 12px; transition: all 0.2s; }
         input[type="file"]::file-selector-button:hover { background-color: #045844; }
-        .section-title { font-size: 18px; font-weight: 800; color: #0f172a; margin-bottom: 20px; display: flex; items-center; gap: 8px; padding-bottom: 12px; border-bottom: 2px dashed #e2e8f0; }
+        .section-title { font-size: 18px; font-weight: 800; color: #0f172a; margin-bottom: 20px; display: flex; align-items: center; gap: 8px; padding-bottom: 12px; border-bottom: 2px dashed #e2e8f0; }
         #overlay-loading { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(255,255,255,0.95); z-index: 50; display: flex; flex-direction: column; justify-content: center; align-items: center; }
         .loader { border: 4px solid #f3f3f3; border-top: 4px solid #0ba97b; border-radius: 50%; width: 40px; height: 40px; animation: spin 1s linear infinite; }
         @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
@@ -31,7 +31,7 @@
 
     <div id="overlay-loading">
         <div class="loader mb-4"></div>
-        <p id="loading-text" class="text-gray-800 font-bold text-lg">Mengecek Ketersediaan Kuota Prodi...</p>
+        <p id="loading-text" class="text-gray-800 font-bold text-lg">Mengecek Sistem Pendaftaran...</p>
     </div>
 
     <!-- Header -->
@@ -45,12 +45,11 @@
         </div>
     </header>
 
-    <main class="max-w-4xl mx-auto px-4 mt-8">
+    <main id="mainContent" class="max-w-4xl mx-auto px-4 mt-8 hidden">
         
         <div id="alertBox" class="hidden p-4 rounded-xl text-sm font-bold transition-all mb-6 flex items-center gap-3"></div>
 
         <form id="pmbForm" class="space-y-6">
-            
             <!-- KARTU 1: Pilihan Prodi & Berkas -->
             <div class="card border-t-4 border-t-[#0ba97b]">
                 <h2 class="section-title text-[#0ba97b] border-b-[#bceadd]"><i class="fa-solid fa-graduation-cap"></i> Pemilihan Program Studi & Berkas</h2>
@@ -107,7 +106,6 @@
                     </div>
                     <div class="form-group">
                         <label>Kewarganegaraan <span class="text-red-500">*</span></label>
-                        <!-- Diperbarui sesuai permintaan -->
                         <input type="text" id="kewarganegaraan" class="custom-input" placeholder="WNI / WNA (Tulis nama negara)" required>
                     </div>
                     <div class="form-group">
@@ -119,7 +117,6 @@
                         <input type="email" id="email" class="custom-input" required>
                     </div>
                     <div class="form-group md:col-span-2">
-                        <!-- Label Diperbarui -->
                         <label>Alamat Lengkap (Sesuai KTP) <span class="text-red-500">*</span></label>
                         <textarea id="alamatLengkap" rows="3" class="custom-input" required></textarea>
                     </div>
@@ -153,7 +150,7 @@
                         </div>
                         <div class="form-group">
                             <label>Penghasilan Ayah <span class="text-red-500">*</span></label>
-                            <select id="penghasilanAyah" class="custom-input" required></select> <!-- Diisi oleh Javascript -->
+                            <select id="penghasilanAyah" class="custom-input" required></select> 
                         </div>
                     </div>
                 </div>
@@ -181,7 +178,7 @@
                         </div>
                         <div class="form-group">
                             <label>Penghasilan Ibu <span class="text-red-500">*</span></label>
-                            <select id="penghasilanIbu" class="custom-input" required></select> <!-- Diisi oleh Javascript -->
+                            <select id="penghasilanIbu" class="custom-input" required></select>
                         </div>
                     </div>
                 </div>
@@ -193,11 +190,24 @@
         </form>
     </main>
 
+    <!-- UI PESAN FORM TUTUP -->
+    <div id="closedMessage" class="hidden flex-col items-center justify-center min-h-[70vh] px-4 text-center mt-8">
+        <div class="bg-white p-8 md:p-12 rounded-3xl shadow-xl max-w-lg border border-slate-100">
+            <div class="w-20 h-20 bg-red-100 text-red-500 rounded-full flex items-center justify-center text-4xl mx-auto mb-6">
+                <i class="fa-solid fa-lock"></i>
+            </div>
+            <h2 class="text-2xl font-black text-slate-800 mb-3 tracking-tight">Status Pendaftaran</h2>
+            <p id="closedMessageText" class="text-slate-600 font-medium leading-relaxed"></p>
+            <a href="https://layanan-akademik.vercel.app" class="inline-block mt-8 text-emerald-600 font-bold hover:text-emerald-700 transition-colors">
+                <i class="fa-solid fa-arrow-left mr-2"></i> Kembali ke Portal
+            </a>
+        </div>
+    </div>
+
     <script>
         // ⚠️ PASTE URL WEB APP BARU BAPAK DI SINI ⚠️
         const API_URL = 'https://script.google.com/macros/s/AKfycbx-05Hxhfk5QdtQbDQfCpUISTcZwiubpludYX2pHcCVowL6JHtCEgbzCILvJ2uAbJ-V/exec'; 
 
-        // Daftar Penghasilan Otomatis
         const penghasilanOptions = [
             "-- Pilih Rentang Penghasilan --",
             "1. Tidak punya penghasilan", "2. < Rp500.000", "3. Rp500.000 - Rp1.000.000",
@@ -208,7 +218,6 @@
         ];
 
         document.addEventListener('DOMContentLoaded', async () => {
-            // Isi dropdown penghasilan
             const selectAyah = document.getElementById('penghasilanAyah');
             const selectIbu = document.getElementById('penghasilanIbu');
             
@@ -222,12 +231,26 @@
                 selectIbu.add(el2);
             });
 
-            // Cek Kuota PBA
             try {
+                // CEK STATUS BUKA/TUTUP FORM & KUOTA PBA SEKALIGUS
                 const response = await fetch(`${API_URL}?action=checkQuota`);
                 const result = await response.json();
                 
+                document.getElementById('overlay-loading').style.display = 'none';
+
                 if (result.status === 'success') {
+                    // JIKA FORM DITUTUP
+                    if (result.isOpen === false) {
+                        document.getElementById('closedMessageText').innerHTML = result.statusMessage;
+                        document.getElementById('closedMessage').style.display = 'flex';
+                        document.getElementById('mainContent').style.display = 'none';
+                        return; // Hentikan proses selanjutnya
+                    }
+
+                    // JIKA FORM DIBUKA -> Tampilkan form utama
+                    document.getElementById('mainContent').style.display = 'block';
+
+                    // Pengaturan Sisa Kuota PBA
                     const terisi = result.count;
                     const sisa = 20 - terisi;
                     const optPBA = document.getElementById('optPBA');
@@ -238,8 +261,9 @@
                     } else {
                         optPBA.text = `Pendidikan Bahasa Arab (Sisa Kuota: ${sisa})`;
                     }
+                } else {
+                    throw new Error("Respon server gagal");
                 }
-                document.getElementById('overlay-loading').style.display = 'none';
             } catch (error) {
                 document.getElementById('loading-text').innerText = "Gagal terhubung ke database. Muat ulang halaman.";
                 document.getElementById('loading-text').classList.add('text-red-600');
@@ -267,7 +291,6 @@
             try {
                 const base64Data = await getBase64(file);
                 
-                // Ambil semua data input dan gabungkan menjadi JSON
                 const payloadJSON = {
                     namaLengkap: document.getElementById('namaLengkap').value.trim(),
                     jenisKelamin: document.getElementById('jenisKelamin').value,
@@ -281,7 +304,6 @@
                     noTelepon: document.getElementById('noTelepon').value,
                     prodiPilihan: document.getElementById('prodiPilihan').value,
                     
-                    // Data Ayah
                     namaAyah: document.getElementById('namaAyah').value.trim(),
                     nikAyah: document.getElementById('nikAyah').value,
                     tglLahirAyah: document.getElementById('tglLahirAyah').value,
@@ -289,7 +311,6 @@
                     pekerjaanAyah: document.getElementById('pekerjaanAyah').value.trim(),
                     penghasilanAyah: document.getElementById('penghasilanAyah').value,
                     
-                    // Data Ibu
                     namaIbu: document.getElementById('namaIbu').value.trim(),
                     nikIbu: document.getElementById('nikIbu').value,
                     tglLahirIbu: document.getElementById('tglLahirIbu').value,
@@ -297,7 +318,6 @@
                     pekerjaanIbu: document.getElementById('pekerjaanIbu').value.trim(),
                     penghasilanIbu: document.getElementById('penghasilanIbu').value,
 
-                    // Data File
                     fileName: file.name,
                     mimeType: file.type || "application/octet-stream",
                     fileData: base64Data
