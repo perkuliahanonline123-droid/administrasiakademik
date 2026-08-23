@@ -31,7 +31,7 @@
 
     <div id="overlay-loading">
         <div class="loader mb-4"></div>
-        <p id="loading-text" class="text-gray-800 font-bold text-lg">Mengecek Sistem Pendaftaran...</p>
+        <p id="loading-text" class="text-gray-800 font-bold text-lg">Mohon tunggu sebentar...</p>
     </div>
 
     <!-- Header -->
@@ -39,7 +39,7 @@
         <div class="max-w-4xl w-full flex items-center gap-4">
             <img src="https://i.ibb.co.com/fGv3qQ11/logo-staiis.webp" alt="Logo STAIIS" class="w-10 h-10 object-contain drop-shadow-sm">
             <div>
-                <h1 class="font-extrabold text-[#045844] text-lg leading-tight tracking-tight">FORMULIR PMB</h1>
+                <h1 class="font-extrabold text-[#045844] text-lg leading-tight tracking-tight">FORMULIR PEMILIHAN PROGRAM STUDI</h1>
                 <p class="text-[10px] font-bold text-emerald-600 uppercase tracking-[0.2em]">STAI Imam Syafi'i Cianjur</p>
             </div>
         </div>
@@ -141,7 +141,7 @@
             </div>
 
             <button type="submit" id="btnSubmit" class="btn-main">
-                <i class="fa-solid fa-paper-plane"></i> Kirim Pendaftaran
+                <i class="fa-solid fa-paper-plane"></i> Kirim Formulir
             </button>
         </form>
     </main>
@@ -235,7 +235,7 @@
                     clearInterval(timer);
                     container.innerHTML = `
                         <button onclick="location.reload()" class="mt-8 bg-[#045844] hover:bg-[#034233] text-white px-8 py-3.5 rounded-xl font-bold transition-all shadow-md w-full md:w-auto">
-                            <i class="fa-solid fa-rotate-right mr-2"></i> Pendaftaran Telah Dibuka!
+                            <i class="fa-solid fa-rotate-right mr-2"></i> Formulir Telah Dibuka!
                         </button>
                     `;
                     return;
@@ -283,7 +283,7 @@
                         } else {
                             document.getElementById('countdownContainer').innerHTML = `
                                 <div class="mt-6 inline-flex bg-slate-100 text-slate-500 font-bold px-6 py-2 rounded-full text-sm">
-                                    <i class="fa-solid fa-ban mr-2 mt-0.5"></i> Gelombang Pendaftaran Ditutup
+                                    <i class="fa-solid fa-ban mr-2 mt-0.5"></i> Pengisian Formulir Ditutup
                                 </div>
                             `;
                         }
@@ -360,7 +360,7 @@
                 
                 const result = await response.json();
                 if (result.status === 'success') {
-                    showAlert('Pendaftaran Berhasil Dikirim! Terima Kasih.', 'success');
+                    showAlert('Formulir Berhasil Dikirim! Terima Kasih.', 'success');
                     setTimeout(() => location.reload(), 3000); 
                 } else {
                     showAlert('Gagal: ' + result.message, 'error');
@@ -369,7 +369,7 @@
                 showAlert('Gagal terhubung ke Database. Periksa koneksi internet Anda.', 'error');
             } finally {
                 btnSubmit.disabled = false; 
-                btnSubmit.innerHTML = '<i class="fa-solid fa-paper-plane"></i> Kirim Pendaftaran';
+                btnSubmit.innerHTML = '<i class="fa-solid fa-paper-plane"></i> Kirim Formulir';
             }
         });
 
