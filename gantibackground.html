@@ -1,0 +1,366 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ubah Warna Background Foto</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        body {
+            background-color: #f8f9fa;
+            color: #333;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            min-height: 100vh;
+            padding: 40px 20px;
+        }
+
+        .header {
+            text-align: center;
+            max-width: 600px;
+            margin-bottom: 30px;
+        }
+
+        .header h1 {
+            font-size: 2.2rem;
+            margin-bottom: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+        }
+
+        .header p {
+            color: #666;
+            font-size: 0.95rem;
+            line-height: 1.5;
+        }
+
+        .editor-card {
+            background: #ffffff;
+            border-radius: 20px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.08);
+            padding: 30px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            max-width: 500px;
+            width: 100%;
+        }
+
+        /* Color Palette Dots */
+        .color-palette {
+            display: flex;
+            gap: 12px;
+            margin-bottom: 25px;
+            align-items: center;
+            flex-wrap: wrap;
+            justify-content: center;
+        }
+
+        .color-dot {
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            cursor: pointer;
+            border: 2px solid transparent;
+            transition: transform 0.2s, border-color 0.2s;
+            box-shadow: 0 2px 6px rgba(0,0,0,0.15);
+        }
+
+        .color-dot:hover, .color-dot.active {
+            transform: scale(1.15);
+            border-color: #5d46e2;
+        }
+
+        .color-picker-wrapper {
+            position: relative;
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            overflow: hidden;
+            background: conic-gradient(red, yellow, lime, cyan, blue, magenta, red);
+            cursor: pointer;
+            box-shadow: 0 2px 6px rgba(0,0,0,0.15);
+        }
+
+        .color-picker-wrapper input[type="color"] {
+            position: absolute;
+            top: -10px;
+            left: -10px;
+            width: 50px;
+            height: 50px;
+            opacity: 0;
+            cursor: pointer;
+        }
+
+        /* Main Preview Canvas */
+        .preview-container {
+            width: 100%;
+            height: 380px;
+            background-color: #eee;
+            border-radius: 14px;
+            overflow: hidden;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            position: relative;
+            border: 1px solid #e0e0e0;
+        }
+
+        canvas {
+            max-width: 100%;
+            max-height: 100%;
+            object-fit: contain;
+        }
+
+        .upload-placeholder {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 12px;
+            color: #888;
+            cursor: pointer;
+        }
+
+        .upload-placeholder i {
+            font-size: 3rem;
+            color: #5d46e2;
+        }
+
+        /* Action Controls */
+        .controls {
+            display: flex;
+            gap: 10px;
+            margin-top: 25px;
+            width: 100%;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+
+        .btn {
+            background-color: #f0f0f5;
+            color: #444;
+            border: none;
+            padding: 10px 18px;
+            border-radius: 10px;
+            font-size: 0.85rem;
+            font-weight: 600;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            transition: background 0.2s;
+        }
+
+        .btn:hover {
+            background-color: #e2e2ec;
+        }
+
+        .btn-primary {
+            background-color: #5d46e2;
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background-color: #4b36c8;
+        }
+
+        #file-input {
+            display: none;
+        }
+
+        /* Tolerance adjustment for background replacement */
+        .settings-bar {
+            margin-top: 15px;
+            font-size: 0.8rem;
+            color: #666;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            width: 100%;
+            justify-content: center;
+        }
+
+        .settings-bar input[type="range"] {
+            width: 120px;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="header">
+        <h1><i class="fa-solid fa-wand-magic-sparkles" style="color:#5d46e2;"></i> Ubah Warna Background</h1>
+        <p>Ganti warna latar belakang foto produk atau pasfoto Anda secara instan dalam hitungan detik.</p>
+    </div>
+
+    <div class="editor-card">
+        <!-- Palette Option Dots -->
+        <div class="color-palette">
+            <div class="color-dot" style="background-color: #ffffff;" onclick="changeBgColor('#ffffff', this)"></div>
+            <div class="color-dot" style="background-color: #00e5ff;" onclick="changeBgColor('#00e5ff', this)"></div>
+            <div class="color-dot" style="background-color: #0038ff;" onclick="changeBgColor('#0038ff', this)"></div>
+            <div class="color-dot" style="background-color: #556b2f;" onclick="changeBgColor('#556b2f', this)"></div>
+            <div class="color-dot active" style="background-color: #ff3385;" onclick="changeBgColor('#ff3385', this)"></div>
+            <div class="color-dot" style="background-color: #ff5252;" onclick="changeBgColor('#ff5252', this)"></div>
+            <div class="color-dot" style="background-color: #fffdd0;" onclick="changeBgColor('#fffdd0', this)"></div>
+            <div class="color-picker-wrapper" title="Pilih warna kustom">
+                <input type="color" id="custom-color" value="#ff3385" onchange="changeBgColor(this.value, null)">
+            </div>
+        </div>
+
+        <!-- Image Canvas Display -->
+        <div class="preview-container" onclick="document.getElementById('file-input').click()">
+            <canvas id="canvas"></canvas>
+            <div class="upload-placeholder" id="placeholder">
+                <i class="fa-solid fa-cloud-arrow-up"></i>
+                <p>Klik untuk mengunggah gambar</p>
+            </div>
+        </div>
+
+        <!-- Sensitivity Controller -->
+        <div class="settings-bar">
+            <label for="tolerance">Toleransi Warna:</label>
+            <input type="range" id="tolerance" min="5" max="100" value="40" oninput="processImage()">
+        </div>
+
+        <!-- Action Toolbar -->
+        <div class="controls">
+            <input type="file" id="file-input" accept="image/*" onchange="loadImage(event)">
+            <button class="btn btn-primary" onclick="document.getElementById('file-input').click()">
+                <i class="fa-solid fa-upload"></i> Unggah Foto
+            </button>
+            <button class="btn" onclick="resetCanvas()">
+                <i class="fa-solid fa-rotate-left"></i> Reset
+            </button>
+            <button class="btn" onclick="downloadImage()">
+                <i class="fa-solid fa-download"></i> Unduh
+            </button>
+        </div>
+    </div>
+
+    <script>
+        const canvas = document.getElementById('canvas');
+        const ctx = canvas.getContext('2d', { willReadFrequently: true });
+        const placeholder = document.getElementById('placeholder');
+        
+        let originalImage = null;
+        let selectedBgColor = '#ff3385';
+        let originalBgColor = null; // Sampled automatically from top-left pixel
+
+        function loadImage(event) {
+            const file = event.target.files[0];
+            if (!file) return;
+
+            const reader = new FileReader();
+            reader.onload = function (e) {
+                const img = new Image();
+                img.onload = function () {
+                    originalImage = img;
+                    canvas.width = img.width;
+                    canvas.height = img.height;
+                    placeholder.style.display = 'none';
+
+                    // Sample the original background color from the top-left corner (0,0)
+                    const tempCanvas = document.createElement('canvas');
+                    tempCanvas.width = img.width;
+                    tempCanvas.height = img.height;
+                    const tempCtx = tempCanvas.getContext('2d');
+                    tempCtx.drawImage(img, 0, 0);
+                    const pixel = tempCtx.getImageData(5, 5, 1, 1).data;
+                    originalBgColor = { r: pixel[0], g: pixel[1], b: pixel[2] };
+
+                    processImage();
+                };
+                img.src = e.target.result;
+            };
+            reader.readAsDataURL(file);
+        }
+
+        function changeBgColor(color, element) {
+            selectedBgColor = color;
+            if (element) {
+                document.querySelectorAll('.color-dot').forEach(dot => dot.classList.remove('active'));
+                element.classList.add('active');
+            }
+            if (originalImage) {
+                processImage();
+            }
+        }
+
+        function processImage() {
+            if (!originalImage) return;
+
+            const width = canvas.width;
+            const height = canvas.height;
+
+            // Draw original image to get pixels
+            ctx.drawImage(originalImage, 0, 0, width, height);
+            const imgData = ctx.getImageData(0, 0, width, height);
+            const data = imgData.data;
+
+            // Parse hex target color
+            const targetRGB = hexToRgb(selectedBgColor);
+            const tolerance = parseInt(document.getElementById('tolerance').value);
+
+            // Simple Chroma Key Algorithm replacing original background
+            if (originalBgColor) {
+                for (let i = 0; i < data.length; i += 4) {
+                    const r = data[i];
+                    const g = data[i + 1];
+                    const b = data[i + 2];
+
+                    // Calculate distance to original background color
+                    const diff = Math.sqrt(
+                        Math.pow(r - originalBgColor.r, 2) +
+                        Math.pow(g - originalBgColor.g, 2) +
+                        Math.pow(b - originalBgColor.b, 2)
+                    );
+
+                    if (diff < tolerance * 2) {
+                        data[i] = targetRGB.r;
+                        data[i + 1] = targetRGB.g;
+                        data[i + 2] = targetRGB.b;
+                    }
+                }
+            }
+
+            ctx.putImageData(imgData, 0, 0);
+        }
+
+        function hexToRgb(hex) {
+            let result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
+            return result ? {
+                r: parseInt(result[1], 16),
+                g: parseInt(result[2], 16),
+                b: parseInt(result[3], 16)
+            } : { r: 255, g: 255, b: 255 };
+        }
+
+        function resetCanvas() {
+            if (originalImage) {
+                ctx.drawImage(originalImage, 0, 0);
+            }
+        }
+
+        function downloadImage() {
+            if (!originalImage) {
+                alert('Silakan unggah foto terlebih dahulu!');
+                return;
+            }
+            const link = document.createElement('a');
+            link.download = 'foto-background-baru.png';
+            link.href = canvas.toDataURL('image/png');
+            link.click();
+        }
+    </script>
+</body>
+</html>
