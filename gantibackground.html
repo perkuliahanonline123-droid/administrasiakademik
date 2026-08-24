@@ -3,93 +3,302 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Ubah Warna Background Foto</title>
-    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <title>Change Background Color - Photoroom Clone</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
     <style>
         * {
             box-sizing: border-box;
             margin: 0;
             padding: 0;
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
         }
 
         body {
-            background-color: #f8f9fa;
-            color: #333;
+            background-color: #fafafa;
+            color: #1a1a1a;
+            min-height: 100vh;
             display: flex;
             flex-direction: column;
             align-items: center;
-            min-height: 100vh;
-            padding: 40px 20px;
         }
 
-        .header {
-            text-align: center;
-            max-width: 600px;
-            margin-bottom: 30px;
+        /* Navbar */
+        .navbar {
+            width: 100%;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 16px 40px;
+            background: #fff;
+            border-bottom: 1px solid #eaeaea;
         }
 
-        .header h1 {
-            font-size: 2.2rem;
-            margin-bottom: 10px;
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-weight: 800;
+            font-size: 1.4rem;
+            color: #000;
+        }
+
+        .logo-icon {
+            background: #6100FF;
+            color: #fff;
+            width: 28px;
+            height: 28px;
+            border-radius: 6px;
             display: flex;
             align-items: center;
             justify-content: center;
-            gap: 10px;
+            font-size: 0.9rem;
+            font-weight: 900;
         }
 
-        .header p {
+        .nav-links {
+            display: flex;
+            gap: 24px;
+            list-style: none;
+            font-size: 0.9rem;
+            font-weight: 500;
+            color: #555;
+        }
+
+        .nav-buttons {
+            display: flex;
+            gap: 12px;
+            align-items: center;
+        }
+
+        .btn-login {
+            background: none;
+            border: none;
+            font-weight: 600;
+            cursor: pointer;
+            padding: 8px 16px;
+        }
+
+        .btn-start {
+            background: #000;
+            color: #fff;
+            border: none;
+            padding: 10px 18px;
+            border-radius: 8px;
+            font-weight: 600;
+            cursor: pointer;
+        }
+
+        /* Main Container */
+        .hero {
+            text-align: center;
+            max-width: 680px;
+            margin: 40px 20px 20px;
+        }
+
+        .hero-title {
+            font-size: 2.2rem;
+            font-weight: 700;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 12px;
+            margin-bottom: 12px;
+        }
+
+        .hero-desc {
             color: #666;
             font-size: 0.95rem;
             line-height: 1.5;
         }
 
-        .editor-card {
-            background: #ffffff;
+        .workspace {
+            position: relative;
+            width: 100%;
+            max-width: 1100px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            margin: 20px 0 40px;
+            padding: 0 20px;
+        }
+
+        /* Floating Cards decorative */
+        .floating-card {
+            position: absolute;
+            width: 150px;
+            height: 180px;
+            border-radius: 16px;
+            box-shadow: 0 15px 35px rgba(0,0,0,0.1);
+            overflow: hidden;
+            background: #fff;
+            z-index: 1;
+            transition: transform 0.3s;
+        }
+
+        .floating-left {
+            left: 50px;
+            transform: rotate(-8deg);
+        }
+
+        .floating-right {
+            right: 50px;
+            transform: rotate(8deg);
+        }
+
+        .floating-card img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        /* Main Editor Box */
+        .editor-box {
+            background: #fff;
             border-radius: 20px;
-            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.08);
-            padding: 30px;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.06);
+            width: 100%;
+            max-width: 580px;
+            position: relative;
+            z-index: 2;
+            padding: 24px;
             display: flex;
             flex-direction: column;
             align-items: center;
-            max-width: 500px;
-            width: 100%;
         }
 
-        /* Color Palette Dots */
-        .color-palette {
+        /* STATE 1: UPLOAD VIEW */
+        #view-upload {
+            width: 100%;
             display: flex;
-            gap: 12px;
-            margin-bottom: 25px;
+            flex-direction: column;
             align-items: center;
-            flex-wrap: wrap;
+        }
+
+        .dropzone {
+            width: 100%;
+            height: 320px;
+            border-radius: 16px;
+            /* Checkerboard Background */
+            background-color: #ffffff;
+            background-image: linear-gradient(45deg, #e6e6e6 25%, transparent 25%), 
+                              linear-gradient(-45deg, #e6e6e6 25%, transparent 25%), 
+                              linear-gradient(45deg, transparent 75%, #e6e6e6 75%), 
+                              linear-gradient(-45deg, transparent 75%, #e6e6e6 75%);
+            background-size: 20px 20px;
+            background-position: 0 0, 0 10px, 10px -10px, -10px 0px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            border: 2px dashed #ddd;
+            cursor: pointer;
+            transition: border-color 0.2s;
+        }
+
+        .dropzone:hover {
+            border-color: #6100FF;
+        }
+
+        .btn-upload-main {
+            background: #6100FF;
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 10px;
+            font-size: 0.95rem;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            cursor: pointer;
+            box-shadow: 0 4px 12px rgba(97, 0, 255, 0.25);
+            margin-bottom: 12px;
+        }
+
+        .dropzone p {
+            font-size: 0.85rem;
+            color: #777;
+            font-weight: 500;
+        }
+
+        .samples-container {
+            margin-top: 24px;
+            text-align: center;
+        }
+
+        .samples-title {
+            font-size: 0.75rem;
+            color: #888;
+            margin-bottom: 10px;
+            font-weight: 500;
+        }
+
+        .samples-grid {
+            display: flex;
+            gap: 10px;
             justify-content: center;
         }
 
+        .sample-thumb {
+            width: 44px;
+            height: 44px;
+            border-radius: 8px;
+            object-fit: cover;
+            cursor: pointer;
+            border: 1px solid #ddd;
+            transition: transform 0.2s;
+        }
+
+        .sample-thumb:hover {
+            transform: scale(1.08);
+        }
+
+        /* STATE 2: EDITOR VIEW */
+        #view-editor {
+            width: 100%;
+            display: none;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        /* Top Bar Editor */
+        .editor-topbar {
+            width: 100%;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+
+        .color-palette {
+            display: flex;
+            gap: 8px;
+            align-items: center;
+        }
+
         .color-dot {
-            width: 32px;
-            height: 32px;
+            width: 26px;
+            height: 26px;
             border-radius: 50%;
             cursor: pointer;
             border: 2px solid transparent;
-            transition: transform 0.2s, border-color 0.2s;
-            box-shadow: 0 2px 6px rgba(0,0,0,0.15);
+            transition: transform 0.15s, border-color 0.15s;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
         }
 
         .color-dot:hover, .color-dot.active {
             transform: scale(1.15);
-            border-color: #5d46e2;
+            border-color: #000;
         }
 
         .color-picker-wrapper {
             position: relative;
-            width: 32px;
-            height: 32px;
+            width: 26px;
+            height: 26px;
             border-radius: 50%;
             overflow: hidden;
             background: conic-gradient(red, yellow, lime, cyan, blue, magenta, red);
             cursor: pointer;
-            box-shadow: 0 2px 6px rgba(0,0,0,0.15);
         }
 
         .color-picker-wrapper input[type="color"] {
@@ -102,18 +311,43 @@
             cursor: pointer;
         }
 
-        /* Main Preview Canvas */
-        .preview-container {
+        /* Toggle Before/After */
+        .toggle-ba {
+            background: #f0f0f2;
+            padding: 3px;
+            border-radius: 20px;
+            display: flex;
+            gap: 2px;
+        }
+
+        .toggle-btn {
+            border: none;
+            background: transparent;
+            padding: 4px 12px;
+            font-size: 0.75rem;
+            font-weight: 600;
+            border-radius: 16px;
+            cursor: pointer;
+            color: #666;
+        }
+
+        .toggle-btn.active {
+            background: #fff;
+            color: #000;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+        }
+
+        /* Canvas Display Area */
+        .canvas-wrapper {
+            position: relative;
             width: 100%;
             height: 380px;
-            background-color: #eee;
-            border-radius: 14px;
+            border-radius: 16px;
             overflow: hidden;
             display: flex;
             justify-content: center;
             align-items: center;
-            position: relative;
-            border: 1px solid #e0e0e0;
+            background-color: #C8102E; /* DEFAULT RED */
         }
 
         canvas {
@@ -122,243 +356,332 @@
             object-fit: contain;
         }
 
-        .upload-placeholder {
+        .btn-close {
+            position: absolute;
+            top: 12px;
+            right: 12px;
+            background: rgba(255, 255, 255, 0.85);
+            border: none;
+            width: 28px;
+            height: 28px;
+            border-radius: 50%;
             display: flex;
-            flex-direction: column;
             align-items: center;
-            gap: 12px;
-            color: #888;
+            justify-content: center;
             cursor: pointer;
+            color: #333;
+            transition: background 0.2s;
+            z-index: 10;
         }
 
-        .upload-placeholder i {
-            font-size: 3rem;
-            color: #5d46e2;
+        .btn-close:hover {
+            background: #fff;
         }
 
-        /* Action Controls */
-        .controls {
+        /* Bottom Controls Bar */
+        .editor-bottombar {
             display: flex;
-            gap: 10px;
-            margin-top: 25px;
+            gap: 8px;
+            margin-top: 20px;
             width: 100%;
             justify-content: center;
             flex-wrap: wrap;
         }
 
-        .btn {
-            background-color: #f0f0f5;
-            color: #444;
+        .action-btn {
+            background: #f0f0f4;
             border: none;
-            padding: 10px 18px;
+            padding: 10px 14px;
             border-radius: 10px;
-            font-size: 0.85rem;
+            font-size: 0.8rem;
             font-weight: 600;
+            color: #333;
             cursor: pointer;
             display: flex;
             align-items: center;
-            gap: 8px;
+            gap: 6px;
             transition: background 0.2s;
         }
 
-        .btn:hover {
-            background-color: #e2e2ec;
+        .action-btn:hover {
+            background: #e4e4eb;
         }
 
-        .btn-primary {
-            background-color: #5d46e2;
-            color: white;
+        .action-btn.primary {
+            background: #6100FF;
+            color: #fff;
         }
 
-        .btn-primary:hover {
-            background-color: #4b36c8;
+        .action-btn.primary:hover {
+            background: #4e00cc;
         }
 
         #file-input {
             display: none;
         }
-
-        /* Tolerance adjustment for background replacement */
-        .settings-bar {
-            margin-top: 15px;
-            font-size: 0.8rem;
-            color: #666;
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            width: 100%;
-            justify-content: center;
-        }
-
-        .settings-bar input[type="range"] {
-            width: 120px;
-        }
     </style>
 </head>
 <body>
 
-    <div class="header">
-        <h1><i class="fa-solid fa-wand-magic-sparkles" style="color:#5d46e2;"></i> Ubah Warna Background</h1>
-        <p>Ganti warna latar belakang foto produk atau pasfoto Anda secara instan dalam hitungan detik.</p>
+    <!-- Header Navbar -->
+    <nav class="navbar">
+        <div class="logo">
+            <div class="logo-icon">P</div>
+            Photoroom
+        </div>
+        <ul class="nav-links">
+            <li>Product <i class="fa-solid fa-chevron-down" style="font-size: 0.7rem;"></i></li>
+            <li>Solutions <i class="fa-solid fa-chevron-down" style="font-size: 0.7rem;"></i></li>
+            <li>Resources <i class="fa-solid fa-chevron-down" style="font-size: 0.7rem;"></i></li>
+            <li>Enterprise <i class="fa-solid fa-chevron-down" style="font-size: 0.7rem;"></i></li>
+            <li>Pricing</li>
+        </ul>
+        <div class="nav-buttons">
+            <button class="btn-login">Log in</button>
+            <button class="btn-login">Contact sales</button>
+            <button class="btn-start">Start creating</button>
+        </div>
+    </nav>
+
+    <!-- Hero Title -->
+    <div class="hero">
+        <h1 class="hero-title">
+            <i class="fa-solid fa-arrows-spin" style="font-size: 1.8rem;"></i>
+            Change background color
+        </h1>
+        <p class="hero-desc">
+            Turn plain product photos into high converting listings in seconds. Our AI background color changer tool instantly swaps the backdrop color so your products grab attention on marketplaces, product listings, and online stores.
+        </p>
     </div>
 
-    <div class="editor-card">
-        <!-- Palette Option Dots -->
-        <div class="color-palette">
-            <div class="color-dot" style="background-color: #ffffff;" onclick="changeBgColor('#ffffff', this)"></div>
-            <div class="color-dot" style="background-color: #00e5ff;" onclick="changeBgColor('#00e5ff', this)"></div>
-            <div class="color-dot" style="background-color: #0038ff;" onclick="changeBgColor('#0038ff', this)"></div>
-            <div class="color-dot" style="background-color: #556b2f;" onclick="changeBgColor('#556b2f', this)"></div>
-            <div class="color-dot active" style="background-color: #ff3385;" onclick="changeBgColor('#ff3385', this)"></div>
-            <div class="color-dot" style="background-color: #ff5252;" onclick="changeBgColor('#ff5252', this)"></div>
-            <div class="color-dot" style="background-color: #fffdd0;" onclick="changeBgColor('#fffdd0', this)"></div>
-            <div class="color-picker-wrapper" title="Pilih warna kustom">
-                <input type="color" id="custom-color" value="#ff3385" onchange="changeBgColor(this.value, null)">
+    <!-- Main Workspace -->
+    <div class="workspace">
+        
+        <!-- Floating Card Left -->
+        <div class="floating-card floating-left">
+            <img src="https://images.unsplash.com/photo-1592945403244-b3fbafd7f539?w=300" alt="Perfume">
+        </div>
+
+        <!-- Editor Box -->
+        <div class="editor-box">
+            
+            <!-- STATE 1: UPLOAD INITIAL (Gambar 1) -->
+            <div id="view-upload">
+                <div class="dropzone" onclick="document.getElementById('file-input').click()">
+                    <button class="btn-upload-main">
+                        <i class="fa-solid fa-plus"></i> Start from a photo
+                    </button>
+                    <p>Or drop an image here</p>
+                </div>
+
+                <div class="samples-container">
+                    <p class="samples-title">No image? Try one of these</p>
+                    <div class="samples-grid">
+                        <img class="sample-thumb" src="https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=150" onclick="loadSample(this.src)">
+                        <img class="sample-thumb" src="https://images.unsplash.com/photo-1523275335684-37898b6baf30?w=150" onclick="loadSample(this.src)">
+                        <img class="sample-thumb" src="https://images.unsplash.com/photo-1542291026-7eec264c27ff?w=150" onclick="loadSample(this.src)">
+                        <img class="sample-thumb" src="https://images.unsplash.com/photo-1505740420928-5e560c06d30e?w=150" onclick="loadSample(this.src)">
+                    </div>
+                </div>
             </div>
-        </div>
 
-        <!-- Image Canvas Display -->
-        <div class="preview-container" onclick="document.getElementById('file-input').click()">
-            <canvas id="canvas"></canvas>
-            <div class="upload-placeholder" id="placeholder">
-                <i class="fa-solid fa-cloud-arrow-up"></i>
-                <p>Klik untuk mengunggah gambar</p>
+            <!-- STATE 2: EDITOR DISPLAY (Gambar 2 & 3) -->
+            <div id="view-editor">
+                
+                <!-- Palette Colors (Merah #C8102E adalah Pilihan Pertama/Default) -->
+                <div class="editor-topbar">
+                    <div class="color-palette">
+                        <div class="color-dot active" style="background-color: #C8102E;" title="Merah Default" onclick="changeBg('#C8102E', this)"></div>
+                        <div class="color-dot" style="background-color: #ffffff;" title="Putih" onclick="changeBg('#ffffff', this)"></div>
+                        <div class="color-dot" style="background-color: #00e5ff;" title="Cyan" onclick="changeBg('#00e5ff', this)"></div>
+                        <div class="color-dot" style="background-color: #0038ff;" title="Biru" onclick="changeBg('#0038ff', this)"></div>
+                        <div class="color-dot" style="background-color: #556b2f;" title="Hijau Olive" onclick="changeBg('#556b2f', this)"></div>
+                        <div class="color-dot" style="background-color: #ff3385;" title="Pink" onclick="changeBg('#ff3385', this)"></div>
+                        <div class="color-dot" style="background-color: #ff6b6b;" title="Coral Red" onclick="changeBg('#ff6b6b', this)"></div>
+                        <div class="color-dot" style="background-color: #fffdd0;" title="Krem" onclick="changeBg('#fffdd0', this)"></div>
+                        <div class="color-picker-wrapper" title="Warna Lainnya">
+                            <input type="color" id="custom-color-picker" value="#C8102E" onchange="changeBg(this.value, null)">
+                        </div>
+                    </div>
+
+                    <div class="toggle-ba">
+                        <button class="toggle-btn" id="btn-before" onclick="setBeforeAfter(true)">Before</button>
+                        <button class="toggle-btn active" id="btn-after" onclick="setBeforeAfter(false)">After</button>
+                    </div>
+                </div>
+
+                <!-- Canvas Wrapper -->
+                <div class="canvas-wrapper" id="canvas-wrapper">
+                    <button class="btn-close" onclick="resetToUpload()" title="Close"><i class="fa-solid fa-xmark"></i></button>
+                    <canvas id="main-canvas"></canvas>
+                </div>
+
+                <!-- Action Controls Toolbar -->
+                <div class="editor-bottombar">
+                    <button class="action-btn primary"><i class="fa-solid fa-wand-magic-sparkles"></i> Edit for free</button>
+                    <button class="action-btn"><i class="fa-solid fa-scissors"></i> Edit cutout</button>
+                    <button class="action-btn"><i class="fa-solid fa-crop-simple"></i> Resize</button>
+                    <button class="action-btn"><i class="fa-solid fa-image"></i> Add background</button>
+                    <button class="action-btn" onclick="downloadResult()"><i class="fa-solid fa-download"></i> Download</button>
+                </div>
             </div>
+
         </div>
 
-        <!-- Sensitivity Controller -->
-        <div class="settings-bar">
-            <label for="tolerance">Toleransi Warna:</label>
-            <input type="range" id="tolerance" min="5" max="100" value="40" oninput="processImage()">
+        <!-- Floating Card Right -->
+        <div class="floating-card floating-right">
+            <img src="https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=300" alt="Man model">
         </div>
 
-        <!-- Action Toolbar -->
-        <div class="controls">
-            <input type="file" id="file-input" accept="image/*" onchange="loadImage(event)">
-            <button class="btn btn-primary" onclick="document.getElementById('file-input').click()">
-                <i class="fa-solid fa-upload"></i> Unggah Foto
-            </button>
-            <button class="btn" onclick="resetCanvas()">
-                <i class="fa-solid fa-rotate-left"></i> Reset
-            </button>
-            <button class="btn" onclick="downloadImage()">
-                <i class="fa-solid fa-download"></i> Unduh
-            </button>
-        </div>
     </div>
+
+    <!-- Hidden File Input -->
+    <input type="file" id="file-input" accept="image/*" onchange="handleFileUpload(event)">
 
     <script>
-        const canvas = document.getElementById('canvas');
+        const viewUpload = document.getElementById('view-upload');
+        const viewEditor = document.getElementById('view-editor');
+        const canvas = document.getElementById('main-canvas');
         const ctx = canvas.getContext('2d', { willReadFrequently: true });
-        const placeholder = document.getElementById('placeholder');
-        
-        let originalImage = null;
-        let selectedBgColor = '#ff3385';
-        let originalBgColor = null; // Sampled automatically from top-left pixel
+        const canvasWrapper = document.getElementById('canvas-wrapper');
 
-        function loadImage(event) {
+        let currentImage = null;
+        let selectedColor = '#C8102E'; // DEFAULT RED COLOR (#C8102E)
+        let isBeforeState = false;
+
+        // Handle File Upload from User
+        function handleFileUpload(event) {
             const file = event.target.files[0];
             if (!file) return;
 
             const reader = new FileReader();
-            reader.onload = function (e) {
-                const img = new Image();
-                img.onload = function () {
-                    originalImage = img;
-                    canvas.width = img.width;
-                    canvas.height = img.height;
-                    placeholder.style.display = 'none';
-
-                    // Sample the original background color from the top-left corner (0,0)
-                    const tempCanvas = document.createElement('canvas');
-                    tempCanvas.width = img.width;
-                    tempCanvas.height = img.height;
-                    const tempCtx = tempCanvas.getContext('2d');
-                    tempCtx.drawImage(img, 0, 0);
-                    const pixel = tempCtx.getImageData(5, 5, 1, 1).data;
-                    originalBgColor = { r: pixel[0], g: pixel[1], b: pixel[2] };
-
-                    processImage();
-                };
-                img.src = e.target.result;
+            reader.onload = function(e) {
+                loadImage(e.target.result);
             };
             reader.readAsDataURL(file);
         }
 
-        function changeBgColor(color, element) {
-            selectedBgColor = color;
-            if (element) {
-                document.querySelectorAll('.color-dot').forEach(dot => dot.classList.remove('active'));
-                element.classList.add('active');
-            }
-            if (originalImage) {
-                processImage();
-            }
+        // Handle Sample Image Click
+        function loadSample(src) {
+            loadImage(src);
         }
 
-        function processImage() {
-            if (!originalImage) return;
+        // Load image into canvas and switch view
+        function loadImage(src) {
+            const img = new Image();
+            img.crossOrigin = "anonymous";
+            img.onload = function() {
+                currentImage = img;
+                canvas.width = img.width;
+                canvas.height = img.height;
+                
+                // Show Editor View, Hide Upload View
+                viewUpload.style.display = 'none';
+                viewEditor.style.display = 'flex';
+                
+                // Set Default Color to Merah (#C8102E)
+                selectedColor = '#C8102E';
+                resetActiveColorDots();
+                
+                renderCanvas();
+            };
+            img.src = src;
+        }
 
-            const width = canvas.width;
-            const height = canvas.height;
+        // Render Canvas with Background Removal Simulation
+        function renderCanvas() {
+            if (!currentImage) return;
 
-            // Draw original image to get pixels
-            ctx.drawImage(originalImage, 0, 0, width, height);
-            const imgData = ctx.getImageData(0, 0, width, height);
+            if (isBeforeState) {
+                // Show original image
+                canvasWrapper.style.backgroundColor = 'transparent';
+                ctx.clearRect(0, 0, canvas.width, canvas.height);
+                ctx.drawImage(currentImage, 0, 0);
+                return;
+            }
+
+            // Apply selected background color
+            canvasWrapper.style.backgroundColor = selectedColor;
+
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            ctx.drawImage(currentImage, 0, 0);
+
+            // Simple Chroma keying background replacement simulation
+            const imgData = ctx.getImageData(0, 0, canvas.width, canvas.height);
             const data = imgData.data;
 
-            // Parse hex target color
-            const targetRGB = hexToRgb(selectedBgColor);
-            const tolerance = parseInt(document.getElementById('tolerance').value);
+            // Sample top-left corner color as background color
+            const bgR = data[0], bgG = data[1], bgB = data[2];
 
-            // Simple Chroma Key Algorithm replacing original background
-            if (originalBgColor) {
-                for (let i = 0; i < data.length; i += 4) {
-                    const r = data[i];
-                    const g = data[i + 1];
-                    const b = data[i + 2];
+            for (let i = 0; i < data.length; i += 4) {
+                const r = data[i], g = data[i+1], b = data[i+2];
+                const diff = Math.sqrt((r - bgR)**2 + (g - bgG)**2 + (b - bgB)**2);
 
-                    // Calculate distance to original background color
-                    const diff = Math.sqrt(
-                        Math.pow(r - originalBgColor.r, 2) +
-                        Math.pow(g - originalBgColor.g, 2) +
-                        Math.pow(b - originalBgColor.b, 2)
-                    );
-
-                    if (diff < tolerance * 2) {
-                        data[i] = targetRGB.r;
-                        data[i + 1] = targetRGB.g;
-                        data[i + 2] = targetRGB.b;
-                    }
+                // Make detected background pixels transparent so container background shows through
+                if (diff < 55) {
+                    data[i + 3] = 0;
                 }
             }
 
             ctx.putImageData(imgData, 0, 0);
         }
 
-        function hexToRgb(hex) {
-            let result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
-            return result ? {
-                r: parseInt(result[1], 16),
-                g: parseInt(result[2], 16),
-                b: parseInt(result[3], 16)
-            } : { r: 255, g: 255, b: 255 };
-        }
+        // Change Background Color
+        function changeBg(color, element) {
+            selectedColor = color;
+            
+            if (element) {
+                document.querySelectorAll('.color-dot').forEach(dot => dot.classList.remove('active'));
+                element.classList.add('active');
+            }
 
-        function resetCanvas() {
-            if (originalImage) {
-                ctx.drawImage(originalImage, 0, 0);
+            if (isBeforeState) {
+                setBeforeAfter(false);
+            } else {
+                renderCanvas();
             }
         }
 
-        function downloadImage() {
-            if (!originalImage) {
-                alert('Silakan unggah foto terlebih dahulu!');
-                return;
-            }
+        function resetActiveColorDots() {
+            const dots = document.querySelectorAll('.color-dot');
+            dots.forEach(dot => dot.classList.remove('active'));
+            if(dots[0]) dots[0].classList.add('active'); // Set first dot (#C8102E) active
+        }
+
+        // Toggle Before / After View
+        function setBeforeAfter(isBefore) {
+            isBeforeState = isBefore;
+            document.getElementById('btn-before').classList.toggle('active', isBefore);
+            document.getElementById('btn-after').classList.toggle('active', !isBefore);
+            renderCanvas();
+        }
+
+        // Reset back to initial upload view
+        function resetToUpload() {
+            currentImage = null;
+            document.getElementById('file-input').value = '';
+            viewEditor.style.display = 'none';
+            viewUpload.style.display = 'flex';
+        }
+
+        // Download Image
+        function downloadResult() {
+            if (!currentImage) return;
+
+            // Create export canvas with background filled
+            const exportCanvas = document.createElement('canvas');
+            exportCanvas.width = canvas.width;
+            exportCanvas.height = canvas.height;
+            const expCtx = exportCanvas.getContext('2d');
+
+            // Fill selected background color
+            expCtx.fillStyle = selectedColor;
+            expCtx.fillRect(0, 0, exportCanvas.width, exportCanvas.height);
+            expCtx.drawImage(canvas, 0, 0);
+
             const link = document.createElement('a');
-            link.download = 'foto-background-baru.png';
-            link.href = canvas.toDataURL('image/png');
+            link.download = 'photoroom-edited-image.png';
+            link.href = exportCanvas.toDataURL('image/png');
             link.click();
         }
     </script>
