@@ -294,6 +294,28 @@
       border-color: #045844;
       transform: translateY(-2px);
     }
+    /* Style untuk Tombol Ganti Background */
+    .btn-small-outline {
+      background-color: #f0fdf4;
+      color: #0ba97b;
+      border: 1px solid #bceadd;
+      padding: 6px 12px;
+      border-radius: 8px;
+      font-size: 12px;
+      font-weight: 700;
+      text-decoration: none;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      transition: all 0.2s;
+    }
+
+    .btn-small-outline:hover {
+      background-color: #e6fbf0;
+      color: #045844;
+      border-color: #045844;
+      transform: translateY(-1px);
+    }
 
     /* --- SOLUSI LIVE EDITOR RESPONSIVE AKURAT 100% --- */
     #editor-outer-wrapper {
@@ -431,10 +453,20 @@
       <div class="form-group">
           <label><i class="fa-solid fa-camera" style="margin-right: 6px; color: #15803d;"></i> 2. Upload Foto:</label>
           
-          <!-- Keterangan badge dirapatkan dan diminimalisir -->
-          <div class="photo-requirement-badge" style="background-color: #fee2e2; color: #dc2626; border: 1px solid #fca5a5; padding: 4px 10px; border-radius: 6px; font-weight: 700; font-size: 11px; display: inline-flex; align-items: center; margin-top: 0px; margin-bottom: 10px; letter-spacing: 0.5px;">
-              <i class="fa-solid fa-circle-info" style="margin-right: 6px; font-size: 12px;"></i> 
-              foto resmi (3&times;4) background merah
+          <!-- Wrapper Keterangan Badge & Tombol Eksternal -->
+          <div style="display: flex; gap: 10px; align-items: center; margin-bottom: 10px; flex-wrap: wrap;">
+              
+              <!-- Badge Lama -->
+              <div class="photo-requirement-badge" style="background-color: #fee2e2; color: #dc2626; border: 1px solid #fca5a5; padding: 4px 10px; border-radius: 6px; font-weight: 700; font-size: 11px; display: inline-flex; align-items: center; letter-spacing: 0.5px;">
+                  <i class="fa-solid fa-circle-info" style="margin-right: 6px; font-size: 12px;"></i> 
+                  foto resmi (3&times;4) background merah
+              </div>
+              
+              <!-- Tombol Baru Link ke PhotoRoom -->
+              <a href="https://www.photoroom.com/tools/change-background-color" target="_blank" class="btn-small-outline">
+                  <i class="fa-solid fa-wand-magic-sparkles"></i> Ganti Background Foto
+              </a>
+
           </div>
           
           <input type="file" id="upload-image" accept="image/png, image/jpeg" disabled>
