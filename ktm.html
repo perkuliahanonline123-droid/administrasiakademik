@@ -294,7 +294,22 @@
       border-color: #045844;
       transform: translateY(-2px);
     }
-    /* Style untuk Tombol Ganti Background */
+
+    /* 1. Style Kotak Merah (Disamakan ukurannya) */
+    .photo-requirement-badge {
+      background-color: #fee2e2;
+      color: #dc2626;
+      border: 1px solid #fca5a5;
+      padding: 6px 12px;
+      border-radius: 8px;
+      font-size: 12px;
+      font-weight: 700;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    /* 2. Style Kotak Hijau (Tombol Ganti Background) */
     .btn-small-outline {
       background-color: #f0fdf4;
       color: #0ba97b;
@@ -453,17 +468,16 @@
       <div class="form-group">
           <label><i class="fa-solid fa-camera" style="margin-right: 6px; color: #15803d;"></i> 2. Upload Foto:</label>
           
-          <!-- Wrapper Keterangan Badge & Tombol Eksternal -->
-          <div style="display: flex; gap: 10px; align-items: center; margin-bottom: 10px; flex-wrap: wrap;">
+          <div style="display: flex; gap: 12px; align-items: center; margin-bottom: 12px; flex-wrap: wrap;">
               
-              <!-- Badge Lama -->
-              <div class="photo-requirement-badge" style="background-color: #fee2e2; color: #dc2626; border: 1px solid #fca5a5; padding: 4px 10px; border-radius: 6px; font-weight: 700; font-size: 11px; display: inline-flex; align-items: center; letter-spacing: 0.5px;">
-                  <i class="fa-solid fa-circle-info" style="margin-right: 6px; font-size: 12px;"></i> 
+              <!-- KOTAK MERAH (Sekarang akan sama persis dengan hijau) -->
+              <div class="badge-merah">
+                  <i class="fa-solid fa-circle-info"></i> 
                   foto resmi (3&times;4) background merah
               </div>
               
-              <!-- Tombol Baru Link ke PhotoRoom -->
-              <a href="https://www.photoroom.com/tools/change-background-color" target="_blank" class="btn-small-outline">
+              <!-- KOTAK HIJAU -->
+              <a href="https://www.photoroom.com/tools/change-background-color" target="_blank" class="btn-hijau">
                   <i class="fa-solid fa-wand-magic-sparkles"></i> Ganti Background Foto
               </a>
 
@@ -475,7 +489,7 @@
               <i class="fa-solid fa-hand-pointer" style="margin-right: 4px; color: #16a34a;"></i> <b>Tips:</b> Gunakan dua jari (cubit) untuk memperbesar/memperkecil foto dan usap untuk menggeser posisinya.
           </p>
       </div>
-
+      
       <div id="editor-outer-wrapper">
         <div id="editor-wrapper">
           <div id="live-foto-container">
