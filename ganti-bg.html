@@ -116,9 +116,13 @@
         });
 
         selfieSegmentation.onResults(onResults);
+        
+        // Pemanasan (Pre-load) Model AI agar upload pertama kali lebih responsif
+        selfieSegmentation.initialize().then(() => {
+            console.log("Model AI Siap Digunakan!");
+        });
 
         function onResults(results) {
-            // Ambil ukuran gambar yang sudah dikompresi
             const w = results.image.width;
             const h = results.image.height;
             outputCanvas.width = w;
@@ -134,7 +138,10 @@
             imgCanvas.width = w; imgCanvas.height = h;
             const imgCtx = imgCanvas.getContext('2d');
             imgCtx.drawImage(results.image, 0, 0, w, h);
-            const imgData = imgCtx.getImageData(0, 0, w, h).data;
+            
+            // PERBAIKAN: Ambil Object ImageData penuh, bukan hanya Array-nya
+            const imageDataObj = imgCtx.getImageData(0, 0, w, h);
+            const imgData = imageDataObj.data;
 
             const selectedColor = document.querySelector('input[name="bgColor"]:checked').value;
             let bgR = 204, bgG = 0, bgB = 0; 
@@ -161,13 +168,13 @@
                 imgData[i + 3] = 255; 
             }
 
-            ctx.putImageData(imgData, 0, 0);
+            // PERBAIKAN: Taruh Object ImageData kembali ke Canvas
+            ctx.putImageData(imageDataObj, 0, 0);
 
             loadingUI.style.display = 'none';
             resultUI.style.display = 'block';
         }
 
-        // FUNGSI UTAMA: Proses dan Kompres Gambar
         async function processImage() {
             if (!sourceImage.src || sourceImage.src === "") return;
             
@@ -175,7 +182,6 @@
             resultUI.style.display = 'none';
             
             try {
-                // KUNCI SOLUSI MUTER TERUS: Batasi resolusi maksimal gambar menjadi 1080px
                 const MAX_SIZE = 1080;
                 let w = sourceImage.naturalWidth;
                 let h = sourceImage.naturalHeight;
@@ -186,14 +192,12 @@
                     h = Math.round(h * ratio);
                 }
 
-                // Gambar ulang ke resolusi aman
                 const tempCanvas = document.createElement('canvas');
                 tempCanvas.width = w;
                 tempCanvas.height = h;
                 const tCtx = tempCanvas.getContext('2d');
                 tCtx.drawImage(sourceImage, 0, 0, w, h);
 
-                // Kirim versi yang sudah diringankan ke AI
                 await selfieSegmentation.send({image: tempCanvas});
             } catch (err) {
                 console.error(err);
@@ -211,13 +215,12 @@
 
             const reader = new FileReader();
             reader.onload = function (event) {
-                sourceImage.onload = processImage; // Langsung proses saat dimuat
+                sourceImage.onload = processImage; 
                 sourceImage.src = event.target.result;
             }
             reader.readAsDataURL(file);
         });
 
-        // Trigger ulang pemrosesan jika warna diganti (sangat cepat karena AI sudah siap)
         document.querySelectorAll('input[name="bgColor"]').forEach(radio => {
             radio.addEventListener('change', processImage);
         });
