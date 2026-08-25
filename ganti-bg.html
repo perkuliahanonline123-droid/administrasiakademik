@@ -1,0 +1,197 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>AI Ganti Background KTM - STAIIS</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <!-- Library AI dari Google (MediaPipe Selfie Segmentation) -->
+    <script src="https://cdn.jsdelivr.net/npm/@mediapipe/camera_utils/camera_utils.js" crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@mediapipe/control_utils/control_utils.js" crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@mediapipe/drawing_utils/drawing_utils.js" crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@mediapipe/selfie_segmentation/selfie_segmentation.js" crossorigin="anonymous"></script>
+
+    <style>
+        * { box-sizing: border-box; font-family: 'Plus Jakarta Sans', Arial, sans-serif; -webkit-font-smoothing: antialiased; }
+        body { background-color: #f4f7f6; background-image: radial-gradient(#cbd5e1 1px, transparent 1px); background-size: 24px 24px; color: #333; min-height: 100vh; padding-bottom: 40px;}
+        .glass-header { background: rgba(255, 255, 255, 0.9); backdrop-filter: blur(12px); border-bottom: 1px solid rgba(226, 232, 240, 0.8); }
+        .card { background: #ffffff; border-radius: 16px; padding: 28px; margin-bottom: 24px; box-shadow: 0 4px 16px rgba(0, 0, 0, 0.03); border: 1px solid #edf2f7; }
+        
+        .btn-main { width: 100%; padding: 14px; background-color: #045844; color: white; border: none; border-radius: 12px; cursor: pointer; font-weight: 700; font-size: 15px; transition: all 0.2s; box-shadow: 0 8px 16px rgba(4, 88, 68, 0.2); display: flex; align-items: center; justify-content: center; gap: 8px; }
+        .btn-main:hover { background-color: #034233; transform: translateY(-2px); }
+        .btn-main:disabled { background-color: #cbd5e1; box-shadow: none; cursor: not-allowed; transform: none;}
+        
+        input[type="file"]::file-selector-button { background-color: #0ba97b; color: white; border: none; padding: 6px 12px; border-radius: 8px; font-weight: 700; cursor: pointer; margin-right: 12px; transition: all 0.2s; }
+        input[type="file"]::file-selector-button:hover { background-color: #045844; }
+
+        /* Loader AI */
+        #ai-loading { display: none; flex-direction: column; align-items: center; justify-content: center; padding: 30px 0; }
+        .spinner { border: 4px solid #f3f3f3; border-top: 4px solid #0ba97b; border-radius: 50%; width: 40px; height: 40px; animation: spin 1s linear infinite; }
+        @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+        
+        #result-container { display: none; text-align: center; }
+        canvas { max-width: 100%; height: auto; border-radius: 12px; box-shadow: 0 4px 15px rgba(0,0,0,0.1); margin: 0 auto; display: block; border: 2px solid #e2e8f0; }
+    </style>
+</head>
+<body>
+
+    <!-- Header -->
+    <header class="glass-header sticky top-0 z-40 w-full px-6 py-4 flex justify-center shadow-sm">
+        <div class="max-w-3xl w-full flex items-center gap-4">
+            <img src="https://i.ibb.co.com/fGv3qQ11/logo-staiis.webp" alt="Logo" class="w-10 h-10 object-contain">
+            <div>
+                <h1 class="font-extrabold text-[#045844] text-lg leading-tight tracking-tight">AI EDITOR FOTO</h1>
+                <p class="text-[10px] font-bold text-emerald-600 uppercase tracking-[0.2em]">Sistem Akademik STAIIS</p>
+            </div>
+        </div>
+    </header>
+
+    <main class="max-w-3xl mx-auto px-4 mt-8">
+        
+        <div class="card border-t-4 border-t-[#0ba97b]">
+            <h2 class="text-xl font-extrabold text-[#0f172a] mb-2"><i class="fa-solid fa-wand-magic-sparkles text-[#0ba97b] mr-2"></i> Ganti Background Otomatis</h2>
+            <p class="text-sm text-slate-500 font-medium mb-6">Sistem AI ini memproses foto langsung di perangkat Anda tanpa menyimpannya ke server.</p>
+
+            <div class="space-y-5">
+                <!-- Pilihan Warna -->
+                <div>
+                    <label class="block font-bold text-[#045844] text-sm mb-2">1. Pilih Warna Background KTM:</label>
+                    <div class="flex gap-4">
+                        <label class="cursor-pointer flex items-center gap-2 bg-red-50 px-4 py-2 border border-red-200 rounded-lg text-red-700 font-bold text-sm hover:bg-red-100 transition-colors">
+                            <input type="radio" name="bgColor" value="#cc0000" checked class="accent-red-600 w-4 h-4"> Merah
+                        </label>
+                        <label class="cursor-pointer flex items-center gap-2 bg-blue-50 px-4 py-2 border border-blue-200 rounded-lg text-blue-700 font-bold text-sm hover:bg-blue-100 transition-colors">
+                            <input type="radio" name="bgColor" value="#0033cc" class="accent-blue-600 w-4 h-4"> Biru
+                        </label>
+                    </div>
+                </div>
+
+                <!-- Upload Foto -->
+                <div>
+                    <label class="block font-bold text-[#045844] text-sm mb-2">2. Upload Foto Anda:</label>
+                    <div class="border-2 border-dashed border-slate-300 rounded-xl p-4 bg-slate-50 hover:bg-slate-100 transition">
+                        <input type="file" id="imageUpload" accept="image/jpeg, image/png, image/webp" class="w-full text-sm font-semibold text-slate-600 outline-none cursor-pointer">
+                    </div>
+                </div>
+            </div>
+
+            <!-- Loading AI -->
+            <div id="ai-loading">
+                <div class="spinner mb-3"></div>
+                <p class="text-sm font-bold text-emerald-600 animate-pulse">AI sedang memisahkan objek... Mohon tunggu.</p>
+            </div>
+
+            <!-- Hasil Output -->
+            <div id="result-container" class="mt-8">
+                <div class="inline-block relative">
+                    <canvas id="outputCanvas"></canvas>
+                </div>
+                
+                <div class="mt-6 flex flex-col md:flex-row gap-4">
+                    <button id="btnDownload" class="btn-main" onclick="downloadImage()">
+                        <i class="fa-solid fa-download"></i> Download Hasil (Kualitas HD)
+                    </button>
+                    <!-- Tombol Kembali ke KTM -->
+                    <a href="https://perkuliahanprodi.vercel.app/ktm.html" class="w-full md:w-auto px-6 py-3.5 bg-slate-100 text-slate-600 font-bold rounded-xl text-sm border border-slate-200 hover:bg-slate-200 transition text-center flex items-center justify-center gap-2">
+                        <i class="fa-solid fa-arrow-left"></i> Kembali ke Cetak KTM
+                    </a>
+                </div>
+            </div>
+
+            <img id="sourceImage" style="display:none;">
+        </div>
+    </main>
+
+    <script>
+        const imageUpload = document.getElementById('imageUpload');
+        const sourceImage = document.getElementById('sourceImage');
+        const outputCanvas = document.getElementById('outputCanvas');
+        const ctx = outputCanvas.getContext('2d');
+        const loadingUI = document.getElementById('ai-loading');
+        const resultUI = document.getElementById('result-container');
+
+        // INISIALISASI MEDIAPIPE AI (Sistem "Otak" buatan Google)
+        const selfieSegmentation = new SelfieSegmentation({locateFile: (file) => {
+            return `https://cdn.jsdelivr.net/npm/@mediapipe/selfie_segmentation/${file}`;
+        }});
+        
+        selfieSegmentation.setOptions({
+            modelSelection: 0, // 0 = General (Lebih detail), 1 = Landscape (Cepat)
+        });
+
+        // FUNGSI SAAT AI SELESAI MEMOTONG FOTO
+        selfieSegmentation.onResults(onResults);
+
+        function onResults(results) {
+            outputCanvas.width = sourceImage.naturalWidth;
+            outputCanvas.height = sourceImage.naturalHeight;
+
+            ctx.save();
+            ctx.clearRect(0, 0, outputCanvas.width, outputCanvas.height);
+
+            // 1. Gambar hasil topeng (Mask) pemisahan objek dari AI
+            ctx.drawImage(results.segmentationMask, 0, 0, outputCanvas.width, outputCanvas.height);
+
+            // 2. Tempelkan gambar asli (hanya bagian badan manusia yang menempel)
+            ctx.globalCompositeOperation = 'source-in';
+            ctx.drawImage(results.image, 0, 0, outputCanvas.width, outputCanvas.height);
+
+            // 3. Ambil warna radio button yang dipilih (Merah / Biru)
+            const selectedColor = document.querySelector('input[name="bgColor"]:checked').value;
+
+            // 4. Tempelkan warna latar belakang (ditaruh di belakang objek manusia)
+            ctx.globalCompositeOperation = 'destination-over';
+            ctx.fillStyle = selectedColor;
+            ctx.fillRect(0, 0, outputCanvas.width, outputCanvas.height);
+
+            ctx.restore();
+
+            // Sembunyikan Loading, Tampilkan Hasil
+            loadingUI.style.display = 'none';
+            resultUI.style.display = 'block';
+        }
+
+        // TRIGGER SAAT USER MEMILIH FOTO
+        imageUpload.addEventListener('change', async (e) => {
+            const file = e.target.files[0];
+            if (!file) return;
+
+            // Tampilkan Loading
+            resultUI.style.display = 'none';
+            loadingUI.style.display = 'flex';
+
+            const reader = new FileReader();
+            reader.onload = function (event) {
+                sourceImage.onload = async function() {
+                    // Panggil mesin AI untuk memproses gambar
+                    await selfieSegmentation.send({image: sourceImage});
+                }
+                sourceImage.src = event.target.result;
+            }
+            reader.readAsDataURL(file);
+        });
+
+        // RE-GENERATE JIKA USER MENGGANTI WARNA RADIO BUTTON
+        document.querySelectorAll('input[name="bgColor"]').forEach(radio => {
+            radio.addEventListener('change', async () => {
+                if (sourceImage.src) {
+                    loadingUI.style.display = 'flex';
+                    resultUI.style.display = 'none';
+                    await selfieSegmentation.send({image: sourceImage});
+                }
+            });
+        });
+
+        // FUNGSI DOWNLOAD FOTO
+        function downloadImage() {
+            const link = document.createElement('a');
+            link.download = 'Pas_Foto_KTM_STAIIS.png';
+            link.href = outputCanvas.toDataURL('image/png', 1.0);
+            link.click();
+        }
+    </script>
+</body>
+</html>
