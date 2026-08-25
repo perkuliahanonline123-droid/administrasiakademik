@@ -162,9 +162,10 @@
         </div>
     </div>
 
-    <!-- AREA PDF TERSEMBUNYI UNTUK HTML2PDF -->
-    <div style="display: none;">
+    <!-- AREA PDF TERSEMBUNYI UNTUK HTML2PDF (TIDAK MENGGUNAKAN DISPLAY: NONE) -->
+    <div style="position: absolute; top: -9999px; left: -9999px; z-index: -100;">
         <div id="pdf-template" style="width: 210mm; background: white; padding: 12mm 20mm; box-sizing: border-box; font-family: 'Times New Roman', Times, serif; color: #000; line-height: 1.45; text-align: left;">
+            
             <!-- KOP SURAT -->
             <div style="text-align: center; line-height: 1.15;">
                 <div style="font-size: 14px; font-weight: bold; letter-spacing: 1px;">PUSAT ILMU KEISLAMAN INTERNASIONAL</div>
@@ -181,36 +182,48 @@
             <h2 style="text-align: center; font-size: 14pt; font-weight: bold; text-decoration: underline; margin-bottom: 20px;">FORMULIR PEMILIHAN PROGRAM STUDI</h2>
 
             <table style="width: 100%; border-collapse: collapse; font-size: 11pt;">
-                <tr><td style="width: 38%; padding: 3px 0; vertical-align: top;">Ijazah SMA/Sederajat</td><td style="width: 2%; padding: 3px 0; vertical-align: top;">:</td><td style="padding: 3px 0;" id="pdf-ijazah"></td></tr>
-                <tr><td style="padding: 3px 0; vertical-align: top;">Nama Lengkap</td><td style="padding: 3px 0; vertical-align: top;">:</td><td style="padding: 3px 0;" id="pdf-nama"></td></tr>
+                
+                <!-- A. DATA DIRI MAHASISWA -->
+                <tr><td colspan="3" style="font-weight: bold; padding-top: 10px; padding-bottom: 5px; border-bottom: 1px solid #000;">A. DATA DIRI MAHASISWA</td></tr>
+                <tr><td style="width: 38%; padding: 3px 0; vertical-align: top;">Nama Lengkap</td><td style="width: 2%; padding: 3px 0; vertical-align: top;">:</td><td style="padding: 3px 0;" id="pdf-nama"></td></tr>
                 <tr><td style="padding: 3px 0; vertical-align: top;">Jenis Kelamin</td><td style="padding: 3px 0; vertical-align: top;">:</td><td style="padding: 3px 0;" id="pdf-jk"></td></tr>
                 <tr><td style="padding: 3px 0; vertical-align: top;">Tempat Lahir</td><td style="padding: 3px 0; vertical-align: top;">:</td><td style="padding: 3px 0;" id="pdf-tempatLahir"></td></tr>
                 <tr><td style="padding: 3px 0; vertical-align: top;">Tanggal Lahir</td><td style="padding: 3px 0; vertical-align: top;">:</td><td style="padding: 3px 0;" id="pdf-tglLahir"></td></tr>
-                <tr><td style="padding: 3px 0; vertical-align: top;">Agama</td><td style="padding: 3px 0; vertical-align: top;">:</td><td style="padding: 3px 0;">Islam</td></tr>
-                <tr><td style="padding: 3px 0; vertical-align: top;">Kewarganegaraan</td><td style="padding: 3px 0; vertical-align: top;">:</td><td style="padding: 3px 0;" id="pdf-warga"></td></tr>
-                <tr><td style="padding: 3px 0; vertical-align: top;">NISN</td><td style="padding: 3px 0; vertical-align: top;">:</td><td style="padding: 3px 0;" id="pdf-nisn"></td></tr>
                 <tr><td style="padding: 3px 0; vertical-align: top;">NIK</td><td style="padding: 3px 0; vertical-align: top;">:</td><td style="padding: 3px 0;" id="pdf-nik"></td></tr>
+                <tr><td style="padding: 3px 0; vertical-align: top;">NISN</td><td style="padding: 3px 0; vertical-align: top;">:</td><td style="padding: 3px 0;" id="pdf-nisn"></td></tr>
+                <tr><td style="padding: 3px 0; vertical-align: top;">Kewarganegaraan</td><td style="padding: 3px 0; vertical-align: top;">:</td><td style="padding: 3px 0;" id="pdf-warga"></td></tr>
+                <tr><td style="padding: 3px 0; vertical-align: top;">Agama</td><td style="padding: 3px 0; vertical-align: top;">:</td><td style="padding: 3px 0;">Islam</td></tr>
+                <tr><td style="padding: 3px 0; vertical-align: top;">Nomor Telepon</td><td style="padding: 3px 0; vertical-align: top;">:</td><td style="padding: 3px 0;" id="pdf-telp"></td></tr>
+                <tr><td style="padding: 3px 0; vertical-align: top;">Alamat Email</td><td style="padding: 3px 0; vertical-align: top;">:</td><td style="padding: 3px 0;" id="pdf-email"></td></tr>
                 <tr><td style="padding: 3px 0; vertical-align: top;">Alamat Lengkap</td><td style="padding: 3px 0; vertical-align: top;">:</td><td style="padding: 3px 0;" id="pdf-alamat"></td></tr>
                 <tr><td style="padding: 3px 0; vertical-align: top;">Penerima KPS</td><td style="padding: 3px 0; vertical-align: top;">:</td><td style="padding: 3px 0;">Tidak</td></tr>
-                <tr><td style="padding: 3px 0; vertical-align: top;">Alamat Email</td><td style="padding: 3px 0; vertical-align: top;">:</td><td style="padding: 3px 0;" id="pdf-email"></td></tr>
-                <tr><td style="padding: 3px 0; vertical-align: top;">Nomor Telepon</td><td style="padding: 3px 0; vertical-align: top;">:</td><td style="padding: 3px 0;" id="pdf-telp"></td></tr>
+
+                <!-- B. PEMILIHAN PRODI & BERKAS -->
+                <tr><td colspan="3" style="font-weight: bold; padding-top: 15px; padding-bottom: 5px; border-bottom: 1px solid #000;">B. PEMILIHAN PROGRAM STUDI & BERKAS</td></tr>
+                <tr><td style="padding: 3px 0; vertical-align: top;">Program Studi Pilihan</td><td style="padding: 3px 0; vertical-align: top;">:</td><td style="padding: 3px 0; font-weight: bold;" id="pdf-prodi"></td></tr>
+                <tr><td style="padding: 3px 0; vertical-align: top;">Ijazah SMA/Sederajat</td><td style="padding: 3px 0; vertical-align: top;">:</td><td style="padding: 3px 0;" id="pdf-ijazah"></td></tr>
+                <tr><td style="padding: 3px 0; vertical-align: top;">Status Masuk</td><td style="padding: 3px 0; vertical-align: top;">:</td><td style="padding: 3px 0;">Mahasiswa Baru</td></tr>
+                <tr><td style="padding: 3px 0; vertical-align: top;">Tahun Masuk</td><td style="padding: 3px 0; vertical-align: top;">:</td><td style="padding: 3px 0;" id="pdf-tahunMasuk"></td></tr>
+                <tr><td style="padding: 3px 0; vertical-align: top;">Semester Masuk</td><td style="padding: 3px 0; vertical-align: top;">:</td><td style="padding: 3px 0;">Ganjil</td></tr>
+                <tr><td style="padding: 3px 0; vertical-align: top;">Tanggal Masuk</td><td style="padding: 3px 0; vertical-align: top;">:</td><td style="padding: 3px 0;" id="pdf-tglMasuk"></td></tr>
+
+                <!-- C. DATA ORANG TUA -->
+                <tr><td colspan="3" style="font-weight: bold; padding-top: 15px; padding-bottom: 5px; border-bottom: 1px solid #000;">C. DATA ORANG TUA</td></tr>
+                <tr><td style="padding: 3px 0; vertical-align: top; font-weight: bold;" colspan="3">Data Ayah</td></tr>
                 <tr><td style="padding: 3px 0; vertical-align: top;">Nama Ayah</td><td style="padding: 3px 0; vertical-align: top;">:</td><td style="padding: 3px 0;" id="pdf-namaAyah"></td></tr>
                 <tr><td style="padding: 3px 0; vertical-align: top;">NIK Ayah</td><td style="padding: 3px 0; vertical-align: top;">:</td><td style="padding: 3px 0;" id="pdf-nikAyah"></td></tr>
                 <tr><td style="padding: 3px 0; vertical-align: top;">Tanggal Lahir Ayah</td><td style="padding: 3px 0; vertical-align: top;">:</td><td style="padding: 3px 0;" id="pdf-tglAyah"></td></tr>
                 <tr><td style="padding: 3px 0; vertical-align: top;">Pendidikan Ayah</td><td style="padding: 3px 0; vertical-align: top;">:</td><td style="padding: 3px 0;" id="pdf-pendAyah"></td></tr>
                 <tr><td style="padding: 3px 0; vertical-align: top;">Pekerjaan Ayah</td><td style="padding: 3px 0; vertical-align: top;">:</td><td style="padding: 3px 0;" id="pdf-pekAyah"></td></tr>
                 <tr><td style="padding: 3px 0; vertical-align: top;">Penghasilan Ayah</td><td style="padding: 3px 0; vertical-align: top;">:</td><td style="padding: 3px 0;" id="pdf-pengAyah"></td></tr>
+                
+                <tr><td style="padding: 10px 0 3px 0; vertical-align: top; font-weight: bold;" colspan="3">Data Ibu</td></tr>
                 <tr><td style="padding: 3px 0; vertical-align: top;">Nama Ibu</td><td style="padding: 3px 0; vertical-align: top;">:</td><td style="padding: 3px 0;" id="pdf-namaIbu"></td></tr>
                 <tr><td style="padding: 3px 0; vertical-align: top;">NIK Ibu</td><td style="padding: 3px 0; vertical-align: top;">:</td><td style="padding: 3px 0;" id="pdf-nikIbu"></td></tr>
                 <tr><td style="padding: 3px 0; vertical-align: top;">Tanggal Lahir Ibu</td><td style="padding: 3px 0; vertical-align: top;">:</td><td style="padding: 3px 0;" id="pdf-tglIbu"></td></tr>
                 <tr><td style="padding: 3px 0; vertical-align: top;">Pendidikan Ibu</td><td style="padding: 3px 0; vertical-align: top;">:</td><td style="padding: 3px 0;" id="pdf-pendIbu"></td></tr>
                 <tr><td style="padding: 3px 0; vertical-align: top;">Pekerjaan Ibu</td><td style="padding: 3px 0; vertical-align: top;">:</td><td style="padding: 3px 0;" id="pdf-pekIbu"></td></tr>
                 <tr><td style="padding: 3px 0; vertical-align: top;">Penghasilan Ibu</td><td style="padding: 3px 0; vertical-align: top;">:</td><td style="padding: 3px 0;" id="pdf-pengIbu"></td></tr>
-                <tr><td style="padding: 3px 0; vertical-align: top;">Program Studi Pilihan</td><td style="padding: 3px 0; vertical-align: top;">:</td><td style="padding: 3px 0; font-weight: bold;" id="pdf-prodi"></td></tr>
-                <tr><td style="padding: 3px 0; vertical-align: top;">Status Masuk</td><td style="padding: 3px 0; vertical-align: top;">:</td><td style="padding: 3px 0;">Mahasiswa Baru</td></tr>
-                <tr><td style="padding: 3px 0; vertical-align: top;">Tahun Masuk</td><td style="padding: 3px 0; vertical-align: top;">:</td><td style="padding: 3px 0;" id="pdf-tahunMasuk"></td></tr>
-                <tr><td style="padding: 3px 0; vertical-align: top;">Semester Masuk</td><td style="padding: 3px 0; vertical-align: top;">:</td><td style="padding: 3px 0;">Ganjil</td></tr>
-                <tr><td style="padding: 3px 0; vertical-align: top;">Tanggal Masuk</td><td style="padding: 3px 0; vertical-align: top;">:</td><td style="padding: 3px 0;" id="pdf-tglMasuk"></td></tr>
             </table>
 
             <div style="margin-top: 40px; text-align: right; font-size: 11pt;">
