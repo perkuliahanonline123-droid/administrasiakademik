@@ -7,6 +7,10 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <!-- Library HTML2PDF -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+
     <style>
         * { box-sizing: border-box; font-family: 'Plus Jakarta Sans', Arial, sans-serif; -webkit-font-smoothing: antialiased; }
         body { background-color: #f4f7f6; background-image: radial-gradient(#cbd5e1 1px, transparent 1px); background-size: 24px 24px; color: #333; min-height: 100vh; padding-bottom: 40px;}
@@ -154,8 +158,67 @@
             </div>
             <h2 class="text-2xl font-black text-slate-800 mb-3 tracking-tight">Jadwal Pengisian Formulir</h2>
             <p id="closedMessageText" class="text-slate-600 font-medium leading-relaxed mb-4"></p>
-            
             <div id="countdownContainer"></div>
+        </div>
+    </div>
+
+    <!-- AREA PDF TERSEMBUNYI UNTUK HTML2PDF -->
+    <div style="display: none;">
+        <div id="pdf-template" style="width: 210mm; background: white; padding: 12mm 20mm; box-sizing: border-box; font-family: 'Times New Roman', Times, serif; color: #000; line-height: 1.45; text-align: left;">
+            <!-- KOP SURAT -->
+            <div style="text-align: center; line-height: 1.15;">
+                <div style="font-size: 14px; font-weight: bold; letter-spacing: 1px;">PUSAT ILMU KEISLAMAN INTERNASIONAL</div>
+                <div style="font-size: 18px; font-weight: bold; letter-spacing: 1px;">SEKOLAH TINGGI AGAMA ISLAM (STAI) IMAM SYAFI’I CIANJUR</div>
+                <div style="font-size: 20px; font-weight: bold; margin: 3px 0;">جامعة&nbsp;الإمام&nbsp;الشافعي</div>
+                <div style="font-size: 12px; margin-top: 4px;">Jl. Sarongge No. 16, RT 01/RW 04, Desa Ciputri, Kec. Pacet, Cianjur, Jawa Barat</div>
+                <div style="font-size: 12px;">Telp.: +62 851-1145-0055 | Email: staiis_cianjur@yahoo.com</div>
+            </div>
+            
+            <!-- GARIS PEMBATAS KOP -->
+            <div style="margin-top: 10px; margin-bottom: 2px; border-bottom: 3px solid black;"></div>
+            <div style="margin-bottom: 15px; border-bottom: 1px solid black;"></div>
+
+            <h2 style="text-align: center; font-size: 14pt; font-weight: bold; text-decoration: underline; margin-bottom: 20px;">FORMULIR PEMILIHAN PROGRAM STUDI</h2>
+
+            <table style="width: 100%; border-collapse: collapse; font-size: 11pt;">
+                <tr><td style="width: 38%; padding: 3px 0; vertical-align: top;">Ijazah SMA/Sederajat</td><td style="width: 2%; padding: 3px 0; vertical-align: top;">:</td><td style="padding: 3px 0;" id="pdf-ijazah"></td></tr>
+                <tr><td style="padding: 3px 0; vertical-align: top;">Nama Lengkap</td><td style="padding: 3px 0; vertical-align: top;">:</td><td style="padding: 3px 0;" id="pdf-nama"></td></tr>
+                <tr><td style="padding: 3px 0; vertical-align: top;">Jenis Kelamin</td><td style="padding: 3px 0; vertical-align: top;">:</td><td style="padding: 3px 0;" id="pdf-jk"></td></tr>
+                <tr><td style="padding: 3px 0; vertical-align: top;">Tempat Lahir</td><td style="padding: 3px 0; vertical-align: top;">:</td><td style="padding: 3px 0;" id="pdf-tempatLahir"></td></tr>
+                <tr><td style="padding: 3px 0; vertical-align: top;">Tanggal Lahir</td><td style="padding: 3px 0; vertical-align: top;">:</td><td style="padding: 3px 0;" id="pdf-tglLahir"></td></tr>
+                <tr><td style="padding: 3px 0; vertical-align: top;">Agama</td><td style="padding: 3px 0; vertical-align: top;">:</td><td style="padding: 3px 0;">Islam</td></tr>
+                <tr><td style="padding: 3px 0; vertical-align: top;">Kewarganegaraan</td><td style="padding: 3px 0; vertical-align: top;">:</td><td style="padding: 3px 0;" id="pdf-warga"></td></tr>
+                <tr><td style="padding: 3px 0; vertical-align: top;">NISN</td><td style="padding: 3px 0; vertical-align: top;">:</td><td style="padding: 3px 0;" id="pdf-nisn"></td></tr>
+                <tr><td style="padding: 3px 0; vertical-align: top;">NIK</td><td style="padding: 3px 0; vertical-align: top;">:</td><td style="padding: 3px 0;" id="pdf-nik"></td></tr>
+                <tr><td style="padding: 3px 0; vertical-align: top;">Alamat Lengkap</td><td style="padding: 3px 0; vertical-align: top;">:</td><td style="padding: 3px 0;" id="pdf-alamat"></td></tr>
+                <tr><td style="padding: 3px 0; vertical-align: top;">Penerima KPS</td><td style="padding: 3px 0; vertical-align: top;">:</td><td style="padding: 3px 0;">Tidak</td></tr>
+                <tr><td style="padding: 3px 0; vertical-align: top;">Alamat Email</td><td style="padding: 3px 0; vertical-align: top;">:</td><td style="padding: 3px 0;" id="pdf-email"></td></tr>
+                <tr><td style="padding: 3px 0; vertical-align: top;">Nomor Telepon</td><td style="padding: 3px 0; vertical-align: top;">:</td><td style="padding: 3px 0;" id="pdf-telp"></td></tr>
+                <tr><td style="padding: 3px 0; vertical-align: top;">Nama Ayah</td><td style="padding: 3px 0; vertical-align: top;">:</td><td style="padding: 3px 0;" id="pdf-namaAyah"></td></tr>
+                <tr><td style="padding: 3px 0; vertical-align: top;">NIK Ayah</td><td style="padding: 3px 0; vertical-align: top;">:</td><td style="padding: 3px 0;" id="pdf-nikAyah"></td></tr>
+                <tr><td style="padding: 3px 0; vertical-align: top;">Tanggal Lahir Ayah</td><td style="padding: 3px 0; vertical-align: top;">:</td><td style="padding: 3px 0;" id="pdf-tglAyah"></td></tr>
+                <tr><td style="padding: 3px 0; vertical-align: top;">Pendidikan Ayah</td><td style="padding: 3px 0; vertical-align: top;">:</td><td style="padding: 3px 0;" id="pdf-pendAyah"></td></tr>
+                <tr><td style="padding: 3px 0; vertical-align: top;">Pekerjaan Ayah</td><td style="padding: 3px 0; vertical-align: top;">:</td><td style="padding: 3px 0;" id="pdf-pekAyah"></td></tr>
+                <tr><td style="padding: 3px 0; vertical-align: top;">Penghasilan Ayah</td><td style="padding: 3px 0; vertical-align: top;">:</td><td style="padding: 3px 0;" id="pdf-pengAyah"></td></tr>
+                <tr><td style="padding: 3px 0; vertical-align: top;">Nama Ibu</td><td style="padding: 3px 0; vertical-align: top;">:</td><td style="padding: 3px 0;" id="pdf-namaIbu"></td></tr>
+                <tr><td style="padding: 3px 0; vertical-align: top;">NIK Ibu</td><td style="padding: 3px 0; vertical-align: top;">:</td><td style="padding: 3px 0;" id="pdf-nikIbu"></td></tr>
+                <tr><td style="padding: 3px 0; vertical-align: top;">Tanggal Lahir Ibu</td><td style="padding: 3px 0; vertical-align: top;">:</td><td style="padding: 3px 0;" id="pdf-tglIbu"></td></tr>
+                <tr><td style="padding: 3px 0; vertical-align: top;">Pendidikan Ibu</td><td style="padding: 3px 0; vertical-align: top;">:</td><td style="padding: 3px 0;" id="pdf-pendIbu"></td></tr>
+                <tr><td style="padding: 3px 0; vertical-align: top;">Pekerjaan Ibu</td><td style="padding: 3px 0; vertical-align: top;">:</td><td style="padding: 3px 0;" id="pdf-pekIbu"></td></tr>
+                <tr><td style="padding: 3px 0; vertical-align: top;">Penghasilan Ibu</td><td style="padding: 3px 0; vertical-align: top;">:</td><td style="padding: 3px 0;" id="pdf-pengIbu"></td></tr>
+                <tr><td style="padding: 3px 0; vertical-align: top;">Program Studi Pilihan</td><td style="padding: 3px 0; vertical-align: top;">:</td><td style="padding: 3px 0; font-weight: bold;" id="pdf-prodi"></td></tr>
+                <tr><td style="padding: 3px 0; vertical-align: top;">Status Masuk</td><td style="padding: 3px 0; vertical-align: top;">:</td><td style="padding: 3px 0;">Mahasiswa Baru</td></tr>
+                <tr><td style="padding: 3px 0; vertical-align: top;">Tahun Masuk</td><td style="padding: 3px 0; vertical-align: top;">:</td><td style="padding: 3px 0;" id="pdf-tahunMasuk"></td></tr>
+                <tr><td style="padding: 3px 0; vertical-align: top;">Semester Masuk</td><td style="padding: 3px 0; vertical-align: top;">:</td><td style="padding: 3px 0;">Ganjil</td></tr>
+                <tr><td style="padding: 3px 0; vertical-align: top;">Tanggal Masuk</td><td style="padding: 3px 0; vertical-align: top;">:</td><td style="padding: 3px 0;" id="pdf-tglMasuk"></td></tr>
+            </table>
+
+            <div style="margin-top: 40px; text-align: right; font-size: 11pt;">
+                <p>Cianjur, <span id="pdf-tglCetak"></span></p>
+                <p>Pendaftar,</p>
+                <br><br><br>
+                <p style="font-weight: bold; text-decoration: underline;" id="pdf-ttd"></p>
+            </div>
         </div>
     </div>
 
@@ -164,6 +227,7 @@
         const API_URL = 'https://script.google.com/macros/s/AKfycbx-05Hxhfk5QdtQbDQfCpUISTcZwiubpludYX2pHcCVowL6JHtCEgbzCILvJ2uAbJ-V/exec'; 
 
         let globalSisaLaki = 20;
+        const currentYear = new Date().getFullYear();
 
         const penghasilanOptions = [
             "-- Pilih Rentang Penghasilan --",
@@ -259,11 +323,11 @@
             
             penghasilanOptions.forEach((opt, idx) => {
                 const el1 = new Option(opt, idx===0 ? "" : opt);
-                if (idx===0) { el1.disabled = true; el1.selected = true; } // Perbaikan Selected Default
+                if (idx===0) { el1.disabled = true; el1.selected = true; } 
                 selectAyah.add(el1);
 
                 const el2 = new Option(opt, idx===0 ? "" : opt);
-                if (idx===0) { el2.disabled = true; el2.selected = true; } // Perbaikan Selected Default
+                if (idx===0) { el2.disabled = true; el2.selected = true; } 
                 selectIbu.add(el2);
             });
 
@@ -312,6 +376,14 @@
             reader.onerror = error => reject(error);
         });
 
+        // FUNGSI FORMAT TANGGAL UNTUK TAMPILAN PDF
+        function formatDateIndo(dateString) {
+            if(!dateString) return "-";
+            const parts = dateString.split("-");
+            const months = ["Januari", "Februari", "Maret", "April", "Mei", "Juni", "Juli", "Agustus", "September", "Oktober", "November", "Desember"];
+            return `${parts[2]} ${months[parseInt(parts[1])-1]} ${parts[0]}`;
+        }
+
         document.getElementById('pmbForm').addEventListener('submit', async function(e) {
             e.preventDefault();
             const file = document.getElementById('fileIjazah').files[0];
@@ -319,7 +391,7 @@
             
             const btnSubmit = document.getElementById('btnSubmit');
             btnSubmit.disabled = true; 
-            btnSubmit.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Mengirim Data...';
+            btnSubmit.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Memproses Data...';
             document.getElementById('alertBox').classList.add('hidden');
             
             try {
@@ -360,18 +432,70 @@
                 });
                 
                 const result = await response.json();
+                
                 if (result.status === 'success') {
-                    showAlert('Formulir Berhasil Dikirim! Terima Kasih.', 'success');
-                    setTimeout(() => location.reload(), 3000); 
+                    showAlert('Berhasil! Sedang mengunduh dokumen pendaftaran...', 'success');
+                    btnSubmit.innerHTML = '<i class="fa-solid fa-download"></i> Mengunduh PDF...';
+
+                    // 1. POPULATE DATA KE PDF TEMPLATE
+                    document.getElementById('pdf-ijazah').innerText = payloadJSON.fileName;
+                    document.getElementById('pdf-nama').innerText = payloadJSON.namaLengkap;
+                    document.getElementById('pdf-jk').innerText = payloadJSON.jenisKelamin;
+                    document.getElementById('pdf-tempatLahir').innerText = payloadJSON.tempatLahir;
+                    document.getElementById('pdf-tglLahir').innerText = formatDateIndo(payloadJSON.tglLahir);
+                    document.getElementById('pdf-warga').innerText = payloadJSON.kewarganegaraan;
+                    document.getElementById('pdf-nisn').innerText = payloadJSON.nisn;
+                    document.getElementById('pdf-nik').innerText = payloadJSON.nik;
+                    document.getElementById('pdf-alamat').innerText = payloadJSON.alamatLengkap;
+                    document.getElementById('pdf-email').innerText = payloadJSON.email;
+                    document.getElementById('pdf-telp').innerText = payloadJSON.noTelepon;
+                    
+                    document.getElementById('pdf-namaAyah').innerText = payloadJSON.namaAyah;
+                    document.getElementById('pdf-nikAyah').innerText = payloadJSON.nikAyah;
+                    document.getElementById('pdf-tglAyah').innerText = formatDateIndo(payloadJSON.tglLahirAyah);
+                    document.getElementById('pdf-pendAyah').innerText = payloadJSON.pendidikanAyah;
+                    document.getElementById('pdf-pekAyah').innerText = payloadJSON.pekerjaanAyah;
+                    document.getElementById('pdf-pengAyah').innerText = payloadJSON.penghasilanAyah.substring(3); // Hapus angka prefix
+                    
+                    document.getElementById('pdf-namaIbu').innerText = payloadJSON.namaIbu;
+                    document.getElementById('pdf-nikIbu').innerText = payloadJSON.nikIbu;
+                    document.getElementById('pdf-tglIbu').innerText = formatDateIndo(payloadJSON.tglLahirIbu);
+                    document.getElementById('pdf-pendIbu').innerText = payloadJSON.pendidikanIbu;
+                    document.getElementById('pdf-pekIbu').innerText = payloadJSON.pekerjaanIbu;
+                    document.getElementById('pdf-pengIbu').innerText = payloadJSON.penghasilanIbu.substring(3);
+
+                    document.getElementById('pdf-prodi').innerText = payloadJSON.prodiPilihan;
+                    document.getElementById('pdf-tahunMasuk').innerText = currentYear;
+                    document.getElementById('pdf-tglMasuk').innerText = "1 September " + currentYear;
+                    
+                    const todayDate = new Date();
+                    document.getElementById('pdf-tglCetak').innerText = formatDateIndo(todayDate.toISOString().split('T')[0]);
+                    document.getElementById('pdf-ttd').innerText = payloadJSON.namaLengkap;
+
+                    // 2. GENERATE PDF LALU RELOAD HALAMAN
+                    const element = document.getElementById('pdf-template');
+                    const opt = {
+                        margin:       0,
+                        filename:     'Formulir_PMB_' + payloadJSON.namaLengkap.replace(/\s+/g, '_') + '.pdf',
+                        image:        { type: 'jpeg', quality: 0.98 },
+                        html2canvas:  { scale: 2 },
+                        jsPDF:        { unit: 'mm', format: 'a4', orientation: 'portrait' }
+                    };
+
+                    html2pdf().set(opt).from(element).save().then(() => {
+                        setTimeout(() => location.reload(), 2000); 
+                    });
+
                 } else {
                     showAlert('Gagal: ' + result.message, 'error');
+                    btnSubmit.disabled = false; 
+                    btnSubmit.innerHTML = '<i class="fa-solid fa-paper-plane"></i> Kirim Formulir';
                 }
             } catch (error) {
                 showAlert('Gagal terhubung ke Database. Periksa koneksi internet Anda.', 'error');
-            } finally {
                 btnSubmit.disabled = false; 
                 btnSubmit.innerHTML = '<i class="fa-solid fa-paper-plane"></i> Kirim Formulir';
-            }
+            } 
         });
 
         function showAlert(message, type) {
