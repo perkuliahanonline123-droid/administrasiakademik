@@ -403,7 +403,6 @@
             reader.onerror = error => reject(error);
         });
 
-        // FUNGSI FORMAT TANGGAL UNTUK TAMPILAN PDF
         function formatDateIndo(dateString) {
             if(!dateString) return "-";
             const parts = dateString.split("-");
@@ -461,53 +460,54 @@
                 const result = await response.json();
                 
                 // ====================================================================
-                // BLOK LOGIKA CETAK PDF NATIVE (TANPA LIBRARY, LANGSUNG DARI BROWSER)
+                // BLOK LOGIKA CETAK PDF NATIVE (DIPERBAIKI UNTUK HP)
                 // ====================================================================
                 if (result.status === 'success') {
                     showAlert('Berhasil! Menyiapkan dokumen pendaftaran...', 'success');
                     btnSubmit.innerHTML = '<i class="fa-solid fa-print"></i> Mencetak Formulir...';
 
-                    // 1. POPULATE DATA KE DALAM DIV CETAK TERSEMBUNYI
-                    document.getElementById('print-nama').innerText = payloadJSON.namaLengkap;
-                    document.getElementById('print-jk').innerText = payloadJSON.jenisKelamin;
-                    document.getElementById('print-tempatLahir').innerText = payloadJSON.tempatLahir;
-                    document.getElementById('print-tglLahir').innerText = formatDateIndo(payloadJSON.tglLahir);
-                    document.getElementById('print-nik').innerText = payloadJSON.nik;
-                    document.getElementById('print-nisn').innerText = payloadJSON.nisn;
-                    document.getElementById('print-warga').innerText = payloadJSON.kewarganegaraan;
-                    document.getElementById('print-telp').innerText = payloadJSON.noTelepon;
-                    document.getElementById('print-email').innerText = payloadJSON.email;
-                    document.getElementById('print-alamat').innerText = payloadJSON.alamatLengkap;
-
-                    document.getElementById('print-prodi').innerText = payloadJSON.prodiPilihan;
-                    document.getElementById('print-ijazah').innerText = payloadJSON.fileName;
-                    document.getElementById('print-tahunMasuk').innerText = currentYear;
-                    document.getElementById('print-tglMasuk').innerText = "1 September " + currentYear;
-
-                    document.getElementById('print-namaAyah').innerText = payloadJSON.namaAyah;
-                    document.getElementById('print-nikAyah').innerText = payloadJSON.nikAyah;
-                    document.getElementById('print-tglAyah').innerText = formatDateIndo(payloadJSON.tglLahirAyah);
-                    document.getElementById('print-pendAyah').innerText = payloadJSON.pendidikanAyah;
-                    document.getElementById('print-pekAyah').innerText = payloadJSON.pekerjaanAyah;
-                    document.getElementById('print-pengAyah').innerText = payloadJSON.penghasilanAyah.substring(3);
-
-                    document.getElementById('print-namaIbu').innerText = payloadJSON.namaIbu;
-                    document.getElementById('print-nikIbu').innerText = payloadJSON.nikIbu;
-                    document.getElementById('print-tglIbu').innerText = formatDateIndo(payloadJSON.tglLahirIbu);
-                    document.getElementById('print-pendIbu').innerText = payloadJSON.pendidikanIbu;
-                    document.getElementById('print-pekIbu').innerText = payloadJSON.pekerjaanIbu;
-                    document.getElementById('print-pengIbu').innerText = payloadJSON.penghasilanIbu.substring(3);
-
-                    const todayDate = new Date();
-                    document.getElementById('print-tglCetak').innerText = formatDateIndo(todayDate.toISOString().split('T')[0]);
-                    document.getElementById('print-ttd').innerText = payloadJSON.namaLengkap;
-
-                    // 2. SEMBUNYIKAN UI WEB MENGGUNAKAN JAVASCRIPT SEBELUM PRINT (AGAR HP TIDAK BINGUNG)
+                    // 1. SEMBUNYIKAN UI WEB & TAMPILKAN AREA CETAK TERLEBIH DAHULU
+                    // Ini wajib dilakukan sebelum mengisi data agar HP me-render teksnya dan tidak blank
                     document.getElementById('web-header').style.display = 'none';
                     document.getElementById('mainContent').style.display = 'none';
                     document.getElementById('cetakArea').style.display = 'block';
 
-                    // 3. GANTI JUDUL HALAMAN UNTUK NAMA FILE
+                    // 2. POPULATE DATA MENGGUNAKAN .innerHTML (Sangat diwajibkan untuk browser HP)
+                    document.getElementById('print-nama').innerHTML = payloadJSON.namaLengkap;
+                    document.getElementById('print-jk').innerHTML = payloadJSON.jenisKelamin;
+                    document.getElementById('print-tempatLahir').innerHTML = payloadJSON.tempatLahir;
+                    document.getElementById('print-tglLahir').innerHTML = formatDateIndo(payloadJSON.tglLahir);
+                    document.getElementById('print-nik').innerHTML = payloadJSON.nik;
+                    document.getElementById('print-nisn').innerHTML = payloadJSON.nisn;
+                    document.getElementById('print-warga').innerHTML = payloadJSON.kewarganegaraan;
+                    document.getElementById('print-telp').innerHTML = payloadJSON.noTelepon;
+                    document.getElementById('print-email').innerHTML = payloadJSON.email;
+                    document.getElementById('print-alamat').innerHTML = payloadJSON.alamatLengkap;
+
+                    document.getElementById('print-prodi').innerHTML = payloadJSON.prodiPilihan;
+                    document.getElementById('print-ijazah').innerHTML = payloadJSON.fileName;
+                    document.getElementById('print-tahunMasuk').innerHTML = currentYear;
+                    document.getElementById('print-tglMasuk').innerHTML = "1 September " + currentYear;
+
+                    document.getElementById('print-namaAyah').innerHTML = payloadJSON.namaAyah;
+                    document.getElementById('print-nikAyah').innerHTML = payloadJSON.nikAyah;
+                    document.getElementById('print-tglAyah').innerHTML = formatDateIndo(payloadJSON.tglLahirAyah);
+                    document.getElementById('print-pendAyah').innerHTML = payloadJSON.pendidikanAyah;
+                    document.getElementById('print-pekAyah').innerHTML = payloadJSON.pekerjaanAyah;
+                    document.getElementById('print-pengAyah').innerHTML = payloadJSON.penghasilanAyah.substring(3);
+
+                    document.getElementById('print-namaIbu').innerHTML = payloadJSON.namaIbu;
+                    document.getElementById('print-nikIbu').innerHTML = payloadJSON.nikIbu;
+                    document.getElementById('print-tglIbu').innerHTML = formatDateIndo(payloadJSON.tglLahirIbu);
+                    document.getElementById('print-pendIbu').innerHTML = payloadJSON.pendidikanIbu;
+                    document.getElementById('print-pekIbu').innerHTML = payloadJSON.pekerjaanIbu;
+                    document.getElementById('print-pengIbu').innerHTML = payloadJSON.penghasilanIbu.substring(3);
+
+                    const todayDate = new Date();
+                    document.getElementById('print-tglCetak').innerHTML = formatDateIndo(todayDate.toISOString().split('T')[0]);
+                    document.getElementById('print-ttd').innerHTML = payloadJSON.namaLengkap;
+
+                    // 3. GANTI JUDUL HALAMAN UNTUK NAMA FILE PDF (Sesuai Arahan agar tidak ada kata PMB)
                     const originalTitle = document.title;
                     document.title = 'Formulir_Pemilihan_Prodi_' + payloadJSON.namaLengkap.replace(/\s+/g, '_');
 
