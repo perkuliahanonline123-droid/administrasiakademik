@@ -53,7 +53,10 @@
             <div class="card border-t-4 border-t-[#0ba97b]">
                 <h2 class="section-title text-[#0ba97b] border-b-[#bceadd]"><i class="fa-solid fa-id-card"></i> Data Diri Mahasiswa</h2>
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
-                    <div class="form-group"><label>Nama Lengkap (Sesuai Ijazah) <span class="text-red-500">*</span></label><input type="text" id="namaLengkap" class="custom-input" required></div>
+                    <div class="form-group">
+                        <label>Nama Lengkap (Sesuai Ijazah) <span class="text-red-500">*</span></label>
+                        <input type="text" id="namaLengkap" class="custom-input" placeholder="GUNAKAN HURUF KAPITAL" style="text-transform: uppercase;" oninput="this.value = this.value.toUpperCase()" required>
+                    </div>
                     <div class="form-group">
                         <label>Jenis Kelamin <span class="text-red-500">*</span></label>
                         <select id="jenisKelamin" class="custom-input bg-[#f0fdf4]" required>
