@@ -467,24 +467,26 @@
 
                     // 2. INJEKSI KE IFRAME DAN PRINT NATIVE
                     const iframe = document.createElement('iframe');
-                    iframe.style.display = 'none';
+                    iframe.style.position = 'absolute';
+                    iframe.style.width = '0px';
+                    iframe.style.height = '0px';
+                    iframe.style.border = 'none';
                     document.body.appendChild(iframe);
                     
                     iframe.contentWindow.document.open();
                     iframe.contentWindow.document.write(cetakHTML);
                     iframe.contentWindow.document.close();
 
-                    // Tunggu dokumen termuat sempurna lalu cetak
-                    setTimeout(() => {
+                    // Gunakan iframe.onload agar sistem menunggu HTML selesai digambar sebelum mencetak
+                    iframe.onload = function() {
                         iframe.contentWindow.focus();
                         iframe.contentWindow.print();
                         
-                        // Reload halaman setelah dialog print ditutup
+                        // Reload halaman setelah jeda 2 detik
                         setTimeout(() => {
-                            document.body.removeChild(iframe);
                             location.reload();
                         }, 2000);
-                    }, 500);
+                    };
 
                 } else {
                     showAlert('Gagal: ' + result.message, 'error');
