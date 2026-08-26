@@ -546,24 +546,29 @@
             // Paksa scroll ke atas agar tidak ada area yang terpotong
             window.scrollTo(0, 0);
 
-            // TIDAK PERLU MENGUBAH PADDING DAN WIDTH
-            // Biarkan menggunakan ukuran asli (210mm) dan padding bawaan elemen agar persis seperti pratinjau
+            // SIMPAN STYLE ASLI
+            const originalMinHeight = element.style.minHeight;
+            
+            // HILANGKAN MIN-HEIGHT SEMENTARA
+            // Membiarkan tinggi menyesuaikan isi agar tidak menabrak batas 297mm yang memicu halaman 2
+            element.style.minHeight = 'auto'; 
 
             const opt = {
-                margin:       0, // Set margin 0 karena kita sudah pakai padding di div #kertas-target
+                margin:       0, 
                 filename:     'Formulir_Pemilihan_Prodi_' + nama.replace(/\s+/g, '_') + '.pdf',
                 image:        { type: 'jpeg', quality: 0.98 },
                 html2canvas:  { 
                     scale: 2, 
                     useCORS: true,
-                    scrollY: 0,
-                    // Hilangkan windowWidth atau sesuaikan dengan lebar resolusi A4 standar (~794px)
-                    // Jika di HP masih bermasalah, Anda bisa mengaktifkan kembali windowWidth: 794
+                    scrollY: 0
                 },
                 jsPDF:        { unit: 'mm', format: 'a4', orientation: 'portrait' }
             };
 
             html2pdf().set(opt).from(element).save().then(() => {
+                // KEMBALIKAN STYLE SEPERTI SEMULA SETELAH DOWNLOAD SELESAI
+                element.style.minHeight = originalMinHeight;
+                
                 btn.innerHTML = originalText;
                 btn.disabled = false;
             });
