@@ -198,7 +198,7 @@
         <!-- Wadah Kertas (Bisa digeser di HP jika kebesaran) -->
         <div class="kertas-wrapper">
             <!-- TARGET HTML2PDF: Kertas A4 ini yang akan ditangkap oleh sistem -->
-            <div class="kertas-a4" id="kertas-target" style="padding: 15mm 20mm;">
+            <div class="kertas-a4" id="kertas-target" style="padding: 8mm 20mm;">
                 <!-- KONTEN AKAN DI-INJEKSI OLEH JAVASCRIPT AGAR PADAT DAN RAPI -->
             </div>
         </div>
@@ -415,16 +415,14 @@
                 
                 const result = await response.json();
                 
-                // ====================================================================
-                // BLOK PEMBUATAN PRATINJAU DENGAN GABUNGAN 1 DAN 2 KOLOM
-                // ====================================================================
                 if (result.status === 'success') {
                     showAlert('Berhasil! Menyiapkan dokumen pendaftaran...', 'success');
 
                     const todayDate = new Date();
                     const tglCetak = formatDateIndo(todayDate.toISOString().split('T')[0]);
                     
-                    // MEMBANGUN HTML YANG SANGAT RAPI (DATA DIRI 1 KOLOM, ORANG TUA 2 KOLOM)
+                    // MEMBANGUN HTML YANG SANGAT RAPI
+                    // Margin dan padding dikompresi agar jaminan muat 1 lembar kertas
                     const cetakHTML = `
                         <!-- KOP SURAT -->
                         <div style="text-align: center; line-height: 1.15;">
@@ -436,12 +434,12 @@
                         </div>
                         
                         <div style="margin-top: 10px; margin-bottom: 2px; border-bottom: 3px solid black;"></div>
-                        <div style="margin-bottom: 12px; border-bottom: 1px solid black;"></div>
+                        <div style="margin-bottom: 10px; border-bottom: 1px solid black;"></div>
 
-                        <h2 style="text-align: center; font-size: 12pt; font-weight: bold; text-decoration: underline; margin-bottom: 15px;">FORMULIR PEMILIHAN PROGRAM STUDI</h2>
+                        <h2 style="text-align: center; font-size: 12pt; font-weight: bold; text-decoration: underline; margin-bottom: 10px;">FORMULIR PEMILIHAN PROGRAM STUDI</h2>
 
                         <!-- A. DATA DIRI (1 KOLOM) -->
-                        <div style="font-weight: bold; padding-top: 5px; padding-bottom: 2px; border-bottom: 1px solid #000; margin-bottom: 6px; font-size: 11pt;">A. DATA DIRI MAHASISWA</div>
+                        <div style="font-weight: bold; padding-top: 4px; padding-bottom: 2px; border-bottom: 1px solid #000; margin-bottom: 4px; font-size: 11pt;">A. DATA DIRI MAHASISWA</div>
                         <table style="width: 100%; border-collapse: collapse; font-size: 10.5pt; line-height: 1.3;">
                             <tr><td style="width: 25%; padding: 3px 0;">Nama Lengkap</td><td style="width: 2%;">:</td><td style="font-weight:bold;">${payloadJSON.namaLengkap}</td></tr>
                             <tr><td style="padding: 3px 0;">Jenis Kelamin</td><td>:</td><td>${payloadJSON.jenisKelamin}</td></tr>
@@ -458,7 +456,7 @@
                         </table>
 
                         <!-- B. PRODI (1 KOLOM) -->
-                        <div style="font-weight: bold; padding-top: 10px; padding-bottom: 2px; border-bottom: 1px solid #000; margin-bottom: 6px; font-size: 11pt;">B. PEMILIHAN PROGRAM STUDI & BERKAS</div>
+                        <div style="font-weight: bold; padding-top: 8px; padding-bottom: 2px; border-bottom: 1px solid #000; margin-bottom: 4px; font-size: 11pt;">B. PEMILIHAN PROGRAM STUDI & BERKAS</div>
                         <table style="width: 100%; border-collapse: collapse; font-size: 10.5pt; line-height: 1.3;">
                             <tr><td style="width: 25%; padding: 3px 0;">Program Studi Pilihan</td><td style="width: 2%;">:</td><td style="font-weight: bold;">${payloadJSON.prodiPilihan}</td></tr>
                             <tr><td style="padding: 3px 0;">Ijazah SMA/Sederajat</td><td>:</td><td>${payloadJSON.fileName}</td></tr>
@@ -469,7 +467,7 @@
                         </table>
 
                         <!-- C. ORANG TUA (2 KOLOM) -->
-                        <div style="font-weight: bold; padding-top: 10px; padding-bottom: 2px; border-bottom: 1px solid #000; margin-bottom: 6px; font-size: 11pt;">C. DATA ORANG TUA</div>
+                        <div style="font-weight: bold; padding-top: 8px; padding-bottom: 2px; border-bottom: 1px solid #000; margin-bottom: 4px; font-size: 11pt;">C. DATA ORANG TUA</div>
                         <table style="width: 100%; border-collapse: collapse; font-size: 10.5pt; line-height: 1.3;">
                             <tr>
                                 <td colspan="3" style="font-weight: bold; font-style: italic; padding-bottom: 4px; width: 50%;">Data Ayah</td>
@@ -501,10 +499,11 @@
                             </tr>
                         </table>
 
-                        <div style="margin-top: 30px; text-align: right; margin-right: 15px; font-size: 11pt;">
+                        <!-- MARGIN TOP DIKURANGI AGAR NAIK KE ATAS -->
+                        <div style="margin-top: 15px; text-align: right; margin-right: 15px; font-size: 11pt;">
                             <p>Cianjur, ${tglCetak}</p>
                             <p>Pendaftar,</p>
-                            <br><br><br>
+                            <br><br>
                             <p style="font-weight: bold; text-decoration: underline;" id="nama-pendaftar-pdf">${payloadJSON.namaLengkap}</p>
                         </div>
                     `;
@@ -533,9 +532,8 @@
             } 
         });
 
-        // FUNGSI UNTUK MENDOWNLOAD PDF (ANTI GESER, PASTI 1 HALAMAN, 100% NYATA)
+        // FUNGSI UNTUK MENDOWNLOAD PDF
         function unduhPDF() {
-            // Targetkan langsung Kertas yang SEDANG TAMPIL di layar
             const element = document.getElementById('kertas-target');
             const nama = document.getElementById('nama-pendaftar-pdf').innerText;
             const btn = document.getElementById('btnDownloadPdf');
@@ -544,27 +542,21 @@
             btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Sedang Mengunduh...';
             btn.disabled = true;
 
-            // Pastikan scroll berada di atas agar tidak ada ruang kosong terpotret
-            window.scrollTo(0, 0);
+            // Hilangkan sementara padding bawaan CSS karena margin akan diatur oleh mesin html2pdf
+            const originalPadding = element.style.padding;
+            element.style.padding = '0';
 
             const opt = {
-                margin:       0, // Margin sudah diatur dari padding elemen kertas (15mm 20mm)
+                // MARGIN ATAS DAN BAWAH DITURUNKAN KE 8mm AGAR MUAT 1 HALAMAN
+                margin:       [8, 20, 8, 20], 
                 filename:     'Formulir_Pemilihan_Prodi_' + nama.replace(/\s+/g, '_') + '.pdf',
-                image:        { type: 'jpeg', quality: 1 },
-                html2canvas:  { 
-                    scale: 2, 
-                    useCORS: true,
-                    scrollY: 0 // Kunci utama anti-geser
-                },
+                image:        { type: 'jpeg', quality: 0.98 },
+                html2canvas:  { scale: 2, useCORS: true },
                 jsPDF:        { unit: 'mm', format: 'a4', orientation: 'portrait' }
             };
 
-            // Panggil html2pdf secara langsung pada elemen yang sedang dilihat (tanpa clone/hide)
             html2pdf().set(opt).from(element).save().then(() => {
-                btn.innerHTML = originalText;
-                btn.disabled = false;
-            }).catch(err => {
-                console.error(err);
+                element.style.padding = originalPadding;
                 btn.innerHTML = originalText;
                 btn.disabled = false;
             });
