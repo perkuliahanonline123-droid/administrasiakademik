@@ -167,7 +167,7 @@
         </form>
     </main>
 
-    <!-- UI PESAN FORM TUTUP -->
+    <!-- UI PESAN FORM TUTUP & HITUNG MUNDUR -->
     <div id="closedMessage" class="hidden flex-col items-center justify-center min-h-[70vh] px-4 text-center mt-8">
         <div class="bg-white p-8 md:p-12 rounded-3xl shadow-xl max-w-lg border border-slate-100 w-full">
             <div class="w-20 h-20 bg-red-100 text-red-500 rounded-full flex items-center justify-center text-4xl mx-auto mb-6">
@@ -325,11 +325,23 @@
                         document.getElementById('closedMessageText').innerHTML = result.statusMessage;
                         document.getElementById('closedMessage').style.display = 'flex';
                         document.getElementById('mainContent').style.display = 'none';
+                        
+                        if (result.statusType === 'before' && result.targetTime) {
+                            startCountdown(result.targetTime);
+                        } else {
+                            document.getElementById('countdownContainer').innerHTML = `
+                                <div class="mt-6 inline-flex bg-slate-100 text-slate-500 font-bold px-6 py-2 rounded-full text-sm">
+                                    <i class="fa-solid fa-ban mr-2 mt-0.5"></i> Pengisian Formulir Ditutup
+                                </div>
+                            `;
+                        }
                         return; 
                     }
 
                     document.getElementById('mainContent').style.display = 'block';
-                    globalSisaLaki = 20 - result.count;
+
+                    const terisi = result.count;
+                    globalSisaLaki = 20 - terisi;
                     
                 } else {
                     throw new Error("Respon server gagal");
@@ -521,7 +533,7 @@
             } 
         });
 
-        // FUNGSI UNTUK MENDOWNLOAD PDF
+        // FUNGSI UNTUK MENDOWNLOAD PDF (ANTI GESER, PASTI 1 HALAMAN)
         function unduhPDF() {
             const element = document.getElementById('kertas-target');
             const nama = document.getElementById('nama-pendaftar-pdf').innerText;
@@ -531,44 +543,49 @@
             btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Sedang Mengunduh...';
             btn.disabled = true;
 
-            // KUNCI 1: Naikkan scroll ke paling atas (0) secara paksa 
-            // agar PDF tidak tergeser ke bawah dan meninggalkan ruang kosong
+            // KUNCI PERBAIKAN: Kita 'CLONE' kertasnya, lalu kita format secara absolut
+            // agar proses pemotretan PDF tidak terpengaruh oleh margin auto atau scroll HP.
+            const clonedElement = element.cloneNode(true);
+            clonedElement.style.margin = '0';
+            clonedElement.style.position = 'absolute';
+            clonedElement.style.top = '0';
+            clonedElement.style.left = '0';
+            clonedElement.style.width = '210mm'; // Paksa ukuran kertas A4
+            clonedElement.style.boxShadow = 'none';
+            clonedElement.style.zIndex = '-9999';
+            
+            document.body.appendChild(clonedElement);
+
+            // Paksa layar naik ke koordinat tertinggi
             window.scrollTo(0, 0);
 
-            // KUNCI 2: Simpan pengaturan tampilan responsif HP
-            const originalPadding = element.style.padding;
-            const originalWidth = element.style.width;
-            
-            // KUNCI 3: Paksa kertas menjadi ukuran baku Desktop (800px) sebelum difoto,
-            // agar teks di HP tidak menyusut ke bawah yang menyebabkannya tumpah ke halaman 2
-            element.style.padding = '0';
-            element.style.width = '800px'; 
-            element.style.maxWidth = '800px';
-
             const opt = {
-                // Margin dikecilkan sedikit (1 cm atas-bawah) untuk menggaransi 100% muat 1 lembar
-                margin:       [10, 15, 10, 15], 
+                margin:       0, // Margin diatur oleh padding bawaan (15mm 20mm) agar akurat
                 filename:     'Formulir_Pemilihan_Prodi_' + nama.replace(/\s+/g, '_') + '.pdf',
                 image:        { type: 'jpeg', quality: 1 },
                 html2canvas:  { 
                     scale: 2, 
                     useCORS: true,
-                    scrollY: 0,        // Mencegah bug scroll
-                    windowWidth: 800   // Simulasi render pada resolusi 800px
+                    scrollY: 0,
+                    scrollX: 0
                 },
                 jsPDF:        { unit: 'mm', format: 'a4', orientation: 'portrait' }
             };
 
-            html2pdf().set(opt).from(element).save().then(() => {
-                // Kembalikan tampilan ke versi responsif aslinya setelah PDF berhasil terunduh
-                element.style.padding = originalPadding;
-                element.style.width = originalWidth;
-                element.style.maxWidth = '';
+            html2pdf().set(opt).from(clonedElement).save().then(() => {
+                // Hapus kertas clone yang disembunyikan
+                document.body.removeChild(clonedElement);
                 
+                // Kembalikan tombol seperti semula
+                btn.innerHTML = originalText;
+                btn.disabled = false;
+            }).catch(err => {
+                console.error(err);
                 btn.innerHTML = originalText;
                 btn.disabled = false;
             });
         }
+
         function showAlert(message, type) {
             const box = document.getElementById('alertBox');
             box.className = `p-4 rounded-xl text-sm font-bold transition-all mb-6 flex items-center gap-3 ${type === 'success' ? 'bg-[#f0fdf4] text-[#045844] border border-[#bceadd]' : 'bg-red-50 text-red-700 border border-red-200'}`;
