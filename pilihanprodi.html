@@ -8,6 +8,9 @@
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     
+    <!-- LIBRARY HTML2PDF KITA PANGGIL LAGI -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+
     <style>
         * { box-sizing: border-box; font-family: 'Plus Jakarta Sans', Arial, sans-serif; -webkit-font-smoothing: antialiased; }
         body { background-color: #f4f7f6; background-image: radial-gradient(#cbd5e1 1px, transparent 1px); background-size: 24px 24px; color: #333; min-height: 100vh; padding-bottom: 40px;}
@@ -32,21 +35,14 @@
            ========================================================= */
         #cetakArea { display: none; background-color: #cbd5e1; min-height: 100vh; padding-bottom: 40px; }
         .action-bar { position: sticky; top: 0; background: white; padding: 15px; box-shadow: 0 4px 10px rgba(0,0,0,0.1); display: flex; justify-content: center; gap: 10px; z-index: 100; }
+        
+        /* Tombol Download */
+        .btn-download-pdf { background-color: #ef4444; color: white; padding: 10px 20px; border-radius: 8px; font-weight: bold; font-size: 14px; border: none; cursor: pointer; display: flex; align-items: center; gap: 8px; transition: 0.2s; }
+        .btn-download-pdf:hover { background-color: #dc2626; }
+        .btn-download-pdf:disabled { background-color: #fca5a5; cursor: not-allowed; }
+
         .kertas-a4 { background: white; width: 210mm; min-height: 297mm; margin: 30px auto; padding: 15mm 20mm; box-shadow: 0 10px 25px rgba(0,0,0,0.15); font-family: 'Times New Roman', Times, serif; font-size: 11pt; line-height: 1.4; color: #000; overflow: hidden;}
         .kertas-wrapper { overflow-x: auto; width: 100%; padding: 10px; }
-
-        /* =========================================================
-           ATURAN SAAT TOMBOL PRINT DITEKAN (NATIVE)
-           ========================================================= */
-        @media print {
-            body, html { background: #fff !important; padding: 0 !important; margin: 0 !important; }
-            #web-header, #mainContent, #overlay-loading, #alertBox, #closedMessage, .action-bar { display: none !important; }
-            
-            #cetakArea { display: block !important; background: transparent !important; padding: 0 !important; }
-            .kertas-wrapper { padding: 0 !important; overflow: visible !important; }
-            .kertas-a4 { box-shadow: none !important; margin: 0 !important; padding: 0 !important; width: 100% !important; min-height: auto !important; }
-            @page { size: A4 portrait; margin: 15mm 20mm; }
-        }
     </style>
 </head>
 <body>
@@ -185,24 +181,25 @@
     </div>
 
     <!-- ========================================================================= -->
-    <!-- HALAMAN PRATINJAU (PREVIEW) & CETAK PDF                                   -->
+    <!-- HALAMAN PRATINJAU (PREVIEW) UNTUK DIUBAH KE PDF MENGGUNAKAN HTML2PDF      -->
     <!-- ========================================================================= -->
     <div id="cetakArea">
         
         <!-- Tombol Aksi Pratinjau -->
         <div class="action-bar">
-            <button onclick="window.print()" style="background-color: #0ba97b; color: white; padding: 10px 20px; border-radius: 8px; font-weight: bold; font-size: 14px; border: none; cursor: pointer; display: flex; align-items: center; gap: 8px;">
-                <i class="fa-solid fa-print"></i> Cetak / Simpan PDF
+            <!-- TOMBOL DOWNLOAD PDF (Memicu html2pdf) -->
+            <button id="btnDownloadPdf" onclick="unduhPDF()" class="btn-download-pdf">
+                <i class="fa-solid fa-file-pdf"></i> Download PDF
             </button>
             <button onclick="location.reload()" style="background-color: #64748b; color: white; padding: 10px 20px; border-radius: 8px; font-weight: bold; font-size: 14px; border: none; cursor: pointer;">
-                Selesai
+                Kembali
             </button>
         </div>
 
         <!-- Wadah Kertas (Bisa digeser di HP jika kebesaran) -->
         <div class="kertas-wrapper">
-            <!-- Kertas A4 -->
-            <div class="kertas-a4">
+            <!-- TARGET HTML2PDF: Kertas A4 ini yang akan ditangkap oleh sistem -->
+            <div class="kertas-a4" id="kertas-target">
                 <!-- KOP SURAT -->
                 <div style="text-align: center; line-height: 1.15;">
                     <div style="font-size: 13pt; font-weight: bold; letter-spacing: 1px;">PUSAT ILMU KEISLAMAN INTERNASIONAL</div>
@@ -289,7 +286,6 @@
             "13. Rp15.000.001 - Rp20.000.000", "14. Rp20.000.001 - Rp25.000.000", "15. > Rp25.000.000"
         ];
 
-        // LOGIKA KONTROL PRODI BERDASARKAN GENDER
         document.getElementById('jenisKelamin').addEventListener('change', function(e) {
             const jk = e.target.value;
             const prodiSelect = document.getElementById('prodiPilihan');
@@ -486,10 +482,6 @@
                 if (result.status === 'success') {
                     showAlert('Berhasil! Menyiapkan dokumen pendaftaran...', 'success');
 
-                    // =======================================================
-                    // LOGIKA PRATINJAU: TAMPILKAN DATA KE KERTAS DI LAYAR
-                    // =======================================================
-                    
                     // 1. Masukkan data ke HTML Pratinjau
                     document.getElementById('print-nama').innerHTML = payloadJSON.namaLengkap;
                     document.getElementById('print-jk').innerHTML = payloadJSON.jenisKelamin;
@@ -525,10 +517,10 @@
                     document.getElementById('print-tglCetak').innerHTML = formatDateIndo(todayDate.toISOString().split('T')[0]);
                     document.getElementById('print-ttd').innerHTML = payloadJSON.namaLengkap;
 
-                    // 2. Ganti Nama Judul Halaman agar saat di Save PDF tidak ada kata PMB
+                    // 2. Ganti Nama Judul Halaman
                     document.title = 'Formulir_Pemilihan_Prodi_' + payloadJSON.namaLengkap.replace(/\s+/g, '_');
 
-                    // 3. Sembunyikan Form, Tampilkan Halaman Pratinjau
+                    // 3. Sembunyikan Form Utama, Munculkan Halaman Kertas
                     document.getElementById('web-header').style.display = 'none';
                     document.getElementById('mainContent').style.display = 'none';
                     document.getElementById('cetakArea').style.display = 'block';
@@ -546,6 +538,32 @@
                 btnSubmit.innerHTML = '<i class="fa-solid fa-paper-plane"></i> Kirim Formulir';
             } 
         });
+
+        // FUNGSI UNTUK MENDOWNLOAD PDF SECARA LANGSUNG
+        function unduhPDF() {
+            // Targetkan area kertas A4 murni
+            const element = document.getElementById('kertas-target');
+            const nama = document.getElementById('print-nama').innerText;
+            const btn = document.getElementById('btnDownloadPdf');
+            
+            const originalText = btn.innerHTML;
+            btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Sedang Mengunduh...';
+            btn.disabled = true;
+
+            // Pengaturan html2pdf dengan margin 0 karena margin kertas sudah diatur via CSS padding
+            const opt = {
+                margin:       0,
+                filename:     'Formulir_Pemilihan_Prodi_' + nama.replace(/\s+/g, '_') + '.pdf',
+                image:        { type: 'jpeg', quality: 0.98 },
+                html2canvas:  { scale: 2, useCORS: true },
+                jsPDF:        { unit: 'mm', format: 'a4', orientation: 'portrait' }
+            };
+
+            html2pdf().set(opt).from(element).save().then(() => {
+                btn.innerHTML = originalText;
+                btn.disabled = false;
+            });
+        }
 
         function showAlert(message, type) {
             const box = document.getElementById('alertBox');
