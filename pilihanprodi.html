@@ -546,33 +546,24 @@
             // Paksa scroll ke atas agar tidak ada area yang terpotong
             window.scrollTo(0, 0);
 
-            // Simpan style asli
-            const originalPadding = element.style.padding;
-            const originalWidth = element.style.width;
-
-            // Hilangkan padding sementara (karena diganti margin jsPDF) 
-            // dan PAKSA LEBAR 800px agar tidak hancur/zoom di HP
-            element.style.padding = '0';
-            element.style.width = '800px';
+            // TIDAK PERLU MENGUBAH PADDING DAN WIDTH
+            // Biarkan menggunakan ukuran asli (210mm) dan padding bawaan elemen agar persis seperti pratinjau
 
             const opt = {
-                margin:       [8, 20, 8, 20], // Margin atas & bawah dikecilkan jadi 8mm agar muat 1 halaman
+                margin:       0, // Set margin 0 karena kita sudah pakai padding di div #kertas-target
                 filename:     'Formulir_Pemilihan_Prodi_' + nama.replace(/\s+/g, '_') + '.pdf',
                 image:        { type: 'jpeg', quality: 0.98 },
                 html2canvas:  { 
                     scale: 2, 
                     useCORS: true,
-                    windowWidth: 800, // Wajib ada agar format tabel tidak hancur berantakan
-                    scrollY: 0
+                    scrollY: 0,
+                    // Hilangkan windowWidth atau sesuaikan dengan lebar resolusi A4 standar (~794px)
+                    // Jika di HP masih bermasalah, Anda bisa mengaktifkan kembali windowWidth: 794
                 },
                 jsPDF:        { unit: 'mm', format: 'a4', orientation: 'portrait' }
             };
 
             html2pdf().set(opt).from(element).save().then(() => {
-                // Kembalikan style seperti semula
-                element.style.padding = originalPadding;
-                element.style.width = originalWidth;
-                
                 btn.innerHTML = originalText;
                 btn.disabled = false;
             });
