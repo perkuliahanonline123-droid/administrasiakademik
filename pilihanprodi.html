@@ -28,15 +28,23 @@
         @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
 
         /* =========================================================
-           ATURAN CETAK PDF NATIVE (TANPA LIBRARY)
+           TAMPILAN KERTAS PRATINJAU (PREVIEW) DI LAYAR
+           ========================================================= */
+        #cetakArea { display: none; background-color: #cbd5e1; min-height: 100vh; padding-bottom: 40px; }
+        .action-bar { position: sticky; top: 0; background: white; padding: 15px; box-shadow: 0 4px 10px rgba(0,0,0,0.1); display: flex; justify-content: center; gap: 10px; z-index: 100; }
+        .kertas-a4 { background: white; width: 210mm; min-height: 297mm; margin: 30px auto; padding: 15mm 20mm; box-shadow: 0 10px 25px rgba(0,0,0,0.15); font-family: 'Times New Roman', Times, serif; font-size: 11pt; line-height: 1.4; color: #000; overflow: hidden;}
+        .kertas-wrapper { overflow-x: auto; width: 100%; padding: 10px; }
+
+        /* =========================================================
+           ATURAN SAAT TOMBOL PRINT DITEKAN (NATIVE)
            ========================================================= */
         @media print {
-            /* Sembunyikan web UI secara total */
             body, html { background: #fff !important; padding: 0 !important; margin: 0 !important; }
-            #web-header, #mainContent, #overlay-loading, #alertBox, #closedMessage { display: none !important; }
+            #web-header, #mainContent, #overlay-loading, #alertBox, #closedMessage, .action-bar { display: none !important; }
             
-            /* Tampilkan Area Cetak dengan format Kertas A4 */
-            #cetakArea { display: block !important; color: #000 !important; }
+            #cetakArea { display: block !important; background: transparent !important; padding: 0 !important; }
+            .kertas-wrapper { padding: 0 !important; overflow: visible !important; }
+            .kertas-a4 { box-shadow: none !important; margin: 0 !important; padding: 0 !important; width: 100% !important; min-height: auto !important; }
             @page { size: A4 portrait; margin: 15mm 20mm; }
         }
     </style>
@@ -177,73 +185,89 @@
     </div>
 
     <!-- ========================================================================= -->
-    <!-- AREA CETAK PDF NATIVE (HANYA TAMPIL SAAT PROSES PRINT BERJALAN)           -->
+    <!-- HALAMAN PRATINJAU (PREVIEW) & CETAK PDF                                   -->
     <!-- ========================================================================= -->
-    <div id="cetakArea" style="display: none; font-family: 'Times New Roman', Times, serif; font-size: 11pt; line-height: 1.4;">
+    <div id="cetakArea">
         
-        <!-- KOP SURAT -->
-        <div style="text-align: center; line-height: 1.15;">
-            <div style="font-size: 13pt; font-weight: bold; letter-spacing: 1px;">PUSAT ILMU KEISLAMAN INTERNASIONAL</div>
-            <div style="font-size: 15pt; font-weight: bold; letter-spacing: 1px;">SEKOLAH TINGGI AGAMA ISLAM (STAI) IMAM SYAFI’I CIANJUR</div>
-            <div style="font-size: 20pt; font-weight: bold; margin: 4px 0;">جامعة الإمام الشافعي</div>
-            <div style="font-size: 10pt; margin-top: 4px;">Jl. Sarongge No. 16, RT 01/RW 04, Desa Ciputri, Kec. Pacet, Cianjur, Jawa Barat</div>
-            <div style="font-size: 10pt;">Telp.: +62 851-1145-0055 | Email: staiis_cianjur@yahoo.com</div>
+        <!-- Tombol Aksi Pratinjau -->
+        <div class="action-bar">
+            <button onclick="window.print()" style="background-color: #0ba97b; color: white; padding: 10px 20px; border-radius: 8px; font-weight: bold; font-size: 14px; border: none; cursor: pointer; display: flex; align-items: center; gap: 8px;">
+                <i class="fa-solid fa-print"></i> Cetak / Simpan PDF
+            </button>
+            <button onclick="location.reload()" style="background-color: #64748b; color: white; padding: 10px 20px; border-radius: 8px; font-weight: bold; font-size: 14px; border: none; cursor: pointer;">
+                Selesai
+            </button>
         </div>
-        
-        <div style="margin-top: 10px; margin-bottom: 2px; border-bottom: 3px solid black;"></div>
-        <div style="margin-bottom: 15px; border-bottom: 1px solid black;"></div>
 
-        <h2 style="text-align: center; font-size: 12pt; font-weight: bold; text-decoration: underline; margin-bottom: 15px;">FORMULIR PEMILIHAN PROGRAM STUDI</h2>
+        <!-- Wadah Kertas (Bisa digeser di HP jika kebesaran) -->
+        <div class="kertas-wrapper">
+            <!-- Kertas A4 -->
+            <div class="kertas-a4">
+                <!-- KOP SURAT -->
+                <div style="text-align: center; line-height: 1.15;">
+                    <div style="font-size: 13pt; font-weight: bold; letter-spacing: 1px;">PUSAT ILMU KEISLAMAN INTERNASIONAL</div>
+                    <div style="font-size: 15pt; font-weight: bold; letter-spacing: 1px;">SEKOLAH TINGGI AGAMA ISLAM (STAI) IMAM SYAFI’I CIANJUR</div>
+                    <div style="font-size: 20pt; font-weight: bold; margin: 4px 0;">جامعة الإمام الشافعي</div>
+                    <div style="font-size: 10pt; margin-top: 4px;">Jl. Sarongge No. 16, RT 01/RW 04, Desa Ciputri, Kec. Pacet, Cianjur, Jawa Barat</div>
+                    <div style="font-size: 10pt;">Telp.: +62 851-1145-0055 | Email: staiis_cianjur@yahoo.com</div>
+                </div>
+                
+                <div style="margin-top: 10px; margin-bottom: 2px; border-bottom: 3px solid black;"></div>
+                <div style="margin-bottom: 15px; border-bottom: 1px solid black;"></div>
 
-        <table style="width: 100%; border-collapse: collapse;">
-            <!-- A. DATA DIRI MAHASISWA -->
-            <tr><td colspan="3"><div style="font-weight: bold; padding-top: 10px; padding-bottom: 3px; border-bottom: 1px solid #000; margin-bottom: 5px;">A. DATA DIRI MAHASISWA</div></td></tr>
-            <tr><td style="width: 35%; padding: 4px 0;">Nama Lengkap</td><td style="width: 3%; padding: 4px 0;">:</td><td style="padding: 4px 0;" id="print-nama"></td></tr>
-            <tr><td style="padding: 4px 0;">Jenis Kelamin</td><td style="padding: 4px 0;">:</td><td style="padding: 4px 0;" id="print-jk"></td></tr>
-            <tr><td style="padding: 4px 0;">Tempat Lahir</td><td style="padding: 4px 0;">:</td><td style="padding: 4px 0;" id="print-tempatLahir"></td></tr>
-            <tr><td style="padding: 4px 0;">Tanggal Lahir</td><td style="padding: 4px 0;">:</td><td style="padding: 4px 0;" id="print-tglLahir"></td></tr>
-            <tr><td style="padding: 4px 0;">NIK</td><td style="padding: 4px 0;">:</td><td style="padding: 4px 0;" id="print-nik"></td></tr>
-            <tr><td style="padding: 4px 0;">NISN</td><td style="padding: 4px 0;">:</td><td style="padding: 4px 0;" id="print-nisn"></td></tr>
-            <tr><td style="padding: 4px 0;">Kewarganegaraan</td><td style="padding: 4px 0;">:</td><td style="padding: 4px 0;" id="print-warga"></td></tr>
-            <tr><td style="padding: 4px 0;">Agama</td><td style="padding: 4px 0;">:</td><td style="padding: 4px 0;">Islam</td></tr>
-            <tr><td style="padding: 4px 0;">Nomor Telepon</td><td style="padding: 4px 0;">:</td><td style="padding: 4px 0;" id="print-telp"></td></tr>
-            <tr><td style="padding: 4px 0;">Alamat Email</td><td style="padding: 4px 0;">:</td><td style="padding: 4px 0;" id="print-email"></td></tr>
-            <tr><td style="padding: 4px 0;">Alamat Lengkap</td><td style="padding: 4px 0;">:</td><td style="padding: 4px 0; line-height: 1.4;" id="print-alamat"></td></tr>
-            <tr><td style="padding: 4px 0;">Penerima KPS</td><td style="padding: 4px 0;">:</td><td style="padding: 4px 0;">Tidak</td></tr>
+                <h2 style="text-align: center; font-size: 12pt; font-weight: bold; text-decoration: underline; margin-bottom: 15px;">FORMULIR PEMILIHAN PROGRAM STUDI</h2>
 
-            <!-- B. PEMILIHAN PRODI & BERKAS -->
-            <tr><td colspan="3"><div style="font-weight: bold; padding-top: 15px; padding-bottom: 3px; border-bottom: 1px solid #000; margin-bottom: 5px;">B. PEMILIHAN PROGRAM STUDI & BERKAS</div></td></tr>
-            <tr><td style="padding: 4px 0;">Program Studi Pilihan</td><td style="padding: 4px 0;">:</td><td style="padding: 4px 0; font-weight: bold;" id="print-prodi"></td></tr>
-            <tr><td style="padding: 4px 0;">Ijazah SMA/Sederajat</td><td style="padding: 4px 0;">:</td><td style="padding: 4px 0;" id="print-ijazah"></td></tr>
-            <tr><td style="padding: 4px 0;">Status Masuk</td><td style="padding: 4px 0;">:</td><td style="padding: 4px 0;">Mahasiswa Baru</td></tr>
-            <tr><td style="padding: 4px 0;">Tahun Masuk</td><td style="padding: 4px 0;">:</td><td style="padding: 4px 0;" id="print-tahunMasuk"></td></tr>
-            <tr><td style="padding: 4px 0;">Semester Masuk</td><td style="padding: 4px 0;">:</td><td style="padding: 4px 0;">Ganjil</td></tr>
-            <tr><td style="padding: 4px 0;">Tanggal Masuk</td><td style="padding: 4px 0;">:</td><td style="padding: 4px 0;" id="print-tglMasuk"></td></tr>
+                <table style="width: 100%; border-collapse: collapse;">
+                    <!-- A. DATA DIRI MAHASISWA -->
+                    <tr><td colspan="3"><div style="font-weight: bold; padding-top: 10px; padding-bottom: 3px; border-bottom: 1px solid #000; margin-bottom: 5px;">A. DATA DIRI MAHASISWA</div></td></tr>
+                    <tr><td style="width: 35%; padding: 4px 0;">Nama Lengkap</td><td style="width: 3%; padding: 4px 0;">:</td><td style="padding: 4px 0;" id="print-nama"></td></tr>
+                    <tr><td style="padding: 4px 0;">Jenis Kelamin</td><td style="padding: 4px 0;">:</td><td style="padding: 4px 0;" id="print-jk"></td></tr>
+                    <tr><td style="padding: 4px 0;">Tempat Lahir</td><td style="padding: 4px 0;">:</td><td style="padding: 4px 0;" id="print-tempatLahir"></td></tr>
+                    <tr><td style="padding: 4px 0;">Tanggal Lahir</td><td style="padding: 4px 0;">:</td><td style="padding: 4px 0;" id="print-tglLahir"></td></tr>
+                    <tr><td style="padding: 4px 0;">NIK</td><td style="padding: 4px 0;">:</td><td style="padding: 4px 0;" id="print-nik"></td></tr>
+                    <tr><td style="padding: 4px 0;">NISN</td><td style="padding: 4px 0;">:</td><td style="padding: 4px 0;" id="print-nisn"></td></tr>
+                    <tr><td style="padding: 4px 0;">Kewarganegaraan</td><td style="padding: 4px 0;">:</td><td style="padding: 4px 0;" id="print-warga"></td></tr>
+                    <tr><td style="padding: 4px 0;">Agama</td><td style="padding: 4px 0;">:</td><td style="padding: 4px 0;">Islam</td></tr>
+                    <tr><td style="padding: 4px 0;">Nomor Telepon</td><td style="padding: 4px 0;">:</td><td style="padding: 4px 0;" id="print-telp"></td></tr>
+                    <tr><td style="padding: 4px 0;">Alamat Email</td><td style="padding: 4px 0;">:</td><td style="padding: 4px 0;" id="print-email"></td></tr>
+                    <tr><td style="padding: 4px 0;">Alamat Lengkap</td><td style="padding: 4px 0;">:</td><td style="padding: 4px 0; line-height: 1.4;" id="print-alamat"></td></tr>
+                    <tr><td style="padding: 4px 0;">Penerima KPS</td><td style="padding: 4px 0;">:</td><td style="padding: 4px 0;">Tidak</td></tr>
 
-            <!-- C. DATA ORANG TUA -->
-            <tr><td colspan="3"><div style="font-weight: bold; padding-top: 15px; padding-bottom: 3px; border-bottom: 1px solid #000; margin-bottom: 5px;">C. DATA ORANG TUA</div></td></tr>
-            <tr><td colspan="3" style="font-weight: bold; font-style: italic; padding-top: 5px; padding-bottom: 4px;">Data Ayah</td></tr>
-            <tr><td style="padding: 4px 0;">Nama Ayah</td><td style="padding: 4px 0;">:</td><td style="padding: 4px 0;" id="print-namaAyah"></td></tr>
-            <tr><td style="padding: 4px 0;">NIK Ayah</td><td style="padding: 4px 0;">:</td><td style="padding: 4px 0;" id="print-nikAyah"></td></tr>
-            <tr><td style="padding: 4px 0;">Tanggal Lahir Ayah</td><td style="padding: 4px 0;">:</td><td style="padding: 4px 0;" id="print-tglAyah"></td></tr>
-            <tr><td style="padding: 4px 0;">Pendidikan Ayah</td><td style="padding: 4px 0;">:</td><td style="padding: 4px 0;" id="print-pendAyah"></td></tr>
-            <tr><td style="padding: 4px 0;">Pekerjaan Ayah</td><td style="padding: 4px 0;">:</td><td style="padding: 4px 0;" id="print-pekAyah"></td></tr>
-            <tr><td style="padding: 4px 0;">Penghasilan Ayah</td><td style="padding: 4px 0;">:</td><td style="padding: 4px 0;" id="print-pengAyah"></td></tr>
-            
-            <tr><td colspan="3" style="font-weight: bold; font-style: italic; padding-top: 8px; padding-bottom: 4px;">Data Ibu</td></tr>
-            <tr><td style="padding: 4px 0;">Nama Ibu</td><td style="padding: 4px 0;">:</td><td style="padding: 4px 0;" id="print-namaIbu"></td></tr>
-            <tr><td style="padding: 4px 0;">NIK Ibu</td><td style="padding: 4px 0;">:</td><td style="padding: 4px 0;" id="print-nikIbu"></td></tr>
-            <tr><td style="padding: 4px 0;">Tanggal Lahir Ibu</td><td style="padding: 4px 0;">:</td><td style="padding: 4px 0;" id="print-tglIbu"></td></tr>
-            <tr><td style="padding: 4px 0;">Pendidikan Ibu</td><td style="padding: 4px 0;">:</td><td style="padding: 4px 0;" id="print-pendIbu"></td></tr>
-            <tr><td style="padding: 4px 0;">Pekerjaan Ibu</td><td style="padding: 4px 0;">:</td><td style="padding: 4px 0;" id="print-pekIbu"></td></tr>
-            <tr><td style="padding: 4px 0;">Penghasilan Ibu</td><td style="padding: 4px 0;">:</td><td style="padding: 4px 0;" id="print-pengIbu"></td></tr>
-        </table>
+                    <!-- B. PEMILIHAN PRODI & BERKAS -->
+                    <tr><td colspan="3"><div style="font-weight: bold; padding-top: 15px; padding-bottom: 3px; border-bottom: 1px solid #000; margin-bottom: 5px;">B. PEMILIHAN PROGRAM STUDI & BERKAS</div></td></tr>
+                    <tr><td style="padding: 4px 0;">Program Studi Pilihan</td><td style="padding: 4px 0;">:</td><td style="padding: 4px 0; font-weight: bold;" id="print-prodi"></td></tr>
+                    <tr><td style="padding: 4px 0;">Ijazah SMA/Sederajat</td><td style="padding: 4px 0;">:</td><td style="padding: 4px 0;" id="print-ijazah"></td></tr>
+                    <tr><td style="padding: 4px 0;">Status Masuk</td><td style="padding: 4px 0;">:</td><td style="padding: 4px 0;">Mahasiswa Baru</td></tr>
+                    <tr><td style="padding: 4px 0;">Tahun Masuk</td><td style="padding: 4px 0;">:</td><td style="padding: 4px 0;" id="print-tahunMasuk"></td></tr>
+                    <tr><td style="padding: 4px 0;">Semester Masuk</td><td style="padding: 4px 0;">:</td><td style="padding: 4px 0;">Ganjil</td></tr>
+                    <tr><td style="padding: 4px 0;">Tanggal Masuk</td><td style="padding: 4px 0;">:</td><td style="padding: 4px 0;" id="print-tglMasuk"></td></tr>
 
-        <div style="margin-top: 30px; text-align: right; margin-right: 15px;">
-            <p>Cianjur, <span id="print-tglCetak"></span></p>
-            <p>Pendaftar,</p>
-            <br><br><br>
-            <p style="font-weight: bold; text-decoration: underline;" id="print-ttd"></p>
+                    <!-- C. DATA ORANG TUA -->
+                    <tr><td colspan="3"><div style="font-weight: bold; padding-top: 15px; padding-bottom: 3px; border-bottom: 1px solid #000; margin-bottom: 5px;">C. DATA ORANG TUA</div></td></tr>
+                    <tr><td colspan="3" style="font-weight: bold; font-style: italic; padding-top: 5px; padding-bottom: 4px;">Data Ayah</td></tr>
+                    <tr><td style="padding: 4px 0;">Nama Ayah</td><td style="padding: 4px 0;">:</td><td style="padding: 4px 0;" id="print-namaAyah"></td></tr>
+                    <tr><td style="padding: 4px 0;">NIK Ayah</td><td style="padding: 4px 0;">:</td><td style="padding: 4px 0;" id="print-nikAyah"></td></tr>
+                    <tr><td style="padding: 4px 0;">Tanggal Lahir Ayah</td><td style="padding: 4px 0;">:</td><td style="padding: 4px 0;" id="print-tglAyah"></td></tr>
+                    <tr><td style="padding: 4px 0;">Pendidikan Ayah</td><td style="padding: 4px 0;">:</td><td style="padding: 4px 0;" id="print-pendAyah"></td></tr>
+                    <tr><td style="padding: 4px 0;">Pekerjaan Ayah</td><td style="padding: 4px 0;">:</td><td style="padding: 4px 0;" id="print-pekAyah"></td></tr>
+                    <tr><td style="padding: 4px 0;">Penghasilan Ayah</td><td style="padding: 4px 0;">:</td><td style="padding: 4px 0;" id="print-pengAyah"></td></tr>
+                    
+                    <tr><td colspan="3" style="font-weight: bold; font-style: italic; padding-top: 8px; padding-bottom: 4px;">Data Ibu</td></tr>
+                    <tr><td style="padding: 4px 0;">Nama Ibu</td><td style="padding: 4px 0;">:</td><td style="padding: 4px 0;" id="print-namaIbu"></td></tr>
+                    <tr><td style="padding: 4px 0;">NIK Ibu</td><td style="padding: 4px 0;">:</td><td style="padding: 4px 0;" id="print-nikIbu"></td></tr>
+                    <tr><td style="padding: 4px 0;">Tanggal Lahir Ibu</td><td style="padding: 4px 0;">:</td><td style="padding: 4px 0;" id="print-tglIbu"></td></tr>
+                    <tr><td style="padding: 4px 0;">Pendidikan Ibu</td><td style="padding: 4px 0;">:</td><td style="padding: 4px 0;" id="print-pendIbu"></td></tr>
+                    <tr><td style="padding: 4px 0;">Pekerjaan Ibu</td><td style="padding: 4px 0;">:</td><td style="padding: 4px 0;" id="print-pekIbu"></td></tr>
+                    <tr><td style="padding: 4px 0;">Penghasilan Ibu</td><td style="padding: 4px 0;">:</td><td style="padding: 4px 0;" id="print-pengIbu"></td></tr>
+                </table>
+
+                <div style="margin-top: 30px; text-align: right; margin-right: 15px;">
+                    <p>Cianjur, <span id="print-tglCetak"></span></p>
+                    <p>Pendaftar,</p>
+                    <br><br><br>
+                    <p style="font-weight: bold; text-decoration: underline;" id="print-ttd"></p>
+                </div>
+            </div>
         </div>
     </div>
 
@@ -459,20 +483,14 @@
                 
                 const result = await response.json();
                 
-                // ====================================================================
-                // BLOK LOGIKA CETAK PDF NATIVE (DIPERBAIKI UNTUK HP)
-                // ====================================================================
                 if (result.status === 'success') {
                     showAlert('Berhasil! Menyiapkan dokumen pendaftaran...', 'success');
-                    btnSubmit.innerHTML = '<i class="fa-solid fa-print"></i> Mencetak Formulir...';
 
-                    // 1. SEMBUNYIKAN UI WEB & TAMPILKAN AREA CETAK TERLEBIH DAHULU
-                    // Ini wajib dilakukan sebelum mengisi data agar HP me-render teksnya dan tidak blank
-                    document.getElementById('web-header').style.display = 'none';
-                    document.getElementById('mainContent').style.display = 'none';
-                    document.getElementById('cetakArea').style.display = 'block';
-
-                    // 2. POPULATE DATA MENGGUNAKAN .innerHTML (Sangat diwajibkan untuk browser HP)
+                    // =======================================================
+                    // LOGIKA PRATINJAU: TAMPILKAN DATA KE KERTAS DI LAYAR
+                    // =======================================================
+                    
+                    // 1. Masukkan data ke HTML Pratinjau
                     document.getElementById('print-nama').innerHTML = payloadJSON.namaLengkap;
                     document.getElementById('print-jk').innerHTML = payloadJSON.jenisKelamin;
                     document.getElementById('print-tempatLahir').innerHTML = payloadJSON.tempatLahir;
@@ -507,19 +525,15 @@
                     document.getElementById('print-tglCetak').innerHTML = formatDateIndo(todayDate.toISOString().split('T')[0]);
                     document.getElementById('print-ttd').innerHTML = payloadJSON.namaLengkap;
 
-                    // 3. GANTI JUDUL HALAMAN UNTUK NAMA FILE PDF (Sesuai Arahan agar tidak ada kata PMB)
-                    const originalTitle = document.title;
+                    // 2. Ganti Nama Judul Halaman agar saat di Save PDF tidak ada kata PMB
                     document.title = 'Formulir_Pemilihan_Prodi_' + payloadJSON.namaLengkap.replace(/\s+/g, '_');
 
-                    // 4. PANGGIL PRINT NATIVE LALU KEMBALIKAN KE SEMULA
-                    setTimeout(() => {
-                        window.print();
-                        
-                        setTimeout(() => {
-                            document.title = originalTitle;
-                            location.reload();
-                        }, 1000);
-                    }, 500);
+                    // 3. Sembunyikan Form, Tampilkan Halaman Pratinjau
+                    document.getElementById('web-header').style.display = 'none';
+                    document.getElementById('mainContent').style.display = 'none';
+                    document.getElementById('cetakArea').style.display = 'block';
+                    
+                    window.scrollTo(0, 0);
 
                 } else {
                     showAlert('Gagal: ' + result.message, 'error');
