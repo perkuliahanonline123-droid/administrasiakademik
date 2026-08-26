@@ -531,25 +531,44 @@
             btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Sedang Mengunduh...';
             btn.disabled = true;
 
-            // Hilangkan sementara padding bawaan CSS karena margin akan diatur oleh mesin html2pdf
+            // KUNCI 1: Naikkan scroll ke paling atas (0) secara paksa 
+            // agar PDF tidak tergeser ke bawah dan meninggalkan ruang kosong
+            window.scrollTo(0, 0);
+
+            // KUNCI 2: Simpan pengaturan tampilan responsif HP
             const originalPadding = element.style.padding;
+            const originalWidth = element.style.width;
+            
+            // KUNCI 3: Paksa kertas menjadi ukuran baku Desktop (800px) sebelum difoto,
+            // agar teks di HP tidak menyusut ke bawah yang menyebabkannya tumpah ke halaman 2
             element.style.padding = '0';
+            element.style.width = '800px'; 
+            element.style.maxWidth = '800px';
 
             const opt = {
-                margin:       [15, 20, 15, 20], 
+                // Margin dikecilkan sedikit (1 cm atas-bawah) untuk menggaransi 100% muat 1 lembar
+                margin:       [10, 15, 10, 15], 
                 filename:     'Formulir_Pemilihan_Prodi_' + nama.replace(/\s+/g, '_') + '.pdf',
-                image:        { type: 'jpeg', quality: 0.98 },
-                html2canvas:  { scale: 2, useCORS: true },
+                image:        { type: 'jpeg', quality: 1 },
+                html2canvas:  { 
+                    scale: 2, 
+                    useCORS: true,
+                    scrollY: 0,        // Mencegah bug scroll
+                    windowWidth: 800   // Simulasi render pada resolusi 800px
+                },
                 jsPDF:        { unit: 'mm', format: 'a4', orientation: 'portrait' }
             };
 
             html2pdf().set(opt).from(element).save().then(() => {
+                // Kembalikan tampilan ke versi responsif aslinya setelah PDF berhasil terunduh
                 element.style.padding = originalPadding;
+                element.style.width = originalWidth;
+                element.style.maxWidth = '';
+                
                 btn.innerHTML = originalText;
                 btn.disabled = false;
             });
         }
-
         function showAlert(message, type) {
             const box = document.getElementById('alertBox');
             box.className = `p-4 rounded-xl text-sm font-bold transition-all mb-6 flex items-center gap-3 ${type === 'success' ? 'bg-[#f0fdf4] text-[#045844] border border-[#bceadd]' : 'bg-red-50 text-red-700 border border-red-200'}`;
