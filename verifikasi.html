@@ -40,12 +40,12 @@
         }
     </style>
 </head>
-<body class="font-sans text-slate-800 min-h-screen flex flex-col items-center justify-center p-4">
+<body class="font-sans text-slate-800 min-h-screen flex flex-col items-center justify-center p-4 relative">
 
     <!-- Wrapper Utama -->
-    <div class="w-full max-w-2xl animate-fade-in">
+    <div class="w-full max-w-2xl animate-fade-in relative z-10">
         
-        <!-- Header Logo (Menyerupai header Portal Dosen) -->
+        <!-- Header Logo -->
         <div class="flex items-center justify-center gap-3 mb-8">
             <img src="https://i.ibb.co.com/fGv3qQ11/logo-staiis.webp" alt="Logo STAIIS" class="w-12 h-12 object-contain drop-shadow-md">
             <div class="text-left">
@@ -64,20 +64,20 @@
         </div>
 
         <!-- Card Hasil Verifikasi -->
-        <div class="glass-card rounded-[2rem] shadow-[0_10px_40px_-10px_rgba(0,0,0,0.08)] border border-slate-200/60 overflow-hidden">
+        <div class="glass-card rounded-[2rem] shadow-[0_10px_40px_-10px_rgba(0,0,0,0.08)] border border-slate-200/60 overflow-hidden" id="cardContainer">
             
-            <!-- Banner Status Valid (Warna Hijau) -->
-            <div class="bg-gradient-to-r from-emerald-500 to-brand-600 p-6 md:p-8 text-center text-white relative overflow-hidden">
+            <!-- Banner Status Valid (Akan berubah merah jika gagal) -->
+            <div id="bannerStatus" class="bg-gradient-to-r from-emerald-500 to-brand-600 p-6 md:p-8 text-center text-white relative overflow-hidden transition-colors duration-500">
                 <div class="absolute top-0 right-0 w-32 h-32 bg-white/10 rounded-full blur-2xl transform translate-x-10 -translate-y-10"></div>
                 
                 <div class="w-16 h-16 bg-white/20 rounded-full flex items-center justify-center mx-auto mb-4 backdrop-blur-md shadow-inner">
-                    <i class="fas fa-check text-3xl text-white"></i>
+                    <i id="iconStatus" class="fas fa-spinner fa-spin text-3xl text-white"></i>
                 </div>
-                <h3 class="text-xl md:text-2xl font-black tracking-tight">DOKUMEN VALID</h3>
-                <p class="text-brand-50 text-xs md:text-sm mt-1 opacity-90">Dokumen ini sah dan tercatat secara resmi di dalam sistem.</p>
+                <h3 id="titleStatus" class="text-xl md:text-2xl font-black tracking-tight">MEMUAT DATA...</h3>
+                <p id="descStatus" class="text-brand-50 text-xs md:text-sm mt-1 opacity-90">Menyinkronkan dengan pangkalan data STAIIS.</p>
             </div>
 
-            <!-- Detail Data (Berdasarkan Sheet DATA KURIKULUM) -->
+            <!-- Detail Data -->
             <div class="p-6 md:p-8">
                 
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-y-6 gap-x-8">
@@ -85,45 +85,45 @@
                     <!-- Baris 1 -->
                     <div>
                         <p class="text-[10px] font-black text-slate-400 uppercase tracking-wider mb-1">Mata Kuliah</p>
-                        <p class="text-base font-bold text-slate-800 leading-snug" id="valMatkul">Mediasi</p>
+                        <p class="text-base font-bold text-slate-800 leading-snug" id="valMatkul">...</p>
                     </div>
                     <div>
                         <p class="text-[10px] font-black text-slate-400 uppercase tracking-wider mb-1">Kode MK / SKS</p>
                         <div class="flex items-center gap-2">
-                            <span class="bg-slate-100 text-slate-700 px-2 py-0.5 rounded text-sm font-bold" id="valKode">MKP-035</span>
-                            <span class="text-sm font-bold text-slate-700" id="valSks">2 SKS</span>
+                            <span class="bg-slate-100 text-slate-700 px-2 py-0.5 rounded text-sm font-bold" id="valKode">...</span>
+                            <span class="text-sm font-bold text-slate-700" id="valSks"></span>
                         </div>
                     </div>
 
                     <!-- Baris 2 -->
                     <div>
                         <p class="text-[10px] font-black text-slate-400 uppercase tracking-wider mb-1">Dosen Pengampu</p>
-                        <p class="text-sm font-bold text-brand-700" id="valDosen">Abdul Hakim, S.H., M.A.</p>
+                        <p class="text-sm font-bold text-brand-700" id="valDosen">...</p>
                     </div>
                     <div>
                         <p class="text-[10px] font-black text-slate-400 uppercase tracking-wider mb-1">Program Studi / Kelas</p>
-                        <p class="text-sm font-bold text-slate-700" id="valProdiKelas">Ahwal Al-Syakhshiyyah • Kelas 2 A</p>
+                        <p class="text-sm font-bold text-slate-700" id="valProdiKelas">...</p>
                     </div>
 
                     <!-- Baris 3 -->
                     <div class="md:col-span-2">
                         <p class="text-[10px] font-black text-slate-400 uppercase tracking-wider mb-1">Tahun Akademik & Semester</p>
-                        <p class="text-sm font-bold text-slate-700" id="valTahun">Genap Tahun Akademik 2026/2027 (Semester 2)</p>
+                        <p class="text-sm font-bold text-slate-700" id="valTahun">...</p>
                     </div>
 
                 </div>
 
                 <hr class="my-6 border-slate-100">
 
-                <!-- Nomor Dokumen (Dari Kolom K & L) -->
+                <!-- Nomor Dokumen -->
                 <div class="bg-slate-50 p-4 rounded-2xl border border-slate-100 flex items-start gap-4">
                     <div class="w-10 h-10 rounded-full bg-brand-100 text-brand-600 flex items-center justify-center shrink-0">
                         <i class="fas fa-file-signature"></i>
                     </div>
                     <div>
                         <p class="text-[10px] font-black text-slate-400 uppercase tracking-wider mb-0.5">Nomor Registrasi Dokumen (SPMI)</p>
-                        <p class="text-sm md:text-base font-bold text-slate-800 font-mono tracking-tight" id="valNoDokumen">19/SPMI-IS/2027</p>
-                        <p class="text-xs text-slate-500 mt-1 font-medium"><i class="far fa-calendar-alt mr-1"></i> Disahkan: <span id="valTglDokumen">15 Januari 2027</span></p>
+                        <p class="text-sm md:text-base font-bold text-slate-800 font-mono tracking-tight" id="valNoDokumen">...</p>
+                        <p class="text-xs text-slate-500 mt-1 font-medium"><i class="far fa-calendar-alt mr-1"></i> Disahkan: <span id="valTglDokumen">...</span></p>
                     </div>
                 </div>
 
@@ -131,7 +131,7 @@
             
             <!-- Footer Card -->
             <div class="bg-slate-50/50 px-6 py-4 border-t border-slate-100 text-center">
-                <a href="#" class="text-xs font-bold text-brand-600 hover:text-brand-800 transition-colors">
+                <a href="pintasan.html" class="text-xs font-bold text-brand-600 hover:text-brand-800 transition-colors">
                     <i class="fas fa-arrow-left mr-1"></i> Kembali ke Beranda Portal
                 </a>
             </div>
@@ -145,5 +145,92 @@
 
     </div>
 
+    <!-- Script Javascript Dinamis -->
+    <script>
+        // URL Google Apps Script yang Anda miliki
+        const scriptUrl = "https://script.google.com/macros/s/AKfycbxMLp-QW7jpO1XFe-JHPGJIjlzLTUTmtheMWt8wz7bwtWheB-LiaaVvDCNngq1rsuAd/exec";
+
+        document.addEventListener("DOMContentLoaded", () => {
+            // Ambil parameter '?kode=' dari URL web
+            const urlParams = new URLSearchParams(window.location.search);
+            const kodeMk = urlParams.get('kode');
+
+            if (kodeMk) {
+                // Proses tarik data (fetch) ke server Google
+                fetch(scriptUrl)
+                    .then(response => response.json())
+                    .then(result => {
+                        // Tarik array data dari Apps Script
+                        const allData = result.rekap_presensi || result.data || []; 
+                        
+                        // Cari spesifik data mata kuliah yang di-scan
+                        const mkData = allData.find(item => item.kode === kodeMk);
+
+                        if (mkData) {
+                            // JIKA DITEMUKAN: Update tampilan hijau valid
+                            document.getElementById('iconStatus').className = "fas fa-check text-3xl text-white";
+                            document.getElementById('titleStatus').innerText = "DOKUMEN VALID";
+                            document.getElementById('descStatus').innerText = "Dokumen ini sah dan tercatat secara resmi di dalam sistem.";
+
+                            // Masukkan data mata kuliah
+                            document.getElementById('valMatkul').innerText = mkData.matkul || "-";
+                            document.getElementById('valKode').innerText = mkData.kode || "-";
+                            
+                            // Ekstrak SKS jika ada
+                            let teksSks = mkData.sks ? `${mkData.sks} SKS` : "";
+                            document.getElementById('valSks').innerText = teksSks;
+                            
+                            // Deteksi berbagai kemungkinan nama kolom Dosen
+                            let namaDosen = mkData.nama_dosen_pengampu || mkData.namadosenpengampu || mkData['Nama Dosen Pengampu'] || mkData['nama dosen pengampu'] || mkData.dosen_pengampu || mkData.dosenpengampu || mkData['dosen pengampu'] || mkData.nama_dosen || mkData.namadosen || mkData.dosen || mkData.Dosen || "-";
+                            document.getElementById('valDosen').innerText = (typeof namaDosen === 'string' && namaDosen.trim() === "") ? "-" : namaDosen;
+                            
+                            // Prodi dan Kelas
+                            let prodi = mkData.program_studi || mkData.programstudi || mkData['Program Studi'] || mkData.prodi || "-";
+                            let kelas = mkData.kelas || "-";
+                            document.getElementById('valProdiKelas').innerText = `${prodi} • Kelas ${kelas}`;
+                            
+                            // Tahun dan Semester
+                            let tahun = mkData.tahun_akademik || mkData.tahun || "-";
+                            let semester = mkData.semester || "-";
+                            document.getElementById('valTahun').innerText = `${tahun} (Semester ${semester})`;
+                            
+                            // Nomor dan Tanggal Dokumen
+                            document.getElementById('valNoDokumen').innerText = mkData.no_dokumen || mkData.nomor_dokumen || mkData['Nomor Dokumen'] || mkData.nomor_surat || "Tidak/Belum Diregistrasi";
+                            document.getElementById('valTglDokumen').innerText = mkData.tgl_dokumen || mkData.tanggal_dokumen || mkData['Tanggal Dokumen'] || mkData.tanggal_ttd || "-";
+                            
+                        } else {
+                            // JIKA TIDAK DITEMUKAN (KODE SALAH/PALSU): Update jadi merah
+                            setTampilanGagal("DOKUMEN TIDAK VALID", `Mata kuliah dengan kode ${kodeMk} tidak ditemukan di sistem.`);
+                        }
+                    })
+                    .catch(error => {
+                        console.error("Error fetching data:", error);
+                        setTampilanGagal("GAGAL TERHUBUNG", "Tidak dapat menyinkronkan dengan server. Silakan coba beberapa saat lagi.");
+                    });
+            } else {
+                // JIKA URL TIDAK ADA PARAMETER KODE
+                setTampilanGagal("AKSES DITOLAK", "URL tidak memiliki kode verifikasi dokumen yang sah.");
+            }
+        });
+
+        // Fungsi bantuan untuk mengubah tampilan ke error/merah
+        function setTampilanGagal(judul, pesan) {
+            let banner = document.getElementById('bannerStatus');
+            banner.className = "bg-gradient-to-r from-rose-500 to-red-600 p-6 md:p-8 text-center text-white relative overflow-hidden transition-colors duration-500";
+            document.getElementById('iconStatus').className = "fas fa-times text-3xl text-white";
+            document.getElementById('titleStatus').innerText = judul;
+            document.getElementById('descStatus').innerText = pesan;
+            
+            // Kosongkan sisa field
+            document.getElementById('valMatkul').innerText = "-";
+            document.getElementById('valKode').innerText = "-";
+            document.getElementById('valSks').innerText = "";
+            document.getElementById('valDosen').innerText = "-";
+            document.getElementById('valProdiKelas').innerText = "-";
+            document.getElementById('valTahun').innerText = "-";
+            document.getElementById('valNoDokumen').innerText = "-";
+            document.getElementById('valTglDokumen').innerText = "-";
+        }
+    </script>
 </body>
 </html>
