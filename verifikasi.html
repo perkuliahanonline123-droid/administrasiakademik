@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Verifikasi Dokumen STAIIS</title>
+    <title>Verifikasi Dokumen - Portal Dosen STAIIS</title>
     <meta name="theme-color" content="#064e3b">
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
@@ -49,7 +49,7 @@
         <div class="flex items-center justify-center gap-3 mb-8">
             <img src="https://i.ibb.co.com/fGv3qQ11/logo-staiis.webp" alt="Logo STAIIS" class="w-12 h-12 object-contain drop-shadow-md">
             <div class="text-left">
-                <h1 class="font-black text-xl tracking-tight text-brand-900 leading-none">PORTAL VERIFIKASI</h1>
+                <h1 class="font-black text-xl tracking-tight text-brand-900 leading-none">PORTAL DOSEN</h1>
                 <p class="text-[10px] text-brand-600 font-bold tracking-[0.15em] uppercase mt-0.5">STAI IMAM SYAFI'I CIANJUR</p>
             </div>
         </div>
@@ -147,7 +147,6 @@
 
     <!-- Script Javascript Dinamis -->
     <script>
-        // URL Google Apps Script
         const scriptUrl = "https://script.google.com/macros/s/AKfycbxMLp-QW7jpO1XFe-JHPGJIjlzLTUTmtheMWt8wz7bwtWheB-LiaaVvDCNngq1rsuAd/exec";
 
         document.addEventListener("DOMContentLoaded", () => {
@@ -158,58 +157,60 @@
                 fetch(scriptUrl)
                     .then(response => response.json())
                     .then(result => {
-                        // Mendeteksi data dari berbagai kemungkinan output nama array
-                        let allData = [];
-                        if (result.data_kurikulum && result.data_kurikulum.length > 0) allData = result.data_kurikulum;
-                        else if (result.kurikulum && result.kurikulum.length > 0) allData = result.kurikulum;
-                        else if (result.data && result.data.length > 0) allData = result.data;
-                        else if (result.rekap_presensi && result.rekap_presensi.length > 0) allData = result.rekap_presensi;
-                        
-                        // CARI MATA KULIAH: 
-                        // Deteksi nama kolom "Kode MK" (dari Spreadsheet) yang diubah ke JSON
-                        const mkData = allData.find(item => {
-                            let k = item.kode_mk || item.kodemk || item['Kode MK'] || item.kode || "";
-                            return String(k).trim() === String(kodeMk).trim();
-                        });
+                        let mkDataRaw = null;
+                        let mkData = {}; // Menyimpan data yang sudah dibersihkan
 
-                        if (mkData) {
-                            // DITEMUKAN: Update tampilan
+                        // 1. Cari array di dalam JSON secara fleksibel
+                        for (let key in result) {
+                            if (Array.isArray(result[key])) {
+                                let found = result[key].find(item => {
+                                    // Deteksi kolom Kode MK (case-insensitive & toleransi spasi)
+                                    let k = item['Kode MK'] || item.kode_mk || item.kodemk || item.kode || item.KODE || item.Kode || "";
+                                    return String(k).trim().toLowerCase() === String(kodeMk).trim().toLowerCase();
+                                });
+                                
+                                if (found) {
+                                    mkDataRaw = found;
+                                    break;
+                                }
+                            }
+                        }
+
+                        if (mkDataRaw) {
+                            // 2. Normalisasi semua nama kolom: buang spasi & jadikan huruf kecil
+                            // Contoh: "Mata Kuliah" menjadi "matakuliah", "Nama Dosen Pengampu" menjadi "namadosenpengampu"
+                            for (let prop in mkDataRaw) {
+                                let cleanProp = prop.toLowerCase().replace(/[^a-z0-9]/g, '');
+                                mkData[cleanProp] = mkDataRaw[prop];
+                            }
+
+                            // 3. Tampilkan Data (Panggil menggunakan nama kolom yang sudah dinormalisasi)
                             document.getElementById('iconStatus').className = "fas fa-check text-3xl text-white";
                             document.getElementById('titleStatus').innerText = "DOKUMEN VALID";
                             document.getElementById('descStatus').innerText = "Dokumen ini sah dan tercatat secara resmi di dalam sistem.";
 
-                            // Mata Kuliah (Kolom C)
-                            document.getElementById('valMatkul').innerText = mkData.mata_kuliah || mkData.matakuliah || mkData['Mata Kuliah'] || mkData.matkul || "-";
+                            document.getElementById('valMatkul').innerText = mkData.matakuliah || mkData.matkul || mkData.matakuliahmk || "-";
+                            document.getElementById('valKode').innerText = mkData.kodemk || mkData.kode || kodeMk;
                             
-                            // Kode MK (Kolom B)
-                            document.getElementById('valKode').innerText = mkData.kode_mk || mkData.kodemk || mkData['Kode MK'] || mkData.kode || kodeMk;
+                            let sks = mkData.sks;
+                            document.getElementById('valSks').innerText = sks ? `${sks} SKS` : "";
                             
-                            // SKS (Kolom D)
-                            let valSks = mkData.sks || mkData.SKS || mkData['SKS'];
-                            document.getElementById('valSks').innerText = valSks ? `${valSks} SKS` : "";
+                            let dosen = mkData.namadosenpengampu || mkData.dosenpengampu || mkData.namadosen || mkData.dosen || "-";
+                            document.getElementById('valDosen').innerText = (typeof dosen === 'string' && dosen.trim() === "") ? "-" : dosen;
                             
-                            // Dosen Pengampu (Kolom F)
-                            let namaDosen = mkData.nama_dosen_pengampu || mkData.namadosenpengampu || mkData['Nama Dosen Pengampu'] || "-";
-                            document.getElementById('valDosen').innerText = (typeof namaDosen === 'string' && namaDosen.trim() === "") ? "-" : namaDosen;
-                            
-                            // Program Studi & Kelas (Kolom H & J)
-                            let prodi = mkData.program_studi || mkData.programstudi || mkData['Program Studi'] || "-";
-                            let kelas = mkData.kelas || mkData.Kelas || "-";
+                            let prodi = mkData.programstudi || mkData.prodi || "-";
+                            let kelas = mkData.kelas || "-";
                             document.getElementById('valProdiKelas').innerText = `${prodi} • Kelas ${kelas}`;
                             
-                            // Tahun Akademik (Kolom G) & Semester (Kolom E)
-                            let tahun = mkData.ta || mkData.TA || mkData.tahun_akademik || mkData.tahun || "-";
-                            let semester = mkData.semester || mkData.Semester || "-";
+                            let tahun = mkData.ta || mkData.tahunakademik || mkData.tahun || "-";
+                            let semester = mkData.semester || "-";
                             document.getElementById('valTahun').innerText = `${tahun} (Semester ${semester})`;
                             
-                            // Nomor SOP (Kolom K)
-                            document.getElementById('valNoDokumen').innerText = mkData.nomor_sop || mkData.nomorsop || mkData['Nomor SOP'] || mkData.no_dokumen || "Tidak/Belum Diregistrasi";
-                            
-                            // Tanggal Pembuatan (Kolom L)
-                            document.getElementById('valTglDokumen').innerText = mkData.tggl_pembuatan || mkData.tgglpembuatan || mkData['Tggl Pembuatan'] || mkData.tgl_dokumen || "-";
+                            document.getElementById('valNoDokumen').innerText = mkData.nomorsop || mkData.nodokumen || mkData.nomorsurat || mkData.nomordokumen || "Tidak/Belum Diregistrasi";
+                            document.getElementById('valTglDokumen').innerText = mkData.tgglpembuatan || mkData.tanggalpembuatan || mkData.tanggaldokumen || mkData.tglpembuatan || mkData.tanggalttd || "-";
                             
                         } else {
-                            // TIDAK DITEMUKAN
+                            // Jika data kode MKK-102 dll benar-benar tidak ada di dalam JSON
                             setTampilanGagal("DOKUMEN TIDAK VALID", `Mata kuliah dengan kode ${kodeMk} tidak ditemukan di sistem.`);
                         }
                     })
@@ -230,7 +231,6 @@
             document.getElementById('titleStatus').innerText = judul;
             document.getElementById('descStatus').innerText = pesan;
             
-            // Kosongkan field yang lain
             document.getElementById('valMatkul').innerText = "-";
             document.getElementById('valKode').innerText = "-";
             document.getElementById('valSks').innerText = "";
