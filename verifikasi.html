@@ -179,7 +179,6 @@
 
                         if (mkDataRaw) {
                             // 2. NORMALISASI NAMA KOLOM (Hapus spasi, ubah jadi huruf kecil semua)
-                            // Ini memastikan kolom "Nama Dosen Pengampu" tetap terbaca sebagai "namadosenpengampu"
                             for (let prop in mkDataRaw) {
                                 let cleanProp = prop.toLowerCase().replace(/[^a-z0-9]/g, '');
                                 mkData[cleanProp] = mkDataRaw[prop];
@@ -212,12 +211,28 @@
                             let semester = mkData.semester || "-";
                             document.getElementById('valTahun').innerText = `${tahun} (Semester ${semester})`;
                             
-                            // Nomor dan Tanggal Dokumen
-                            document.getElementById('valNoDokumen').innerText = mkData.nomorsop || mkData.nodokumen || mkData.nomorsurat || mkData.nomordokumen || "Tidak/Belum Diregistrasi";
-                            document.getElementById('valTglDokumen').innerText = mkData.tgglpembuatan || mkData.tanggalpembuatan || mkData.tanggaldokumen || mkData.tglpembuatan || mkData.tanggalttd || "-";
+                            // ==========================================
+                            // PERBAIKAN: Nomor dan Tanggal Dokumen (SOP)
+                            // ==========================================
+                            
+                            // Mengekstrak Nomor SOP dengan prioritas pada header "Nomor SOP" (nomorsop)
+                            let noSopValue = mkData.nomorsop || mkData.nosop || mkData.nodokumen || mkData.nomorsurat || mkData.nomordokumen;
+                            
+                            // Validasi jika data kosong atau hanya berisi spasi
+                            if (!noSopValue || (typeof noSopValue === 'string' && noSopValue.trim() === "")) {
+                                noSopValue = "Tidak/Belum Diregistrasi";
+                            }
+                            document.getElementById('valNoDokumen').innerText = noSopValue;
+                            
+                            // Tanggal Pengesahan / Dokumen
+                            let tglDokumen = mkData.tgglpembuatan || mkData.tanggalpembuatan || mkData.tanggaldokumen || mkData.tglpembuatan || mkData.tanggalttd;
+                            if (!tglDokumen || (typeof tglDokumen === 'string' && tglDokumen.trim() === "")) {
+                                tglDokumen = "-";
+                            }
+                            document.getElementById('valTglDokumen').innerText = tglDokumen;
                             
                         } else {
-                            // JIKA TIDAK DITEMUKAN (KODE SALAH/PALSU): Update jadi merah
+                            // JIKA TIDAK DITEMUKAN (KODE SALAH/PALSU)
                             setTampilanGagal("DOKUMEN TIDAK VALID", `Mata kuliah dengan kode ${kodeMk} tidak ditemukan di sistem.`);
                         }
                     })
