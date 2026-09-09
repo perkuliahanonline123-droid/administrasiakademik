@@ -66,7 +66,7 @@
         <!-- Card Hasil Verifikasi -->
         <div class="glass-card rounded-[2rem] shadow-[0_10px_40px_-10px_rgba(0,0,0,0.08)] border border-slate-200/60 overflow-hidden" id="cardContainer">
             
-            <!-- Banner Status Valid (Akan berubah merah jika gagal) -->
+            <!-- Banner Status Valid -->
             <div id="bannerStatus" class="bg-gradient-to-r from-emerald-500 to-brand-600 p-6 md:p-8 text-center text-white relative overflow-hidden transition-colors duration-500">
                 <div class="absolute top-0 right-0 w-32 h-32 bg-white/10 rounded-full blur-2xl transform translate-x-10 -translate-y-10"></div>
                 
@@ -147,59 +147,69 @@
 
     <!-- Script Javascript Dinamis -->
     <script>
-        // URL Google Apps Script yang Anda miliki
+        // URL Google Apps Script
         const scriptUrl = "https://script.google.com/macros/s/AKfycbxMLp-QW7jpO1XFe-JHPGJIjlzLTUTmtheMWt8wz7bwtWheB-LiaaVvDCNngq1rsuAd/exec";
 
         document.addEventListener("DOMContentLoaded", () => {
-            // Ambil parameter '?kode=' dari URL web
             const urlParams = new URLSearchParams(window.location.search);
             const kodeMk = urlParams.get('kode');
 
             if (kodeMk) {
-                // Proses tarik data (fetch) ke server Google
                 fetch(scriptUrl)
                     .then(response => response.json())
                     .then(result => {
-                        // Tarik array data dari Apps Script
-                        const allData = result.rekap_presensi || result.data || []; 
+                        // Mendeteksi data dari berbagai kemungkinan output nama array
+                        let allData = [];
+                        if (result.data_kurikulum && result.data_kurikulum.length > 0) allData = result.data_kurikulum;
+                        else if (result.kurikulum && result.kurikulum.length > 0) allData = result.kurikulum;
+                        else if (result.data && result.data.length > 0) allData = result.data;
+                        else if (result.rekap_presensi && result.rekap_presensi.length > 0) allData = result.rekap_presensi;
                         
-                        // Cari spesifik data mata kuliah yang di-scan
-                        const mkData = allData.find(item => item.kode === kodeMk);
+                        // CARI MATA KULIAH: 
+                        // Deteksi nama kolom "Kode MK" (dari Spreadsheet) yang diubah ke JSON
+                        const mkData = allData.find(item => {
+                            let k = item.kode_mk || item.kodemk || item['Kode MK'] || item.kode || "";
+                            return String(k).trim() === String(kodeMk).trim();
+                        });
 
                         if (mkData) {
-                            // JIKA DITEMUKAN: Update tampilan hijau valid
+                            // DITEMUKAN: Update tampilan
                             document.getElementById('iconStatus').className = "fas fa-check text-3xl text-white";
                             document.getElementById('titleStatus').innerText = "DOKUMEN VALID";
                             document.getElementById('descStatus').innerText = "Dokumen ini sah dan tercatat secara resmi di dalam sistem.";
 
-                            // Masukkan data mata kuliah
-                            document.getElementById('valMatkul').innerText = mkData.matkul || "-";
-                            document.getElementById('valKode').innerText = mkData.kode || "-";
+                            // Mata Kuliah (Kolom C)
+                            document.getElementById('valMatkul').innerText = mkData.mata_kuliah || mkData.matakuliah || mkData['Mata Kuliah'] || mkData.matkul || "-";
                             
-                            // Ekstrak SKS jika ada
-                            let teksSks = mkData.sks ? `${mkData.sks} SKS` : "";
-                            document.getElementById('valSks').innerText = teksSks;
+                            // Kode MK (Kolom B)
+                            document.getElementById('valKode').innerText = mkData.kode_mk || mkData.kodemk || mkData['Kode MK'] || mkData.kode || kodeMk;
                             
-                            // Deteksi berbagai kemungkinan nama kolom Dosen
-                            let namaDosen = mkData.nama_dosen_pengampu || mkData.namadosenpengampu || mkData['Nama Dosen Pengampu'] || mkData['nama dosen pengampu'] || mkData.dosen_pengampu || mkData.dosenpengampu || mkData['dosen pengampu'] || mkData.nama_dosen || mkData.namadosen || mkData.dosen || mkData.Dosen || "-";
+                            // SKS (Kolom D)
+                            let valSks = mkData.sks || mkData.SKS || mkData['SKS'];
+                            document.getElementById('valSks').innerText = valSks ? `${valSks} SKS` : "";
+                            
+                            // Dosen Pengampu (Kolom F)
+                            let namaDosen = mkData.nama_dosen_pengampu || mkData.namadosenpengampu || mkData['Nama Dosen Pengampu'] || "-";
                             document.getElementById('valDosen').innerText = (typeof namaDosen === 'string' && namaDosen.trim() === "") ? "-" : namaDosen;
                             
-                            // Prodi dan Kelas
-                            let prodi = mkData.program_studi || mkData.programstudi || mkData['Program Studi'] || mkData.prodi || "-";
-                            let kelas = mkData.kelas || "-";
+                            // Program Studi & Kelas (Kolom H & J)
+                            let prodi = mkData.program_studi || mkData.programstudi || mkData['Program Studi'] || "-";
+                            let kelas = mkData.kelas || mkData.Kelas || "-";
                             document.getElementById('valProdiKelas').innerText = `${prodi} • Kelas ${kelas}`;
                             
-                            // Tahun dan Semester
-                            let tahun = mkData.tahun_akademik || mkData.tahun || "-";
-                            let semester = mkData.semester || "-";
+                            // Tahun Akademik (Kolom G) & Semester (Kolom E)
+                            let tahun = mkData.ta || mkData.TA || mkData.tahun_akademik || mkData.tahun || "-";
+                            let semester = mkData.semester || mkData.Semester || "-";
                             document.getElementById('valTahun').innerText = `${tahun} (Semester ${semester})`;
                             
-                            // Nomor dan Tanggal Dokumen
-                            document.getElementById('valNoDokumen').innerText = mkData.no_dokumen || mkData.nomor_dokumen || mkData['Nomor Dokumen'] || mkData.nomor_surat || "Tidak/Belum Diregistrasi";
-                            document.getElementById('valTglDokumen').innerText = mkData.tgl_dokumen || mkData.tanggal_dokumen || mkData['Tanggal Dokumen'] || mkData.tanggal_ttd || "-";
+                            // Nomor SOP (Kolom K)
+                            document.getElementById('valNoDokumen').innerText = mkData.nomor_sop || mkData.nomorsop || mkData['Nomor SOP'] || mkData.no_dokumen || "Tidak/Belum Diregistrasi";
+                            
+                            // Tanggal Pembuatan (Kolom L)
+                            document.getElementById('valTglDokumen').innerText = mkData.tggl_pembuatan || mkData.tgglpembuatan || mkData['Tggl Pembuatan'] || mkData.tgl_dokumen || "-";
                             
                         } else {
-                            // JIKA TIDAK DITEMUKAN (KODE SALAH/PALSU): Update jadi merah
+                            // TIDAK DITEMUKAN
                             setTampilanGagal("DOKUMEN TIDAK VALID", `Mata kuliah dengan kode ${kodeMk} tidak ditemukan di sistem.`);
                         }
                     })
@@ -208,12 +218,11 @@
                         setTampilanGagal("GAGAL TERHUBUNG", "Tidak dapat menyinkronkan dengan server. Silakan coba beberapa saat lagi.");
                     });
             } else {
-                // JIKA URL TIDAK ADA PARAMETER KODE
                 setTampilanGagal("AKSES DITOLAK", "URL tidak memiliki kode verifikasi dokumen yang sah.");
             }
         });
 
-        // Fungsi bantuan untuk mengubah tampilan ke error/merah
+        // Fungsi mengubah tampilan jika gagal
         function setTampilanGagal(judul, pesan) {
             let banner = document.getElementById('bannerStatus');
             banner.className = "bg-gradient-to-r from-rose-500 to-red-600 p-6 md:p-8 text-center text-white relative overflow-hidden transition-colors duration-500";
@@ -221,7 +230,7 @@
             document.getElementById('titleStatus').innerText = judul;
             document.getElementById('descStatus').innerText = pesan;
             
-            // Kosongkan sisa field
+            // Kosongkan field yang lain
             document.getElementById('valMatkul').innerText = "-";
             document.getElementById('valKode').innerText = "-";
             document.getElementById('valSks').innerText = "";
