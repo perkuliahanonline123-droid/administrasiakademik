@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Verifikasi Dokumen - Portal Dosen STAIIS</title>
+    <title>Portal Verifikasi STAIIS</title>
     <meta name="theme-color" content="#064e3b">
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
@@ -49,7 +49,7 @@
         <div class="flex items-center justify-center gap-3 mb-8">
             <img src="https://i.ibb.co.com/fGv3qQ11/logo-staiis.webp" alt="Logo STAIIS" class="w-12 h-12 object-contain drop-shadow-md">
             <div class="text-left">
-                <h1 class="font-black text-xl tracking-tight text-brand-900 leading-none">PORTAL DOSEN</h1>
+                <h1 class="font-black text-xl tracking-tight text-brand-900 leading-none">PORTAL VERIFIKASI</h1>
                 <p class="text-[10px] text-brand-600 font-bold tracking-[0.15em] uppercase mt-0.5">STAI IMAM SYAFI'I CIANJUR</p>
             </div>
         </div>
@@ -66,7 +66,7 @@
         <!-- Card Hasil Verifikasi -->
         <div class="glass-card rounded-[2rem] shadow-[0_10px_40px_-10px_rgba(0,0,0,0.08)] border border-slate-200/60 overflow-hidden" id="cardContainer">
             
-            <!-- Banner Status Valid -->
+            <!-- Banner Status Valid (Akan berubah merah jika gagal) -->
             <div id="bannerStatus" class="bg-gradient-to-r from-emerald-500 to-brand-600 p-6 md:p-8 text-center text-white relative overflow-hidden transition-colors duration-500">
                 <div class="absolute top-0 right-0 w-32 h-32 bg-white/10 rounded-full blur-2xl transform translate-x-10 -translate-y-10"></div>
                 
@@ -147,6 +147,7 @@
 
     <!-- Script Javascript Dinamis -->
     <script>
+        // URL Google Apps Script yang Anda miliki
         const scriptUrl = "https://script.google.com/macros/s/AKfycbxMLp-QW7jpO1XFe-JHPGJIjlzLTUTmtheMWt8wz7bwtWheB-LiaaVvDCNngq1rsuAd/exec";
 
         document.addEventListener("DOMContentLoaded", () => {
@@ -158,13 +159,13 @@
                     .then(response => response.json())
                     .then(result => {
                         let mkDataRaw = null;
-                        let mkData = {}; // Menyimpan data yang sudah dibersihkan
+                        let mkData = {}; // Objek untuk menampung data yang sudah di-normalisasi
 
-                        // 1. Cari array di dalam JSON secara fleksibel
+                        // 1. CARI ARRAY DATA
                         for (let key in result) {
                             if (Array.isArray(result[key])) {
                                 let found = result[key].find(item => {
-                                    // Deteksi kolom Kode MK (case-insensitive & toleransi spasi)
+                                    // Mencari di berbagai kemungkinan nama kolom kode MK
                                     let k = item['Kode MK'] || item.kode_mk || item.kodemk || item.kode || item.KODE || item.Kode || "";
                                     return String(k).trim().toLowerCase() === String(kodeMk).trim().toLowerCase();
                                 });
@@ -177,40 +178,46 @@
                         }
 
                         if (mkDataRaw) {
-                            // 2. Normalisasi semua nama kolom: buang spasi & jadikan huruf kecil
-                            // Contoh: "Mata Kuliah" menjadi "matakuliah", "Nama Dosen Pengampu" menjadi "namadosenpengampu"
+                            // 2. NORMALISASI NAMA KOLOM (Hapus spasi, ubah jadi huruf kecil semua)
+                            // Ini memastikan kolom "Nama Dosen Pengampu" tetap terbaca sebagai "namadosenpengampu"
                             for (let prop in mkDataRaw) {
                                 let cleanProp = prop.toLowerCase().replace(/[^a-z0-9]/g, '');
                                 mkData[cleanProp] = mkDataRaw[prop];
                             }
 
-                            // 3. Tampilkan Data (Panggil menggunakan nama kolom yang sudah dinormalisasi)
+                            // 3. TAMPILKAN DATA
                             document.getElementById('iconStatus').className = "fas fa-check text-3xl text-white";
                             document.getElementById('titleStatus').innerText = "DOKUMEN VALID";
                             document.getElementById('descStatus').innerText = "Dokumen ini sah dan tercatat secara resmi di dalam sistem.";
 
+                            // Masukkan data mata kuliah
                             document.getElementById('valMatkul').innerText = mkData.matakuliah || mkData.matkul || mkData.matakuliahmk || "-";
                             document.getElementById('valKode').innerText = mkData.kodemk || mkData.kode || kodeMk;
                             
+                            // Ekstrak SKS jika ada
                             let sks = mkData.sks;
                             document.getElementById('valSks').innerText = sks ? `${sks} SKS` : "";
                             
-                            let dosen = mkData.namadosenpengampu || mkData.dosenpengampu || mkData.namadosen || mkData.dosen || "-";
-                            document.getElementById('valDosen').innerText = (typeof dosen === 'string' && dosen.trim() === "") ? "-" : dosen;
+                            // Deteksi kolom Dosen 
+                            let namaDosen = mkData.namadosenpengampu || mkData.dosenpengampu || mkData.namadosen || mkData.dosen || "-";
+                            document.getElementById('valDosen').innerText = (typeof namaDosen === 'string' && namaDosen.trim() === "") ? "-" : namaDosen;
                             
+                            // Prodi dan Kelas
                             let prodi = mkData.programstudi || mkData.prodi || "-";
                             let kelas = mkData.kelas || "-";
                             document.getElementById('valProdiKelas').innerText = `${prodi} • Kelas ${kelas}`;
                             
+                            // Tahun dan Semester
                             let tahun = mkData.ta || mkData.tahunakademik || mkData.tahun || "-";
                             let semester = mkData.semester || "-";
                             document.getElementById('valTahun').innerText = `${tahun} (Semester ${semester})`;
                             
+                            // Nomor dan Tanggal Dokumen
                             document.getElementById('valNoDokumen').innerText = mkData.nomorsop || mkData.nodokumen || mkData.nomorsurat || mkData.nomordokumen || "Tidak/Belum Diregistrasi";
                             document.getElementById('valTglDokumen').innerText = mkData.tgglpembuatan || mkData.tanggalpembuatan || mkData.tanggaldokumen || mkData.tglpembuatan || mkData.tanggalttd || "-";
                             
                         } else {
-                            // Jika data kode MKK-102 dll benar-benar tidak ada di dalam JSON
+                            // JIKA TIDAK DITEMUKAN (KODE SALAH/PALSU): Update jadi merah
                             setTampilanGagal("DOKUMEN TIDAK VALID", `Mata kuliah dengan kode ${kodeMk} tidak ditemukan di sistem.`);
                         }
                     })
@@ -219,11 +226,12 @@
                         setTampilanGagal("GAGAL TERHUBUNG", "Tidak dapat menyinkronkan dengan server. Silakan coba beberapa saat lagi.");
                     });
             } else {
+                // JIKA URL TIDAK ADA PARAMETER KODE
                 setTampilanGagal("AKSES DITOLAK", "URL tidak memiliki kode verifikasi dokumen yang sah.");
             }
         });
 
-        // Fungsi mengubah tampilan jika gagal
+        // Fungsi bantuan untuk mengubah tampilan ke error/merah
         function setTampilanGagal(judul, pesan) {
             let banner = document.getElementById('bannerStatus');
             banner.className = "bg-gradient-to-r from-rose-500 to-red-600 p-6 md:p-8 text-center text-white relative overflow-hidden transition-colors duration-500";
@@ -231,6 +239,7 @@
             document.getElementById('titleStatus').innerText = judul;
             document.getElementById('descStatus').innerText = pesan;
             
+            // Kosongkan sisa field
             document.getElementById('valMatkul').innerText = "-";
             document.getElementById('valKode').innerText = "-";
             document.getElementById('valSks').innerText = "";
