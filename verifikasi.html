@@ -218,11 +218,19 @@
                             // Mengekstrak Nomor SOP dengan prioritas pada header "Nomor SOP" (nomorsop)
                             let noSopValue = mkData.nomorsop || mkData.nosop || mkData.nodokumen || mkData.nomorsurat || mkData.nomordokumen;
                             
+                            let elNoDokumen = document.getElementById('valNoDokumen');
+
                             // Validasi jika data kosong atau hanya berisi spasi
                             if (!noSopValue || (typeof noSopValue === 'string' && noSopValue.trim() === "")) {
-                                noSopValue = "Tidak/Belum Diregistrasi";
+                                // Jika kosong, tampilkan sebagai badge peringatan merah
+                                elNoDokumen.innerHTML = `<span class="bg-rose-100 text-rose-700 px-2.5 py-0.5 rounded text-xs font-bold border border-rose-200 inline-flex items-center gap-1.5"><i class="fas fa-exclamation-circle"></i> Tidak/Belum Diregistrasi</span>`;
+                                // Hapus font-mono agar badge tampil proporsional
+                                elNoDokumen.className = "mt-1";
+                            } else {
+                                // Jika ada nomornya, tampilkan normal
+                                elNoDokumen.innerText = noSopValue;
+                                elNoDokumen.className = "text-sm md:text-base font-bold text-slate-800 font-mono tracking-tight";
                             }
-                            document.getElementById('valNoDokumen').innerText = noSopValue;
                             
                             // Tanggal Pengesahan / Dokumen
                             let tglDokumen = mkData.tgglpembuatan || mkData.tanggalpembuatan || mkData.tanggaldokumen || mkData.tglpembuatan || mkData.tanggalttd;
@@ -261,7 +269,11 @@
             document.getElementById('valDosen').innerText = "-";
             document.getElementById('valProdiKelas').innerText = "-";
             document.getElementById('valTahun').innerText = "-";
-            document.getElementById('valNoDokumen').innerText = "-";
+            
+            let elNoDokumen = document.getElementById('valNoDokumen');
+            elNoDokumen.innerText = "-";
+            elNoDokumen.className = "text-sm md:text-base font-bold text-slate-800 font-mono tracking-tight";
+            
             document.getElementById('valTglDokumen').innerText = "-";
         }
     </script>
