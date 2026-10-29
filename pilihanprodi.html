@@ -46,6 +46,9 @@
 </head>
 <body>
 
+    <!-- WADAH TOAST NOTIFICATION POSISI ATAS TENGAH -->
+    <div id="toast-container" class="fixed top-6 inset-x-0 z-[9999] flex flex-col items-center gap-3 pointer-events-none px-4"></div>
+
     <div id="overlay-loading">
         <div class="loader mb-4"></div>
         <p id="loading-text" class="text-gray-800 font-bold text-lg">Mohon tunggu sebentar...</p>
@@ -53,12 +56,19 @@
 
     <!-- Header Web -->
     <header id="web-header" class="glass-header sticky top-0 z-40 w-full px-6 py-4 flex justify-center shadow-sm">
-        <div class="max-w-4xl w-full flex items-center gap-4">
-            <img src="https://i.ibb.co.com/fGv3qQ11/logo-staiis.webp" alt="Logo STAIIS" class="w-10 h-10 object-contain drop-shadow-sm">
-            <div>
-                <h1 class="font-extrabold text-[#045844] text-lg leading-tight tracking-tight">FORMULIR PEMILIHAN PROGRAM STUDI</h1>
-                <p class="text-[10px] font-bold text-emerald-600 uppercase tracking-[0.2em]">STAI Imam Syafi'i Cianjur</p>
+        <div class="max-w-4xl w-full flex items-center justify-between gap-4">
+            <div class="flex items-center gap-4">
+                <img src="https://i.ibb.co.com/fGv3qQ11/logo-staiis.webp" alt="Logo STAIIS" class="w-10 h-10 object-contain drop-shadow-sm">
+                <div>
+                    <h1 class="font-extrabold text-[#045844] text-base md:text-lg leading-tight tracking-tight">FORMULIR PEMILIHAN PROGRAM STUDI</h1>
+                    <p class="text-[10px] font-bold text-emerald-600 uppercase tracking-[0.2em]">STAI Imam Syafi'i Cianjur</p>
+                </div>
             </div>
+
+            <!-- TOMBOL PEMBARUAN DATA GLOBAL -->
+            <button id="btnRefresh" onclick="refreshData()" class="flex items-center justify-center w-10 h-10 rounded-full bg-white border border-slate-200 text-slate-500 hover:text-[#045844] hover:border-emerald-300 hover:bg-emerald-50 transition-all shadow-sm group shrink-0" title="Perbarui Data dari Server (Semua Perangkat)">
+                <i class="fa-solid fa-rotate group-hover:rotate-180 transition-transform duration-500"></i>
+            </button>
         </div>
     </header>
 
@@ -186,7 +196,6 @@
         
         <!-- Tombol Aksi Pratinjau -->
         <div class="action-bar">
-            <!-- TOMBOL DOWNLOAD PDF (Memicu html2pdf) -->
             <button id="btnDownloadPdf" onclick="unduhPDF()" class="btn-download-pdf">
                 <i class="fa-solid fa-file-pdf"></i> Download PDF
             </button>
@@ -195,22 +204,79 @@
             </button>
         </div>
 
-        <!-- Wadah Kertas (Bisa digeser di HP jika kebesaran) -->
+        <!-- Wadah Kertas -->
         <div class="kertas-wrapper">
-            <!-- TARGET HTML2PDF: Kertas A4 ini yang akan ditangkap oleh sistem -->
             <div class="kertas-a4" id="kertas-target" style="padding: 10mm 20mm;">
-                <!-- KONTEN AKAN DI-INJEKSI OLEH JAVASCRIPT AGAR PADAT DAN RAPI -->
             </div>
         </div>
     </div>
 
     <!-- SCRIPT DIMULAI DI SINI -->
     <script>
-        // ⚠️ PASTE URL WEB APP BARU BAPAK DI SINI ⚠️
         const API_URL = 'https://script.google.com/macros/s/AKfycbx-05Hxhfk5QdtQbDQfCpUISTcZwiubpludYX2pHcCVowL6JHtCEgbzCILvJ2uAbJ-V/exec'; 
 
         let globalSisaLaki = 20;
+        let countdownTimerInterval = null;
         const currentYear = new Date().getFullYear();
+
+        // ====================================================================
+        // KONSTANTA & FUNGSI CACHE (DURASI 1 TAHUN & VERSI CACHE GLOBAL)
+        // ====================================================================
+        const CACHE_DURATION = 365 * 24 * 60 * 60 * 1000; // 1 Tahun
+        const KEY_DATA_CACHE = 'staiis_pilihanprodi_data';
+        const KEY_TIME_CACHE = 'staiis_pilihanprodi_time';
+        const KEY_VERSION_CACHE = 'staiis_pilihanprodi_version';
+
+        function showToast(type, message) {
+            const container = document.getElementById('toast-container');
+            const toast = document.createElement('div');
+            
+            const isSuccess = type === 'success';
+            const iconClass = isSuccess ? 'fa-circle-check text-emerald-600 bg-emerald-50 border-emerald-200' : 'fa-circle-xmark text-red-600 bg-red-50 border-red-200';
+            const titleText = isSuccess ? 'Berhasil' : 'Peringatan';
+
+            toast.className = 'flex items-start gap-3.5 p-4 rounded-2xl shadow-xl border border-slate-100 bg-white transform transition-all duration-300 -translate-y-8 scale-95 opacity-0 max-w-sm w-full pointer-events-auto';
+            toast.innerHTML = `
+                <div class="w-9 h-9 rounded-full flex items-center justify-center border shrink-0 ${iconClass}">
+                    <i class="fa-solid ${iconClass.split(' ')[0]} text-base"></i>
+                </div>
+                <div class="flex-1 pt-0.5">
+                    <p class="font-extrabold text-slate-800 text-xs uppercase tracking-wider">${titleText}</p>
+                    <p class="text-slate-600 text-xs font-semibold mt-0.5 leading-relaxed">${message}</p>
+                </div>
+            `;
+
+            container.appendChild(toast);
+
+            setTimeout(() => {
+                toast.classList.remove('-translate-y-8', 'scale-95', 'opacity-0');
+                toast.classList.add('translate-y-0', 'scale-100', 'opacity-100');
+            }, 10);
+
+            setTimeout(() => {
+                toast.classList.remove('translate-y-0', 'scale-100', 'opacity-100');
+                toast.classList.add('-translate-y-8', 'scale-95', 'opacity-0');
+                setTimeout(() => toast.remove(), 300);
+            }, 3500);
+        }
+
+        function simpanCacheLokal(result, versionOverride = null) {
+            const now = new Date().getTime().toString();
+            const version = versionOverride || result.cacheVersion || now;
+            try {
+                localStorage.setItem(KEY_DATA_CACHE, JSON.stringify(result));
+                localStorage.setItem(KEY_TIME_CACHE, now);
+                localStorage.setItem(KEY_VERSION_CACHE, version.toString());
+            } catch (e) {
+                console.error("Gagal menyimpan cache lokal:", e);
+            }
+        }
+
+        function hapusCacheLokal() {
+            localStorage.removeItem(KEY_DATA_CACHE);
+            localStorage.removeItem(KEY_TIME_CACHE);
+            localStorage.removeItem(KEY_VERSION_CACHE);
+        }
 
         const penghasilanOptions = [
             "-- Pilih Rentang Penghasilan --",
@@ -221,9 +287,9 @@
             "13. Rp15.000.001 - Rp20.000.000", "14. Rp20.000.001 - Rp25.000.000", "15. > Rp25.000.000"
         ];
 
-        // LOGIKA KONTROL PRODI BERDASARKAN GENDER
-        document.getElementById('jenisKelamin').addEventListener('change', function(e) {
-            const jk = e.target.value;
+        // Fungsi untuk memperbarui teks dropdown Prodi sesuai kuota terbaru
+        function perbaruiOpsiProdiGender() {
+            const jk = document.getElementById('jenisKelamin').value;
             const prodiSelect = document.getElementById('prodiPilihan');
             const optAhwal = document.getElementById('optAhwal');
             const optPBA = document.getElementById('optPBA');
@@ -238,17 +304,24 @@
                 if (globalSisaLaki <= 0) {
                     optPBA.disabled = true;
                     optPBA.text = "Pendidikan Bahasa Arab (KUOTA LAKI-LAKI PENUH)";
-                    prodiSelect.value = ""; 
+                    if (prodiSelect.value === 'Pendidikan Bahasa Arab') prodiSelect.value = ""; 
                 } else {
                     optPBA.disabled = false;
                     optPBA.text = `Pendidikan Bahasa Arab (Sisa Kuota Laki-laki: ${globalSisaLaki})`;
-                    prodiSelect.value = "";
                 }
             }
+        }
+
+        // LOGIKA KONTROL PRODI BERDASARKAN GENDER
+        document.getElementById('jenisKelamin').addEventListener('change', function() {
+            document.getElementById('prodiPilihan').value = "";
+            perbaruiOpsiProdiGender();
         });
 
         // FUNGSI HITUNG MUNDUR
         function startCountdown(targetTime) {
+            if (countdownTimerInterval) clearInterval(countdownTimerInterval);
+
             const container = document.getElementById('countdownContainer');
             container.innerHTML = `
                 <div class="flex items-center justify-center gap-2 md:gap-4 mt-6">
@@ -274,14 +347,14 @@
                 </div>
             `;
             
-            const timer = setInterval(() => {
+            const updateTimer = () => {
                 const now = new Date().getTime();
                 const distance = targetTime - now;
                 
                 if (distance < 0) {
-                    clearInterval(timer);
+                    clearInterval(countdownTimerInterval);
                     container.innerHTML = `
-                        <button onclick="location.reload()" class="mt-8 bg-[#045844] hover:bg-[#034233] text-white px-8 py-3.5 rounded-xl font-bold transition-all shadow-md w-full md:w-auto">
+                        <button onclick=" location.reload()" class="mt-8 bg-[#045844] hover:bg-[#034233] text-white px-8 py-3.5 rounded-xl font-bold transition-all shadow-md w-full md:w-auto">
                             <i class="fa-solid fa-rotate-right mr-2"></i> Formulir Telah Dibuka!
                         </button>
                     `;
@@ -293,14 +366,191 @@
                 const m = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60));
                 const s = Math.floor((distance % (1000 * 60)) / 1000);
                 
-                document.getElementById('cdDays').innerText = d.toString().padStart(2, '0');
-                document.getElementById('cdHours').innerText = h.toString().padStart(2, '0');
-                document.getElementById('cdMins').innerText = m.toString().padStart(2, '0');
-                document.getElementById('cdSecs').innerText = s.toString().padStart(2, '0');
-            }, 1000);
+                const elD = document.getElementById('cdDays');
+                if (elD) {
+                    elD.innerText = d.toString().padStart(2, '0');
+                    document.getElementById('cdHours').innerText = h.toString().padStart(2, '0');
+                    document.getElementById('cdMins').innerText = m.toString().padStart(2, '0');
+                    document.getElementById('cdSecs').innerText = s.toString().padStart(2, '0');
+                }
+            };
+
+            updateTimer();
+            countdownTimerInterval = setInterval(updateTimer, 1000);
         }
 
-        document.addEventListener('DOMContentLoaded', async () => {
+        // Fungsi menerapkan data kuota & jadwal ke tampilan (mendukung evaluasi waktu real-time dari cache)
+        function terapkanDataKuota(result) {
+            if (countdownTimerInterval) clearInterval(countdownTimerInterval);
+
+            let isOpen = result.isOpen;
+            let statusType = result.statusType;
+            let statusMessage = result.statusMessage;
+            let targetTime = result.targetTime;
+
+            // Evaluasi ulang terhadap jam perangkat saat ini jika bukaTime & tutupTime tersedia di cache
+            if (result.bukaTime && result.tutupTime) {
+                const now = new Date().getTime();
+                if (now < result.bukaTime) {
+                    isOpen = false;
+                    statusType = 'before';
+                    targetTime = result.bukaTime;
+                    statusMessage = `Formulir pemilihan program studi belum dibuka.<br>Jadwal pengisian dimulai pada <b>${result.bukaStr}</b>.`;
+                } else if (now > result.tutupTime) {
+                    isOpen = false;
+                    statusType = 'after';
+                    targetTime = null;
+                    statusMessage = `Mohon maaf, formulir telah ditutup sejak tanggal <b>${result.tutupStr}</b>.`;
+                } else {
+                    isOpen = true;
+                    statusType = 'open';
+                    targetTime = result.tutupTime;
+                    statusMessage = "";
+                }
+            }
+
+            const terisi = parseInt(result.count, 10) || 0;
+            globalSisaLaki = 20 - terisi;
+            perbaruiOpsiProdiGender();
+
+            if (isOpen === false) {
+                document.getElementById('closedMessageText').innerHTML = statusMessage;
+                document.getElementById('closedMessage').style.display = 'flex';
+                document.getElementById('mainContent').style.display = 'none';
+                
+                if (statusType === 'before' && targetTime) {
+                    startCountdown(targetTime);
+                } else {
+                    document.getElementById('countdownContainer').innerHTML = `
+                        <div class="mt-6 inline-flex bg-slate-100 text-slate-500 font-bold px-6 py-2 rounded-full text-sm">
+                            <i class="fa-solid fa-ban mr-2 mt-0.5"></i> Pengisian Formulir Ditutup
+                        </div>
+                    `;
+                }
+            } else {
+                document.getElementById('closedMessage').style.display = 'none';
+                document.getElementById('mainContent').style.display = 'block';
+            }
+        }
+
+        // ====================================================================
+        // FUNGSI TOMBOL PERBARUI DATA DARI SERVER (BERLAKU SEMUA PERANGKAT)
+        // ====================================================================
+        async function refreshData() {
+            const btnRefresh = document.getElementById('btnRefresh');
+            const icon = btnRefresh.querySelector('i');
+
+            icon.classList.remove('group-hover:rotate-180');
+            icon.classList.add('fa-spin', 'text-[#045844]');
+            btnRefresh.disabled = true;
+
+            try {
+                // 1. Hapus cache lama di perangkat ini
+                hapusCacheLokal();
+
+                // 2. Kirim forceRefresh=true ke server untuk mereset cache global semua perangkat
+                const response = await fetch(`${API_URL}?action=checkQuota&forceRefresh=true&t=${new Date().getTime()}`, {
+                    cache: 'no-store'
+                });
+                const result = await response.json();
+
+                if (result.status === 'success') {
+                    simpanCacheLokal(result);
+                    terapkanDataKuota(result);
+                    showToast('success', 'Data berhasil diperbarui dari server dan berlaku untuk semua perangkat!');
+                } else {
+                    throw new Error(result.message || 'Gagal memuat data');
+                }
+            } catch (error) {
+                showToast('error', 'Gagal memperbarui data dari server. Periksa koneksi internet Anda.');
+            } finally {
+                icon.classList.remove('fa-spin', 'text-[#045844]');
+                icon.classList.add('group-hover:rotate-180');
+                btnRefresh.disabled = false;
+            }
+        }
+
+        // ====================================================================
+        // FUNGSI CEK SINKRONISASI VERSI CACHE OTOMATIS ANTARPERANGKAT
+        // ====================================================================
+        async function cekSinkronisasiServer() {
+            const localVersion = localStorage.getItem(KEY_VERSION_CACHE);
+            if (!localVersion) return;
+
+            try {
+                const res = await fetch(`${API_URL}?action=cek_versi&t=${new Date().getTime()}`, {
+                    cache: 'no-store'
+                });
+                const info = await res.json();
+
+                // Jika versi di server berubah karena perangkat lain menekan tombol Refresh atau ada pendaftar baru
+                if (info.status === 'success' && info.cacheVersion && info.cacheVersion.toString() !== localVersion.toString()) {
+                    hapusCacheLokal();
+
+                    const response = await fetch(`${API_URL}?action=checkQuota&t=${new Date().getTime()}`, {
+                        cache: 'no-store'
+                    });
+                    const result = await response.json();
+
+                    if (result.status === 'success') {
+                        simpanCacheLokal(result, info.cacheVersion);
+                        terapkanDataKuota(result);
+                        showToast('success', 'Data kuota & jadwal otomatis diperbarui dari server!');
+                    }
+                }
+            } catch (e) {
+                // Abaikan jika offline, tetap gunakan cache yang ada
+            }
+        }
+
+        async function loadInitialData() {
+            const cachedDataStr = localStorage.getItem(KEY_DATA_CACHE);
+            const cacheTimeStr = localStorage.getItem(KEY_TIME_CACHE);
+            const now = new Date().getTime();
+
+            // 1. Gunakan cache lokal (1 Tahun) jika tersedia, lalu cek versi terbaru di latar belakang
+            if (cachedDataStr && cacheTimeStr && (now - parseInt(cacheTimeStr, 10) < CACHE_DURATION)) {
+                try {
+                    const cachedResult = JSON.parse(cachedDataStr);
+                    document.getElementById('overlay-loading').style.display = 'none';
+                    terapkanDataKuota(cachedResult);
+                    cekSinkronisasiServer();
+                    return;
+                } catch (e) {
+                    hapusCacheLokal();
+                }
+            }
+
+            // 2. Jika belum ada cache lokal, ambil dari server
+            try {
+                const response = await fetch(`${API_URL}?action=checkQuota&t=${now}`, {
+                    cache: 'no-store'
+                });
+                const result = await response.json();
+                
+                document.getElementById('overlay-loading').style.display = 'none';
+
+                if (result.status === 'success') {
+                    simpanCacheLokal(result);
+                    terapkanDataKuota(result);
+                } else {
+                    throw new Error("Respon server gagal");
+                }
+            } catch (error) {
+                if (cachedDataStr) {
+                    try {
+                        const cachedResult = JSON.parse(cachedDataStr);
+                        document.getElementById('overlay-loading').style.display = 'none';
+                        terapkanDataKuota(cachedResult);
+                        return;
+                    } catch (e) {}
+                }
+                document.getElementById('loading-text').innerText = "Gagal terhubung ke database. Muat ulang halaman.";
+                document.getElementById('loading-text').classList.add('text-red-600');
+            }
+        }
+
+        document.addEventListener('DOMContentLoaded', () => {
             const selectAyah = document.getElementById('penghasilanAyah');
             const selectIbu = document.getElementById('penghasilanIbu');
             
@@ -314,41 +564,13 @@
                 selectIbu.add(el2);
             });
 
-            try {
-                const response = await fetch(`${API_URL}?action=checkQuota&t=${new Date().getTime()}`);
-                const result = await response.json();
-                
-                document.getElementById('overlay-loading').style.display = 'none';
+            loadInitialData();
+        });
 
-                if (result.status === 'success') {
-                    if (result.isOpen === false) {
-                        document.getElementById('closedMessageText').innerHTML = result.statusMessage;
-                        document.getElementById('closedMessage').style.display = 'flex';
-                        document.getElementById('mainContent').style.display = 'none';
-                        
-                        if (result.statusType === 'before' && result.targetTime) {
-                            startCountdown(result.targetTime);
-                        } else {
-                            document.getElementById('countdownContainer').innerHTML = `
-                                <div class="mt-6 inline-flex bg-slate-100 text-slate-500 font-bold px-6 py-2 rounded-full text-sm">
-                                    <i class="fa-solid fa-ban mr-2 mt-0.5"></i> Pengisian Formulir Ditutup
-                                </div>
-                            `;
-                        }
-                        return; 
-                    }
-
-                    document.getElementById('mainContent').style.display = 'block';
-
-                    const terisi = result.count;
-                    globalSisaLaki = 20 - terisi;
-                    
-                } else {
-                    throw new Error("Respon server gagal");
-                }
-            } catch (error) {
-                document.getElementById('loading-text').innerText = "Gagal terhubung ke database. Muat ulang halaman.";
-                document.getElementById('loading-text').classList.add('text-red-600');
+        // Otomatis cek pembaruan saat user membuka kembali tab/aplikasi
+        document.addEventListener('visibilitychange', function() {
+            if (document.visibilityState === 'visible') {
+                cekSinkronisasiServer();
             }
         });
 
@@ -415,16 +637,14 @@
                 
                 const result = await response.json();
                 
-                // ====================================================================
-                // BLOK PEMBUATAN PRATINJAU DENGAN GABUNGAN 1 DAN 2 KOLOM
-                // ====================================================================
                 if (result.status === 'success') {
+                    // Hapus cache lokal agar kuota terbaru ditarik saat halaman dimuat ulang
+                    hapusCacheLokal();
                     showAlert('Berhasil! Menyiapkan dokumen pendaftaran...', 'success');
 
                     const todayDate = new Date();
                     const tglCetak = formatDateIndo(todayDate.toISOString().split('T')[0]);
                     
-                    // MEMBANGUN HTML YANG SANGAT RAPI (DATA DIRI 1 KOLOM, ORANG TUA 2 KOLOM)
                     const cetakHTML = `
                         <!-- KOP SURAT -->
                         <div style="text-align: center; line-height: 1.05;">
@@ -508,13 +728,9 @@
                         </div>
                     `;
 
-                    // Masukkan ke layar pratinjau
                     document.getElementById('kertas-target').innerHTML = cetakHTML;
-
-                    // Ganti Judul Halaman agar tidak ada "PMB" saat didownload
                     document.title = 'Formulir_Pemilihan_Prodi_' + payloadJSON.namaLengkap.replace(/\s+/g, '_');
 
-                    // Sembunyikan Form Utama, Munculkan Layar Pratinjau
                     document.getElementById('web-header').style.display = 'none';
                     document.getElementById('mainContent').style.display = 'none';
                     document.getElementById('cetakArea').style.display = 'block';
@@ -542,14 +758,9 @@
             btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Sedang Mengunduh...';
             btn.disabled = true;
 
-            // Paksa scroll ke atas agar tidak ada area yang terpotong
             window.scrollTo(0, 0);
 
-            // SIMPAN STYLE ASLI
             const originalMinHeight = element.style.minHeight;
-            
-            // HILANGKAN MIN-HEIGHT SEMENTARA
-            // Membiarkan tinggi menyesuaikan isi agar tidak menabrak batas 297mm yang memicu halaman 2
             element.style.minHeight = 'auto'; 
 
             const opt = {
@@ -565,9 +776,7 @@
             };
 
             html2pdf().set(opt).from(element).save().then(() => {
-                // KEMBALIKAN STYLE SEPERTI SEMULA SETELAH DOWNLOAD SELESAI
                 element.style.minHeight = originalMinHeight;
-                
                 btn.innerHTML = originalText;
                 btn.disabled = false;
             });
